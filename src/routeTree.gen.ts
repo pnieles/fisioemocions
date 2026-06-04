@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VisitasRouteImport } from './routes/visitas'
 import { Route as PerfilesRouteImport } from './routes/perfiles'
 import { Route as MaterialRouteImport } from './routes/material'
+import { Route as InventarioRouteImport } from './routes/inventario'
 import { Route as GastosRouteImport } from './routes/gastos'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -30,6 +31,11 @@ const MaterialRoute = MaterialRouteImport.update({
   path: '/material',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InventarioRoute = InventarioRouteImport.update({
+  id: '/inventario',
+  path: '/inventario',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GastosRoute = GastosRouteImport.update({
   id: '/gastos',
   path: '/gastos',
@@ -44,6 +50,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/gastos': typeof GastosRoute
+  '/inventario': typeof InventarioRoute
   '/material': typeof MaterialRoute
   '/perfiles': typeof PerfilesRoute
   '/visitas': typeof VisitasRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/gastos': typeof GastosRoute
+  '/inventario': typeof InventarioRoute
   '/material': typeof MaterialRoute
   '/perfiles': typeof PerfilesRoute
   '/visitas': typeof VisitasRoute
@@ -59,21 +67,36 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/gastos': typeof GastosRoute
+  '/inventario': typeof InventarioRoute
   '/material': typeof MaterialRoute
   '/perfiles': typeof PerfilesRoute
   '/visitas': typeof VisitasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/gastos' | '/material' | '/perfiles' | '/visitas'
+  fullPaths:
+    | '/'
+    | '/gastos'
+    | '/inventario'
+    | '/material'
+    | '/perfiles'
+    | '/visitas'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/gastos' | '/material' | '/perfiles' | '/visitas'
-  id: '__root__' | '/' | '/gastos' | '/material' | '/perfiles' | '/visitas'
+  to: '/' | '/gastos' | '/inventario' | '/material' | '/perfiles' | '/visitas'
+  id:
+    | '__root__'
+    | '/'
+    | '/gastos'
+    | '/inventario'
+    | '/material'
+    | '/perfiles'
+    | '/visitas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GastosRoute: typeof GastosRoute
+  InventarioRoute: typeof InventarioRoute
   MaterialRoute: typeof MaterialRoute
   PerfilesRoute: typeof PerfilesRoute
   VisitasRoute: typeof VisitasRoute
@@ -102,6 +125,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MaterialRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inventario': {
+      id: '/inventario'
+      path: '/inventario'
+      fullPath: '/inventario'
+      preLoaderRoute: typeof InventarioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gastos': {
       id: '/gastos'
       path: '/gastos'
@@ -122,6 +152,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GastosRoute: GastosRoute,
+  InventarioRoute: InventarioRoute,
   MaterialRoute: MaterialRoute,
   PerfilesRoute: PerfilesRoute,
   VisitasRoute: VisitasRoute,
@@ -129,3 +160,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
