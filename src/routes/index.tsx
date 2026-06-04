@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useExpenses, useMaterials, useProfiles, useVisits, EXPENSE_CATEGORIES } from "@/lib/data-hooks";
+import { useExpenses, useMaterials, useProfiles, useVisits } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -250,7 +250,6 @@ function Dashboard() {
         </Card>
       )}
 
-      {EXPENSE_CATEGORIES && null}
     </div>
   );
 }
