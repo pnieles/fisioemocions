@@ -34,6 +34,21 @@ export type Expense = {
   amount: number;
 };
 
+export type InventoryCount = {
+  id: string;
+  period_month: string; // YYYY-MM-01
+  item_name: string;
+  quantity: number;
+  unit_cost: number;
+  notes: string | null;
+};
+  id: string;
+  expense_date: string;
+  category: string;
+  description: string;
+  amount: number;
+};
+
 export const EXPENSE_CATEGORIES = [
   "Alquiler",
   "Útiles",
