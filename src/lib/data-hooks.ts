@@ -110,3 +110,19 @@ export function useExpenses() {
     },
   });
 }
+
+export function useInventoryCounts() {
+  return useQuery({
+    queryKey: ["inventory_counts"],
+    queryFn: async (): Promise<InventoryCount[]> => {
+      const { data, error } = await supabase
+        .from("inventory_counts")
+        .select("*")
+        .order("period_month", { ascending: false })
+        .order("item_name")
+        .limit(2000);
+      if (error) throw error;
+      return (data ?? []) as InventoryCount[];
+    },
+  });
+}
