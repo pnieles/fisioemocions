@@ -1,0 +1,171 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useProfiles, useVisits } from "@/lib/data-hooks";
+import { PageHeader } from "@/components/PageHeader";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { eur, fmtDate, todayISO } from "@/lib/format";
+import { toast } from "sonner";
+import { Trash2, Plus } from "lucide-react";
+
+export const Route = createFileRoute("/visitas")({
+  head: () => ({ meta: [{ title: "Visites · fisioemocions" }] }),
+  component: VisitsPage,
+});
+
+function VisitsPage() {
+  const { data: profiles = [] } = useProfiles();
+  const { data: visits = [] } = useVisits();
+  const qc = useQueryClient();
+
+  const [form, setForm] = useState({
+    visit_date: todayISO(),
+    patient_name: "",
+    profile_id: "",
+    amount: "",
+    notes: "",
+  });
+
+  const add = useMutation({
+    mutationFn: async () => {
+      if (!form.patient_name || !form.profile_id || !form.amount) {
+        throw new Error("Omple tots els camps requerits");
+      }
+      const { error } = await supabase.from("patient_visits").insert({
+        visit_date: form.visit_date,
+        patient_name: form.patient_name,
+        profile_id: form.profile_id,
+        amount: Number(form.amount),
+        notes: form.notes || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Visita registrada");
+      qc.invalidateQueries({ queryKey: ["visits"] });
+      setForm({ ...form, patient_name: "", amount: "", notes: "" });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const del = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("patient_visits").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Visita eliminada");
+      qc.invalidateQueries({ queryKey: ["visits"] });
+    },
+  });
+
+  const handleProfile = (id: string) => {
+    const p = profiles.find((x) => x.id === id);
+    setForm({ ...form, profile_id: id, amount: p ? String(p.default_rate) : form.amount });
+  };
+
+  const total = visits.reduce((s, v) => s + Number(v.amount), 0);
+
+  return (
+    <div className="px-10 py-8 max-w-[1400px] mx-auto">
+      <PageHeader title="Visites de pacients" subtitle="Registra cada visita amb la tarifa segons el perfil de client." />
+
+      <Card className="mb-8 shadow-[var(--shadow-card)]">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+            <Field className="md:col-span-2" label="Data">
+              <Input type="date" value={form.visit_date} onChange={(e) => setForm({ ...form, visit_date: e.target.value })} />
+            </Field>
+            <Field className="md:col-span-3" label="Pacient *">
+              <Input placeholder="Nom del pacient" value={form.patient_name} onChange={(e) => setForm({ ...form, patient_name: e.target.value })} />
+            </Field>
+            <Field className="md:col-span-2" label="Perfil *">
+              <Select value={form.profile_id} onValueChange={handleProfile}>
+                <SelectTrigger><SelectValue placeholder="Perfil" /></SelectTrigger>
+                <SelectContent>
+                  {profiles.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>{p.name} · {eur(p.default_rate)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field className="md:col-span-2" label="Import (€) *">
+              <Input type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
+            </Field>
+            <Field className="md:col-span-2" label="Notes">
+              <Input placeholder="Opcional" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+            </Field>
+            <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-1 h-10">
+              <Plus className="h-4 w-4 mr-1" /> Afegir
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-[var(--shadow-card)]">
+        <CardContent className="p-0">
+          <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-lg">Historial de visites</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">{visits.length} visites · {eur(total)} acumulat</p>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40">
+                <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
+                  <th className="px-6 py-3 font-medium">Data</th>
+                  <th className="px-6 py-3 font-medium">Pacient</th>
+                  <th className="px-6 py-3 font-medium">Perfil</th>
+                  <th className="px-6 py-3 font-medium">Notes</th>
+                  <th className="px-6 py-3 font-medium text-right">Import</th>
+                  <th className="px-6 py-3"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {visits.length === 0 && (
+                  <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Encara no hi ha visites registrades.</td></tr>
+                )}
+                {visits.map((v) => {
+                  const p = profiles.find((x) => x.id === v.profile_id);
+                  return (
+                    <tr key={v.id} className="border-t border-border hover:bg-muted/30">
+                      <td className="px-6 py-3 text-muted-foreground">{fmtDate(v.visit_date)}</td>
+                      <td className="px-6 py-3 font-medium">{v.patient_name}</td>
+                      <td className="px-6 py-3">
+                        <span className="inline-flex px-2 py-0.5 rounded-md bg-accent/10 text-accent text-xs font-medium">
+                          {p?.name ?? "—"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-muted-foreground">{v.notes ?? ""}</td>
+                      <td className="px-6 py-3 text-right tabular-nums font-medium">{eur(Number(v.amount))}</td>
+                      <td className="px-6 py-3 text-right">
+                        <button onClick={() => del.mutate(v.id)} className="text-muted-foreground hover:text-destructive">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function Field({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
+  return (
+    <div className={className}>
+      <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">{label}</Label>
+      {children}
+    </div>
+  );
+}
