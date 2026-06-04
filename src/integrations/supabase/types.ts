@@ -65,6 +65,36 @@ export type Database = {
         }
         Relationships: []
       }
+      inventory_counts: {
+        Row: {
+          created_at: string
+          id: string
+          item_name: string
+          notes: string | null
+          period_month: string
+          quantity: number
+          unit_cost: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_name: string
+          notes?: string | null
+          period_month: string
+          quantity?: number
+          unit_cost?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_name?: string
+          notes?: string | null
+          period_month?: string
+          quantity?: number
+          unit_cost?: number
+        }
+        Relationships: []
+      }
       materials: {
         Row: {
           created_at: string

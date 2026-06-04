@@ -1,11 +1,12 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, Stethoscope, Package, Receipt, Activity } from "lucide-react";
+import { LayoutDashboard, Users, Stethoscope, Package, Receipt, Activity, ClipboardList } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const nav = [
   { to: "/", label: "Panel", icon: LayoutDashboard },
   { to: "/visitas", label: "Visitas", icon: Stethoscope },
   { to: "/material", label: "Material", icon: Package },
+  { to: "/inventario", label: "Inventario", icon: ClipboardList },
   { to: "/gastos", label: "Gastos", icon: Receipt },
   { to: "/perfiles", label: "Perfiles & Tarifas", icon: Users },
 ] as const;
