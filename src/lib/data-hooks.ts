@@ -36,12 +36,39 @@ export type Expense = {
 
 export type InventoryCount = {
   id: string;
-  period_month: string; // YYYY-MM-01
+  period_month: string;
   item_name: string;
   quantity: number;
   unit_cost: number;
   notes: string | null;
 };
+
+export type Patient = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  nationality: string | null;
+  birth_date: string | null;
+  phone: string | null;
+  email: string | null;
+  notes: string | null;
+};
+
+export type Appointment = {
+  id: string;
+  patient_id: string | null;
+  profile_id: string | null;
+  appointment_at: string;
+  duration_min: number;
+  diagnosis: string | null;
+  treatment: string | null;
+  status: string;
+  reminder_sent_at: string | null;
+  notes: string | null;
+};
+
+export type Treatment = { id: string; name: string };
+
 
 export const EXPENSE_CATEGORIES = [
   "Alquiler",
@@ -126,3 +153,48 @@ export function useInventoryCounts() {
     },
   });
 }
+
+export function usePatients() {
+  return useQuery({
+    queryKey: ["patients"],
+    queryFn: async (): Promise<Patient[]> => {
+      const { data, error } = await supabase
+        .from("patients")
+        .select("*")
+        .order("last_name")
+        .limit(2000);
+      if (error) throw error;
+      return (data ?? []) as Patient[];
+    },
+  });
+}
+
+export function useAppointments() {
+  return useQuery({
+    queryKey: ["appointments"],
+    queryFn: async (): Promise<Appointment[]> => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("*")
+        .order("appointment_at", { ascending: true })
+        .limit(2000);
+      if (error) throw error;
+      return (data ?? []) as Appointment[];
+    },
+  });
+}
+
+export function useTreatments() {
+  return useQuery({
+    queryKey: ["treatments"],
+    queryFn: async (): Promise<Treatment[]> => {
+      const { data, error } = await supabase
+        .from("treatments")
+        .select("*")
+        .order("name");
+      if (error) throw error;
+      return (data ?? []) as Treatment[];
+    },
+  });
+}
+
