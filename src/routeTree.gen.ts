@@ -10,10 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VisitasRouteImport } from './routes/visitas'
+import { Route as RecordatoriosRouteImport } from './routes/recordatorios'
 import { Route as PerfilesRouteImport } from './routes/perfiles'
+import { Route as PacientesRouteImport } from './routes/pacientes'
 import { Route as MaterialRouteImport } from './routes/material'
 import { Route as InventarioRouteImport } from './routes/inventario'
 import { Route as GastosRouteImport } from './routes/gastos'
+import { Route as ConsumoRouteImport } from './routes/consumo'
+import { Route as AgendaRouteImport } from './routes/agenda'
 import { Route as IndexRouteImport } from './routes/index'
 
 const VisitasRoute = VisitasRouteImport.update({
@@ -21,9 +25,19 @@ const VisitasRoute = VisitasRouteImport.update({
   path: '/visitas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecordatoriosRoute = RecordatoriosRouteImport.update({
+  id: '/recordatorios',
+  path: '/recordatorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PerfilesRoute = PerfilesRouteImport.update({
   id: '/perfiles',
   path: '/perfiles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PacientesRoute = PacientesRouteImport.update({
+  id: '/pacientes',
+  path: '/pacientes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MaterialRoute = MaterialRouteImport.update({
@@ -41,6 +55,16 @@ const GastosRoute = GastosRouteImport.update({
   path: '/gastos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConsumoRoute = ConsumoRouteImport.update({
+  id: '/consumo',
+  path: '/consumo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgendaRoute = AgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -49,56 +73,90 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/agenda': typeof AgendaRoute
+  '/consumo': typeof ConsumoRoute
   '/gastos': typeof GastosRoute
   '/inventario': typeof InventarioRoute
   '/material': typeof MaterialRoute
+  '/pacientes': typeof PacientesRoute
   '/perfiles': typeof PerfilesRoute
+  '/recordatorios': typeof RecordatoriosRoute
   '/visitas': typeof VisitasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/agenda': typeof AgendaRoute
+  '/consumo': typeof ConsumoRoute
   '/gastos': typeof GastosRoute
   '/inventario': typeof InventarioRoute
   '/material': typeof MaterialRoute
+  '/pacientes': typeof PacientesRoute
   '/perfiles': typeof PerfilesRoute
+  '/recordatorios': typeof RecordatoriosRoute
   '/visitas': typeof VisitasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/agenda': typeof AgendaRoute
+  '/consumo': typeof ConsumoRoute
   '/gastos': typeof GastosRoute
   '/inventario': typeof InventarioRoute
   '/material': typeof MaterialRoute
+  '/pacientes': typeof PacientesRoute
   '/perfiles': typeof PerfilesRoute
+  '/recordatorios': typeof RecordatoriosRoute
   '/visitas': typeof VisitasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/agenda'
+    | '/consumo'
     | '/gastos'
     | '/inventario'
     | '/material'
+    | '/pacientes'
     | '/perfiles'
+    | '/recordatorios'
     | '/visitas'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/gastos' | '/inventario' | '/material' | '/perfiles' | '/visitas'
+  to:
+    | '/'
+    | '/agenda'
+    | '/consumo'
+    | '/gastos'
+    | '/inventario'
+    | '/material'
+    | '/pacientes'
+    | '/perfiles'
+    | '/recordatorios'
+    | '/visitas'
   id:
     | '__root__'
     | '/'
+    | '/agenda'
+    | '/consumo'
     | '/gastos'
     | '/inventario'
     | '/material'
+    | '/pacientes'
     | '/perfiles'
+    | '/recordatorios'
     | '/visitas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AgendaRoute: typeof AgendaRoute
+  ConsumoRoute: typeof ConsumoRoute
   GastosRoute: typeof GastosRoute
   InventarioRoute: typeof InventarioRoute
   MaterialRoute: typeof MaterialRoute
+  PacientesRoute: typeof PacientesRoute
   PerfilesRoute: typeof PerfilesRoute
+  RecordatoriosRoute: typeof RecordatoriosRoute
   VisitasRoute: typeof VisitasRoute
 }
 
@@ -111,11 +169,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VisitasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recordatorios': {
+      id: '/recordatorios'
+      path: '/recordatorios'
+      fullPath: '/recordatorios'
+      preLoaderRoute: typeof RecordatoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/perfiles': {
       id: '/perfiles'
       path: '/perfiles'
       fullPath: '/perfiles'
       preLoaderRoute: typeof PerfilesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pacientes': {
+      id: '/pacientes'
+      path: '/pacientes'
+      fullPath: '/pacientes'
+      preLoaderRoute: typeof PacientesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/material': {
@@ -139,6 +211,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GastosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/consumo': {
+      id: '/consumo'
+      path: '/consumo'
+      fullPath: '/consumo'
+      preLoaderRoute: typeof ConsumoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agenda': {
+      id: '/agenda'
+      path: '/agenda'
+      fullPath: '/agenda'
+      preLoaderRoute: typeof AgendaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -151,10 +237,14 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AgendaRoute: AgendaRoute,
+  ConsumoRoute: ConsumoRoute,
   GastosRoute: GastosRoute,
   InventarioRoute: InventarioRoute,
   MaterialRoute: MaterialRoute,
+  PacientesRoute: PacientesRoute,
   PerfilesRoute: PerfilesRoute,
+  RecordatoriosRoute: RecordatoriosRoute,
   VisitasRoute: VisitasRoute,
 }
 export const routeTree = rootRouteImport
