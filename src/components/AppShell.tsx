@@ -1,14 +1,18 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, Stethoscope, Package, Receipt, Activity, ClipboardList } from "lucide-react";
+import { LayoutDashboard, Users, Stethoscope, Package, Receipt, Activity, ClipboardList, CalendarDays, UserPlus, BarChart3, BellRing } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const nav = [
   { to: "/", label: "Panel", icon: LayoutDashboard },
-  { to: "/visitas", label: "Visitas", icon: Stethoscope },
+  { to: "/agenda", label: "Agenda", icon: CalendarDays },
+  { to: "/recordatorios", label: "Recordatoris", icon: BellRing },
+  { to: "/pacientes", label: "Pacients", icon: UserPlus },
+  { to: "/visitas", label: "Visites", icon: Stethoscope },
   { to: "/material", label: "Material", icon: Package },
-  { to: "/inventario", label: "Inventario", icon: ClipboardList },
-  { to: "/gastos", label: "Gastos", icon: Receipt },
-  { to: "/perfiles", label: "Perfiles & Tarifas", icon: Users },
+  { to: "/inventario", label: "Inventari", icon: ClipboardList },
+  { to: "/consumo", label: "Consum mensual", icon: BarChart3 },
+  { to: "/gastos", label: "Despeses", icon: Receipt },
+  { to: "/perfiles", label: "Perfils & Tarifes", icon: Users },
 ] as const;
 
 export function AppShell() {
