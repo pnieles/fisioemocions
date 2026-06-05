@@ -153,3 +153,48 @@ export function useInventoryCounts() {
     },
   });
 }
+
+export function usePatients() {
+  return useQuery({
+    queryKey: ["patients"],
+    queryFn: async (): Promise<Patient[]> => {
+      const { data, error } = await supabase
+        .from("patients")
+        .select("*")
+        .order("last_name")
+        .limit(2000);
+      if (error) throw error;
+      return (data ?? []) as Patient[];
+    },
+  });
+}
+
+export function useAppointments() {
+  return useQuery({
+    queryKey: ["appointments"],
+    queryFn: async (): Promise<Appointment[]> => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("*")
+        .order("appointment_at", { ascending: true })
+        .limit(2000);
+      if (error) throw error;
+      return (data ?? []) as Appointment[];
+    },
+  });
+}
+
+export function useTreatments() {
+  return useQuery({
+    queryKey: ["treatments"],
+    queryFn: async (): Promise<Treatment[]> => {
+      const { data, error } = await supabase
+        .from("treatments")
+        .select("*")
+        .order("name");
+      if (error) throw error;
+      return (data ?? []) as Treatment[];
+    },
+  });
+}
+
