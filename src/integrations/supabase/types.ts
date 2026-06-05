@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          appointment_at: string
+          created_at: string
+          diagnosis: string | null
+          duration_min: number
+          id: string
+          notes: string | null
+          patient_id: string | null
+          profile_id: string | null
+          reminder_sent_at: string | null
+          status: string
+          treatment: string | null
+          updated_at: string
+        }
+        Insert: {
+          appointment_at: string
+          created_at?: string
+          diagnosis?: string | null
+          duration_min?: number
+          id?: string
+          notes?: string | null
+          patient_id?: string | null
+          profile_id?: string | null
+          reminder_sent_at?: string | null
+          status?: string
+          treatment?: string | null
+          updated_at?: string
+        }
+        Update: {
+          appointment_at?: string
+          created_at?: string
+          diagnosis?: string | null
+          duration_min?: number
+          id?: string
+          notes?: string | null
+          patient_id?: string | null
+          profile_id?: string | null
+          reminder_sent_at?: string | null
+          status?: string
+          treatment?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_profiles: {
         Row: {
           color: string | null
@@ -162,6 +222,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      patients: {
+        Row: {
+          birth_date: string | null
+          created_at: string
+          email: string | null
+          first_name: string
+          id: string
+          last_name: string
+          nationality: string | null
+          notes: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          birth_date?: string | null
+          created_at?: string
+          email?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          nationality?: string | null
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          birth_date?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          nationality?: string | null
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      treatments: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
       }
     }
     Views: {
