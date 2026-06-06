@@ -191,6 +191,7 @@ export type Database = {
           created_at: string
           id: string
           notes: string | null
+          patient_id: string | null
           patient_name: string
           profile_id: string | null
           visit_date: string
@@ -200,6 +201,7 @@ export type Database = {
           created_at?: string
           id?: string
           notes?: string | null
+          patient_id?: string | null
           patient_name: string
           profile_id?: string | null
           visit_date?: string
@@ -209,11 +211,19 @@ export type Database = {
           created_at?: string
           id?: string
           notes?: string | null
+          patient_id?: string | null
           patient_name?: string
           profile_id?: string | null
           visit_date?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "patient_visits_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "patient_visits_profile_id_fkey"
             columns: ["profile_id"]
