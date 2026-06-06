@@ -2,16 +2,19 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useProfiles, useVisits } from "@/lib/data-hooks";
+import { useProfiles, useVisits, usePatients } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { eur, fmtDate, todayISO } from "@/lib/format";
 import { toast } from "sonner";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/visitas")({
   head: () => ({ meta: [{ title: "Visites · fisioemocions" }] }),
@@ -20,24 +23,29 @@ export const Route = createFileRoute("/visitas")({
 
 function VisitsPage() {
   const { data: profiles = [] } = useProfiles();
+  const { data: patients = [] } = usePatients();
   const { data: visits = [] } = useVisits();
   const qc = useQueryClient();
 
   const [form, setForm] = useState({
     visit_date: todayISO(),
+    patient_id: "",
     patient_name: "",
     profile_id: "",
     amount: "",
     notes: "",
   });
 
+  const [patientOpen, setPatientOpen] = useState(false);
+
   const add = useMutation({
     mutationFn: async () => {
-      if (!form.patient_name || !form.profile_id || !form.amount) {
+      if (!form.patient_id || !form.profile_id || !form.amount) {
         throw new Error("Omple tots els camps requerits");
       }
       const { error } = await supabase.from("patient_visits").insert({
         visit_date: form.visit_date,
+        patient_id: form.patient_id,
         patient_name: form.patient_name,
         profile_id: form.profile_id,
         amount: Number(form.amount),
@@ -48,7 +56,13 @@ function VisitsPage() {
     onSuccess: () => {
       toast.success("Visita registrada");
       qc.invalidateQueries({ queryKey: ["visits"] });
-      setForm({ ...form, patient_name: "", amount: "", notes: "" });
+      setForm({
+        ...form,
+        patient_id: "",
+        patient_name: "",
+        amount: "",
+        notes: "",
+      });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -69,7 +83,19 @@ function VisitsPage() {
     setForm({ ...form, profile_id: id, amount: p ? String(p.default_rate) : form.amount });
   };
 
+  const handlePatient = (id: string) => {
+    const p = patients.find((x) => x.id === id);
+    setForm({
+      ...form,
+      patient_id: id,
+      patient_name: p ? `${p.first_name} ${p.last_name}` : form.patient_name,
+    });
+    setPatientOpen(false);
+  };
+
   const total = visits.reduce((s, v) => s + Number(v.amount), 0);
+
+  const selectedPatient = patients.find((p) => p.id === form.patient_id);
 
   return (
     <div className="px-10 py-8 max-w-[1400px] mx-auto">
@@ -82,7 +108,46 @@ function VisitsPage() {
               <Input type="date" value={form.visit_date} onChange={(e) => setForm({ ...form, visit_date: e.target.value })} />
             </Field>
             <Field className="md:col-span-3" label="Pacient *">
-              <Input placeholder="Nom del pacient" value={form.patient_name} onChange={(e) => setForm({ ...form, patient_name: e.target.value })} />
+              <Popover open={patientOpen} onOpenChange={setPatientOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={patientOpen}
+                    className="w-full justify-between h-10 font-normal"
+                  >
+                    {selectedPatient
+                      ? `${selectedPatient.last_name}, ${selectedPatient.first_name}`
+                      : "Selecciona un pacient..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                  <Command>
+                    <CommandInput placeholder="Cerca pacient..." />
+                    <CommandList>
+                      <CommandEmpty>No s'ha trobat cap pacient.</CommandEmpty>
+                      <CommandGroup>
+                        {patients.map((p) => (
+                          <CommandItem
+                            key={p.id}
+                            value={`${p.last_name} ${p.first_name} ${p.phone ?? ""}`}
+                            onSelect={() => handlePatient(p.id)}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                form.patient_id === p.id ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {p.last_name}, {p.first_name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </Field>
             <Field className="md:col-span-2" label="Perfil *">
               <Select value={form.profile_id} onValueChange={handleProfile}>
@@ -132,14 +197,20 @@ function VisitsPage() {
                   <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Encara no hi ha visites registrades.</td></tr>
                 )}
                 {visits.map((v) => {
-                  const p = profiles.find((x) => x.id === v.profile_id);
+                  const prof = profiles.find((x) => x.id === v.profile_id);
+                  const pat = v.patient_id
+                    ? patients.find((x) => x.id === v.patient_id)
+                    : null;
+                  const displayName = pat
+                    ? `${pat.last_name}, ${pat.first_name}`
+                    : v.patient_name;
                   return (
                     <tr key={v.id} className="border-t border-border hover:bg-muted/30">
                       <td className="px-6 py-3 text-muted-foreground">{fmtDate(v.visit_date)}</td>
-                      <td className="px-6 py-3 font-medium">{v.patient_name}</td>
+                      <td className="px-6 py-3 font-medium">{displayName}</td>
                       <td className="px-6 py-3">
                         <span className="inline-flex px-2 py-0.5 rounded-md bg-accent/10 text-accent text-xs font-medium">
-                          {p?.name ?? "—"}
+                          {prof?.name ?? "—"}
                         </span>
                       </td>
                       <td className="px-6 py-3 text-muted-foreground">{v.notes ?? ""}</td>
