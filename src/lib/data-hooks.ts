@@ -12,6 +12,7 @@ export type Visit = {
   id: string;
   visit_date: string;
   patient_name: string;
+  patient_id: string | null;
   profile_id: string | null;
   amount: number;
   notes: string | null;
