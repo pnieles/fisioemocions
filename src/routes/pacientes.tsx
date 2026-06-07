@@ -123,7 +123,18 @@ function PatientsPage() {
             <Field className="md:col-span-4" label="Correu electrònic">
               <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             </Field>
-            <Field className="md:col-span-6" label="Notes">
+            <Field className="md:col-span-3" label="Tractament per defecte">
+              <Select value={form.default_treatment || "__none"} onValueChange={(v) => setForm({ ...form, default_treatment: v === "__none" ? "" : v })}>
+                <SelectTrigger><SelectValue placeholder="Cap" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none">— Cap —</SelectItem>
+                  {treatments.map((t) => (
+                    <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field className="md:col-span-3" label="Notes">
               <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
             </Field>
             <div className="md:col-span-2 flex gap-2">
