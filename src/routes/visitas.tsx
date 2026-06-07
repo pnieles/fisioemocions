@@ -79,6 +79,64 @@ function VisitsPage() {
     },
   });
 
+  const markApptCompleted = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("appointments").update({ status: "completed" }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["appointments"] }),
+  });
+
+  const todaysAppts = useMemo(() => {
+    const today = todayISO();
+    return appts
+      .filter((a) => a.appointment_at.slice(0, 10) === today && a.status === "scheduled")
+      .sort((a, b) => a.appointment_at.localeCompare(b.appointment_at));
+  }, [appts]);
+
+  const prefillFromAppt = (apptId: string) => {
+    const a = appts.find((x) => x.id === apptId);
+    if (!a) return;
+    const p = patients.find((x) => x.id === a.patient_id);
+    const prof = a.profile_id ? profiles.find((x) => x.id === a.profile_id) : null;
+    setForm({
+      visit_date: a.appointment_at.slice(0, 10),
+      patient_id: a.patient_id ?? "",
+      patient_name: p ? `${p.first_name} ${p.last_name}` : "",
+      profile_id: prof?.id ?? "",
+      amount: prof ? String(prof.default_rate) : "",
+      notes: a.treatment ? `Cita: ${a.treatment}` : "",
+    });
+    toast.success("Cita carregada al formulari. Revisa i desa.");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const confirmAppt = async (apptId: string) => {
+    const a = appts.find((x) => x.id === apptId);
+    if (!a) return;
+    const p = patients.find((x) => x.id === a.patient_id);
+    const prof = a.profile_id ? profiles.find((x) => x.id === a.profile_id) : null;
+    if (!a.patient_id || !prof) {
+      prefillFromAppt(apptId);
+      return;
+    }
+    const { error } = await supabase.from("patient_visits").insert({
+      visit_date: a.appointment_at.slice(0, 10),
+      patient_id: a.patient_id,
+      patient_name: p ? `${p.first_name} ${p.last_name}` : "",
+      profile_id: prof.id,
+      amount: prof.default_rate,
+      notes: a.treatment ?? null,
+    });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    await markApptCompleted.mutateAsync(apptId);
+    qc.invalidateQueries({ queryKey: ["visits"] });
+    toast.success("Visita registrada des de l'agenda");
+  };
+
   const handleProfile = (id: string) => {
     const p = profiles.find((x) => x.id === id);
     setForm({ ...form, profile_id: id, amount: p ? String(p.default_rate) : form.amount });
