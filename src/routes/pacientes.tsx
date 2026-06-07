@@ -42,6 +42,7 @@ function ageOf(birth: string | null) {
 
 function PatientsPage() {
   const { data: patients = [] } = usePatients();
+  const { data: treatments = [] } = useTreatments();
   const qc = useQueryClient();
   const [form, setForm] = useState<FormState>(empty);
   const [editing, setEditing] = useState<string | null>(null);
@@ -57,6 +58,7 @@ function PatientsPage() {
         phone: form.phone || null,
         email: form.email || null,
         notes: form.notes || null,
+        default_treatment: form.default_treatment || null,
       };
       if (editing) {
         const { error } = await supabase.from("patients").update(payload).eq("id", editing);
@@ -91,8 +93,10 @@ function PatientsPage() {
       first_name: p.first_name, last_name: p.last_name,
       nationality: p.nationality ?? "", birth_date: p.birth_date ?? "",
       phone: p.phone ?? "", email: p.email ?? "", notes: p.notes ?? "",
+      default_treatment: p.default_treatment ?? "",
     });
   };
+
 
   return (
     <div className="px-10 py-8 max-w-[1400px] mx-auto">
