@@ -160,6 +160,38 @@ function VisitsPage() {
     <div className="px-10 py-8 max-w-[1400px] mx-auto">
       <PageHeader title="Visites de pacients" subtitle="Registra cada visita amb la tarifa segons el perfil de client." />
 
+      {todaysAppts.length > 0 && (
+        <Card className="mb-6 shadow-[var(--shadow-card)]">
+          <CardContent className="p-0">
+            <div className="px-6 py-4 border-b border-border flex items-center gap-2">
+              <CalendarCheck className="h-4 w-4 text-primary" />
+              <h2 className="font-display text-lg">Agenda d'avui</h2>
+              <span className="text-xs text-muted-foreground ml-1">{todaysAppts.length} pendents</span>
+            </div>
+            <div className="divide-y divide-border">
+              {todaysAppts.map((a) => {
+                const p = patients.find((x) => x.id === a.patient_id);
+                const time = new Date(a.appointment_at).toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" });
+                return (
+                  <div key={a.id} className="px-6 py-3 flex items-center gap-4 hover:bg-muted/30">
+                    <div className="text-sm font-medium tabular-nums w-14">{time}</div>
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">{p ? `${p.last_name}, ${p.first_name}` : "—"}</div>
+                      {a.treatment && (
+                        <div className="text-xs text-muted-foreground mt-0.5">{a.treatment}</div>
+                      )}
+                    </div>
+                    <Button size="sm" variant="ghost" onClick={() => prefillFromAppt(a.id)}>Editar</Button>
+                    <Button size="sm" onClick={() => confirmAppt(a.id)}>Confirmar</Button>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+
       <Card className="mb-8 shadow-[var(--shadow-card)]">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
