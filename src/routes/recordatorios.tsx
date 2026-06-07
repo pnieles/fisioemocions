@@ -24,9 +24,15 @@ function digitsOnly(phone: string) {
   return phone.replace(/[^\d]/g, "");
 }
 
+function digitsOnly(phone: string) {
+  return phone.replace(/[^\d]/g, "");
+}
+
 function ReminderPage() {
   const { data: appts = [] } = useAppointments();
   const { data: patients = [] } = usePatients();
+  const { data: company } = useCompanySettings();
+  const { data: tpl } = useReminderTemplates();
   const qc = useQueryClient();
   const [windowHours, setWindowHours] = useState("36");
 
@@ -89,13 +95,20 @@ function ReminderPage() {
             const when = new Date(a.appointment_at);
             const name = p ? p.first_name : "pacient";
             const fullName = p ? `${p.last_name}, ${p.first_name}` : "—";
-            const msg = buildMessage(name, when);
+            const vars = {
+              name,
+              company: company?.name || "fisioemocions",
+              date: when.toLocaleDateString("ca-ES", { weekday: "long", day: "numeric", month: "long" }),
+              time: when.toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" }),
+            };
+            const waMsg = applyVars(tpl?.whatsapp || "", vars);
+            const emailSubject = applyVars(tpl?.email_subject || "", vars);
+            const emailBody = applyVars(tpl?.email_body || "", vars);
             const wa = p?.phone
-              ? `https://wa.me/${digitsOnly(p.phone)}?text=${encodeURIComponent(msg)}`
+              ? `https://wa.me/${digitsOnly(p.phone)}?text=${encodeURIComponent(waMsg)}`
               : null;
-            const subject = `Recordatori de cita · fisioemocions`;
             const mailto = p?.email
-              ? `mailto:${p.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(msg)}`
+              ? `mailto:${p.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`
               : null;
 
             return (
