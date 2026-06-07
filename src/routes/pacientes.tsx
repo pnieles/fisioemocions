@@ -25,11 +25,12 @@ type FormState = {
   phone: string;
   email: string;
   notes: string;
+  default_treatment: string;
 };
 
 const empty: FormState = {
   first_name: "", last_name: "", nationality: "", birth_date: "",
-  phone: "", email: "", notes: "",
+  phone: "", email: "", notes: "", default_treatment: "",
 };
 
 function ageOf(birth: string | null) {
