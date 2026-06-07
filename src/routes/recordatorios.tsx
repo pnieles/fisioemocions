@@ -24,9 +24,6 @@ function digitsOnly(phone: string) {
   return phone.replace(/[^\d]/g, "");
 }
 
-function digitsOnly(phone: string) {
-  return phone.replace(/[^\d]/g, "");
-}
 
 function ReminderPage() {
   const { data: appts = [] } = useAppointments();
@@ -119,8 +116,8 @@ function ReminderPage() {
                     {when.toLocaleString("ca-ES", { weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
                   </div>
                 </div>
-                <div className="md:col-span-5 text-sm text-muted-foreground bg-muted/40 rounded-md p-3 leading-relaxed">
-                  {msg}
+                <div className="md:col-span-5 text-sm text-muted-foreground bg-muted/40 rounded-md p-3 leading-relaxed whitespace-pre-wrap">
+                  {waMsg}
                 </div>
                 <div className="md:col-span-3 flex flex-wrap gap-2">
                   {wa ? (
