@@ -114,7 +114,17 @@ function AgendaPage() {
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             <Field className="md:col-span-3" label="Pacient *">
-              <Select value={form.patient_id} onValueChange={(v) => setForm({ ...form, patient_id: v })}>
+              <Select
+                value={form.patient_id}
+                onValueChange={(v) => {
+                  const p = patients.find((x) => x.id === v);
+                  setForm((f) => ({
+                    ...f,
+                    patient_id: v,
+                    treatment: p?.default_treatment || f.treatment,
+                  }));
+                }}
+              >
                 <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
                 <SelectContent>
                   {patients.map((p) => (
