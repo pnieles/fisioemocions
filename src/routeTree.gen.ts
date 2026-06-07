@@ -17,6 +17,7 @@ import { Route as MaterialRouteImport } from './routes/material'
 import { Route as InventarioRouteImport } from './routes/inventario'
 import { Route as GastosRouteImport } from './routes/gastos'
 import { Route as ConsumoRouteImport } from './routes/consumo'
+import { Route as ConfiguracionRouteImport } from './routes/configuracion'
 import { Route as AgendaRouteImport } from './routes/agenda'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -60,6 +61,11 @@ const ConsumoRoute = ConsumoRouteImport.update({
   path: '/consumo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfiguracionRoute = ConfiguracionRouteImport.update({
+  id: '/configuracion',
+  path: '/configuracion',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AgendaRoute = AgendaRouteImport.update({
   id: '/agenda',
   path: '/agenda',
@@ -74,6 +80,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/agenda': typeof AgendaRoute
+  '/configuracion': typeof ConfiguracionRoute
   '/consumo': typeof ConsumoRoute
   '/gastos': typeof GastosRoute
   '/inventario': typeof InventarioRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/agenda': typeof AgendaRoute
+  '/configuracion': typeof ConfiguracionRoute
   '/consumo': typeof ConsumoRoute
   '/gastos': typeof GastosRoute
   '/inventario': typeof InventarioRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/agenda': typeof AgendaRoute
+  '/configuracion': typeof ConfiguracionRoute
   '/consumo': typeof ConsumoRoute
   '/gastos': typeof GastosRoute
   '/inventario': typeof InventarioRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/agenda'
+    | '/configuracion'
     | '/consumo'
     | '/gastos'
     | '/inventario'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/agenda'
+    | '/configuracion'
     | '/consumo'
     | '/gastos'
     | '/inventario'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/agenda'
+    | '/configuracion'
     | '/consumo'
     | '/gastos'
     | '/inventario'
@@ -150,6 +162,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AgendaRoute: typeof AgendaRoute
+  ConfiguracionRoute: typeof ConfiguracionRoute
   ConsumoRoute: typeof ConsumoRoute
   GastosRoute: typeof GastosRoute
   InventarioRoute: typeof InventarioRoute
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsumoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/configuracion': {
+      id: '/configuracion'
+      path: '/configuracion'
+      fullPath: '/configuracion'
+      preLoaderRoute: typeof ConfiguracionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/agenda': {
       id: '/agenda'
       path: '/agenda'
@@ -238,6 +258,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AgendaRoute: AgendaRoute,
+  ConfiguracionRoute: ConfiguracionRoute,
   ConsumoRoute: ConsumoRoute,
   GastosRoute: GastosRoute,
   InventarioRoute: InventarioRoute,
@@ -250,3 +271,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
