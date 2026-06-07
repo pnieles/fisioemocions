@@ -53,6 +53,7 @@ export type Patient = {
   phone: string | null;
   email: string | null;
   notes: string | null;
+  default_treatment: string | null;
 };
 
 export type Appointment = {
