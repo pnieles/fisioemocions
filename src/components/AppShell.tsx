@@ -1,6 +1,7 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, Stethoscope, Package, Receipt, Activity, ClipboardList, CalendarDays, UserPlus, BarChart3, BellRing } from "lucide-react";
+import { LayoutDashboard, Users, Stethoscope, Package, Receipt, Activity, ClipboardList, CalendarDays, UserPlus, BarChart3, BellRing, Settings as SettingsIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCompanySettings } from "@/lib/data-hooks";
 
 const nav = [
   { to: "/", label: "Panel", icon: LayoutDashboard },
@@ -13,20 +14,27 @@ const nav = [
   { to: "/consumo", label: "Consum mensual", icon: BarChart3 },
   { to: "/gastos", label: "Despeses", icon: Receipt },
   { to: "/perfiles", label: "Perfils & Tarifes", icon: Users },
+  { to: "/configuracion", label: "Configuració", icon: SettingsIcon },
 ] as const;
 
 export function AppShell() {
   const { location } = useRouterState();
+  const { data: company } = useCompanySettings();
+  const companyName = company?.name || "fisioemocions";
   return (
     <div className="flex min-h-screen bg-background">
       <aside className="w-64 shrink-0 bg-sidebar text-sidebar-foreground flex flex-col">
         <div className="px-6 py-7 border-b border-sidebar-border">
           <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-md bg-sidebar-primary/15 flex items-center justify-center">
-              <Activity className="h-5 w-5 text-sidebar-primary" strokeWidth={2.2} />
-            </div>
+            {company?.logo_url ? (
+              <img src={company.logo_url} alt={companyName} className="h-9 w-9 rounded-md object-cover bg-sidebar-primary/10" />
+            ) : (
+              <div className="h-9 w-9 rounded-md bg-sidebar-primary/15 flex items-center justify-center">
+                <Activity className="h-5 w-5 text-sidebar-primary" strokeWidth={2.2} />
+              </div>
+            )}
             <div>
-              <div className="font-display text-xl leading-none">fisioemocions</div>
+              <div className="font-display text-xl leading-none">{companyName}</div>
               <div className="text-[11px] uppercase tracking-[0.18em] text-sidebar-foreground/55 mt-1">
                 Centre de fisioteràpia
               </div>

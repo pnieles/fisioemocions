@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useProfiles, useVisits, usePatients } from "@/lib/data-hooks";
+import { useProfiles, useVisits, usePatients, useAppointments } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { eur, fmtDate, todayISO } from "@/lib/format";
 import { toast } from "sonner";
-import { Trash2, Plus, Check, ChevronsUpDown } from "lucide-react";
+import { Trash2, Plus, Check, ChevronsUpDown, CalendarCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/visitas")({
@@ -25,6 +25,7 @@ function VisitsPage() {
   const { data: profiles = [] } = useProfiles();
   const { data: patients = [] } = usePatients();
   const { data: visits = [] } = useVisits();
+  const { data: appts = [] } = useAppointments();
   const qc = useQueryClient();
 
   const [form, setForm] = useState({
@@ -78,6 +79,64 @@ function VisitsPage() {
     },
   });
 
+  const markApptCompleted = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("appointments").update({ status: "completed" }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["appointments"] }),
+  });
+
+  const todaysAppts = useMemo(() => {
+    const today = todayISO();
+    return appts
+      .filter((a) => a.appointment_at.slice(0, 10) === today && a.status === "scheduled")
+      .sort((a, b) => a.appointment_at.localeCompare(b.appointment_at));
+  }, [appts]);
+
+  const prefillFromAppt = (apptId: string) => {
+    const a = appts.find((x) => x.id === apptId);
+    if (!a) return;
+    const p = patients.find((x) => x.id === a.patient_id);
+    const prof = a.profile_id ? profiles.find((x) => x.id === a.profile_id) : null;
+    setForm({
+      visit_date: a.appointment_at.slice(0, 10),
+      patient_id: a.patient_id ?? "",
+      patient_name: p ? `${p.first_name} ${p.last_name}` : "",
+      profile_id: prof?.id ?? "",
+      amount: prof ? String(prof.default_rate) : "",
+      notes: a.treatment ? `Cita: ${a.treatment}` : "",
+    });
+    toast.success("Cita carregada al formulari. Revisa i desa.");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const confirmAppt = async (apptId: string) => {
+    const a = appts.find((x) => x.id === apptId);
+    if (!a) return;
+    const p = patients.find((x) => x.id === a.patient_id);
+    const prof = a.profile_id ? profiles.find((x) => x.id === a.profile_id) : null;
+    if (!a.patient_id || !prof) {
+      prefillFromAppt(apptId);
+      return;
+    }
+    const { error } = await supabase.from("patient_visits").insert({
+      visit_date: a.appointment_at.slice(0, 10),
+      patient_id: a.patient_id,
+      patient_name: p ? `${p.first_name} ${p.last_name}` : "",
+      profile_id: prof.id,
+      amount: prof.default_rate,
+      notes: a.treatment ?? null,
+    });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    await markApptCompleted.mutateAsync(apptId);
+    qc.invalidateQueries({ queryKey: ["visits"] });
+    toast.success("Visita registrada des de l'agenda");
+  };
+
   const handleProfile = (id: string) => {
     const p = profiles.find((x) => x.id === id);
     setForm({ ...form, profile_id: id, amount: p ? String(p.default_rate) : form.amount });
@@ -100,6 +159,38 @@ function VisitsPage() {
   return (
     <div className="px-10 py-8 max-w-[1400px] mx-auto">
       <PageHeader title="Visites de pacients" subtitle="Registra cada visita amb la tarifa segons el perfil de client." />
+
+      {todaysAppts.length > 0 && (
+        <Card className="mb-6 shadow-[var(--shadow-card)]">
+          <CardContent className="p-0">
+            <div className="px-6 py-4 border-b border-border flex items-center gap-2">
+              <CalendarCheck className="h-4 w-4 text-primary" />
+              <h2 className="font-display text-lg">Agenda d'avui</h2>
+              <span className="text-xs text-muted-foreground ml-1">{todaysAppts.length} pendents</span>
+            </div>
+            <div className="divide-y divide-border">
+              {todaysAppts.map((a) => {
+                const p = patients.find((x) => x.id === a.patient_id);
+                const time = new Date(a.appointment_at).toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" });
+                return (
+                  <div key={a.id} className="px-6 py-3 flex items-center gap-4 hover:bg-muted/30">
+                    <div className="text-sm font-medium tabular-nums w-14">{time}</div>
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">{p ? `${p.last_name}, ${p.first_name}` : "—"}</div>
+                      {a.treatment && (
+                        <div className="text-xs text-muted-foreground mt-0.5">{a.treatment}</div>
+                      )}
+                    </div>
+                    <Button size="sm" variant="ghost" onClick={() => prefillFromAppt(a.id)}>Editar</Button>
+                    <Button size="sm" onClick={() => confirmAppt(a.id)}>Confirmar</Button>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
 
       <Card className="mb-8 shadow-[var(--shadow-card)]">
         <CardContent className="p-6">
