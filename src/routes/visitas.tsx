@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useProfiles, useVisits, usePatients } from "@/lib/data-hooks";
+import { useProfiles, useVisits, usePatients, useAppointments } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { eur, fmtDate, todayISO } from "@/lib/format";
 import { toast } from "sonner";
-import { Trash2, Plus, Check, ChevronsUpDown } from "lucide-react";
+import { Trash2, Plus, Check, ChevronsUpDown, CalendarCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/visitas")({
@@ -25,6 +25,7 @@ function VisitsPage() {
   const { data: profiles = [] } = useProfiles();
   const { data: patients = [] } = usePatients();
   const { data: visits = [] } = useVisits();
+  const { data: appts = [] } = useAppointments();
   const qc = useQueryClient();
 
   const [form, setForm] = useState({
