@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MessageCircle, Mail, Check, BellRing } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/recordatorios")({
