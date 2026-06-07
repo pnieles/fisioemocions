@@ -70,6 +70,49 @@ export type Appointment = {
 
 export type Treatment = { id: string; name: string };
 
+export type CompanySettings = { name: string; logo_url: string | null };
+export type ReminderTemplates = {
+  whatsapp: string;
+  email_subject: string;
+  email_body: string;
+};
+
+export function useCompanySettings() {
+  return useQuery({
+    queryKey: ["settings", "company"],
+    queryFn: async (): Promise<CompanySettings> => {
+      const { data, error } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "company")
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.value as CompanySettings) ?? { name: "fisioemocions", logo_url: null };
+    },
+  });
+}
+
+export function useReminderTemplates() {
+  return useQuery({
+    queryKey: ["settings", "reminder_templates"],
+    queryFn: async (): Promise<ReminderTemplates> => {
+      const { data, error } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "reminder_templates")
+        .maybeSingle();
+      if (error) throw error;
+      return (
+        (data?.value as ReminderTemplates) ?? {
+          whatsapp: "",
+          email_subject: "",
+          email_body: "",
+        }
+      );
+    },
+  });
+}
+
 
 export const EXPENSE_CATEGORIES = [
   "Alquiler",
