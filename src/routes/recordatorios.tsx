@@ -2,12 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAppointments, usePatients } from "@/lib/data-hooks";
+import { useAppointments, usePatients, useCompanySettings, useReminderTemplates } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MessageCircle, Mail, Check, BellRing } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/recordatorios")({
@@ -15,10 +16,8 @@ export const Route = createFileRoute("/recordatorios")({
   component: ReminderPage,
 });
 
-function buildMessage(name: string, when: Date) {
-  const dateStr = when.toLocaleDateString("ca-ES", { weekday: "long", day: "numeric", month: "long" });
-  const timeStr = when.toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" });
-  return `Hola ${name}, et recordem la teva cita a fisioemocions el ${dateStr} a les ${timeStr}. Si no pots assistir, si us plau avisa'ns. Gràcies!`;
+function applyVars(template: string, vars: Record<string, string>) {
+  return template.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
 }
 
 function digitsOnly(phone: string) {
