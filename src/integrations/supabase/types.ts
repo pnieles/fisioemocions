@@ -255,6 +255,7 @@ export type Database = {
         Row: {
           birth_date: string | null
           created_at: string
+          default_treatment: string | null
           email: string | null
           first_name: string
           id: string
@@ -267,6 +268,7 @@ export type Database = {
         Insert: {
           birth_date?: string | null
           created_at?: string
+          default_treatment?: string | null
           email?: string | null
           first_name: string
           id?: string
@@ -279,6 +281,7 @@ export type Database = {
         Update: {
           birth_date?: string | null
           created_at?: string
+          default_treatment?: string | null
           email?: string | null
           first_name?: string
           id?: string

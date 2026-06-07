@@ -2,12 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { usePatients, type Patient } from "@/lib/data-hooks";
+import { usePatients, useTreatments, type Patient } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Trash2, Plus, Phone, Mail } from "lucide-react";
 
@@ -24,11 +25,12 @@ type FormState = {
   phone: string;
   email: string;
   notes: string;
+  default_treatment: string;
 };
 
 const empty: FormState = {
   first_name: "", last_name: "", nationality: "", birth_date: "",
-  phone: "", email: "", notes: "",
+  phone: "", email: "", notes: "", default_treatment: "",
 };
 
 function ageOf(birth: string | null) {
@@ -40,6 +42,7 @@ function ageOf(birth: string | null) {
 
 function PatientsPage() {
   const { data: patients = [] } = usePatients();
+  const { data: treatments = [] } = useTreatments();
   const qc = useQueryClient();
   const [form, setForm] = useState<FormState>(empty);
   const [editing, setEditing] = useState<string | null>(null);
@@ -55,6 +58,7 @@ function PatientsPage() {
         phone: form.phone || null,
         email: form.email || null,
         notes: form.notes || null,
+        default_treatment: form.default_treatment || null,
       };
       if (editing) {
         const { error } = await supabase.from("patients").update(payload).eq("id", editing);
@@ -89,8 +93,10 @@ function PatientsPage() {
       first_name: p.first_name, last_name: p.last_name,
       nationality: p.nationality ?? "", birth_date: p.birth_date ?? "",
       phone: p.phone ?? "", email: p.email ?? "", notes: p.notes ?? "",
+      default_treatment: p.default_treatment ?? "",
     });
   };
+
 
   return (
     <div className="px-10 py-8 max-w-[1400px] mx-auto">
@@ -117,7 +123,18 @@ function PatientsPage() {
             <Field className="md:col-span-4" label="Correu electrònic">
               <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             </Field>
-            <Field className="md:col-span-6" label="Notes">
+            <Field className="md:col-span-3" label="Tractament per defecte">
+              <Select value={form.default_treatment || "__none"} onValueChange={(v) => setForm({ ...form, default_treatment: v === "__none" ? "" : v })}>
+                <SelectTrigger><SelectValue placeholder="Cap" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none">— Cap —</SelectItem>
+                  {treatments.map((t) => (
+                    <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field className="md:col-span-3" label="Notes">
               <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
             </Field>
             <div className="md:col-span-2 flex gap-2">
