@@ -15,6 +15,7 @@ import { Route as PerfilesRouteImport } from './routes/perfiles'
 import { Route as PacientesRouteImport } from './routes/pacientes'
 import { Route as MaterialRouteImport } from './routes/material'
 import { Route as InventarioRouteImport } from './routes/inventario'
+import { Route as InformesRouteImport } from './routes/informes'
 import { Route as GastosRouteImport } from './routes/gastos'
 import { Route as ConsumoRouteImport } from './routes/consumo'
 import { Route as ConfiguracionRouteImport } from './routes/configuracion'
@@ -51,6 +52,11 @@ const InventarioRoute = InventarioRouteImport.update({
   path: '/inventario',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InformesRoute = InformesRouteImport.update({
+  id: '/informes',
+  path: '/informes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GastosRoute = GastosRouteImport.update({
   id: '/gastos',
   path: '/gastos',
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/configuracion': typeof ConfiguracionRoute
   '/consumo': typeof ConsumoRoute
   '/gastos': typeof GastosRoute
+  '/informes': typeof InformesRoute
   '/inventario': typeof InventarioRoute
   '/material': typeof MaterialRoute
   '/pacientes': typeof PacientesRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/configuracion': typeof ConfiguracionRoute
   '/consumo': typeof ConsumoRoute
   '/gastos': typeof GastosRoute
+  '/informes': typeof InformesRoute
   '/inventario': typeof InventarioRoute
   '/material': typeof MaterialRoute
   '/pacientes': typeof PacientesRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/configuracion': typeof ConfiguracionRoute
   '/consumo': typeof ConsumoRoute
   '/gastos': typeof GastosRoute
+  '/informes': typeof InformesRoute
   '/inventario': typeof InventarioRoute
   '/material': typeof MaterialRoute
   '/pacientes': typeof PacientesRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/configuracion'
     | '/consumo'
     | '/gastos'
+    | '/informes'
     | '/inventario'
     | '/material'
     | '/pacientes'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/configuracion'
     | '/consumo'
     | '/gastos'
+    | '/informes'
     | '/inventario'
     | '/material'
     | '/pacientes'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/configuracion'
     | '/consumo'
     | '/gastos'
+    | '/informes'
     | '/inventario'
     | '/material'
     | '/pacientes'
@@ -165,6 +177,7 @@ export interface RootRouteChildren {
   ConfiguracionRoute: typeof ConfiguracionRoute
   ConsumoRoute: typeof ConsumoRoute
   GastosRoute: typeof GastosRoute
+  InformesRoute: typeof InformesRoute
   InventarioRoute: typeof InventarioRoute
   MaterialRoute: typeof MaterialRoute
   PacientesRoute: typeof PacientesRoute
@@ -217,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InventarioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/informes': {
+      id: '/informes'
+      path: '/informes'
+      fullPath: '/informes'
+      preLoaderRoute: typeof InformesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gastos': {
       id: '/gastos'
       path: '/gastos'
@@ -261,6 +281,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConfiguracionRoute: ConfiguracionRoute,
   ConsumoRoute: ConsumoRoute,
   GastosRoute: GastosRoute,
+  InformesRoute: InformesRoute,
   InventarioRoute: InventarioRoute,
   MaterialRoute: MaterialRoute,
   PacientesRoute: PacientesRoute,
@@ -271,3 +292,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

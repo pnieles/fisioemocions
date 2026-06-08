@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAppointments, usePatients, useProfiles, useTreatments } from "@/lib/data-hooks";
+import { useAppointments, usePatients, useProfiles, useTreatments, useScheduleSettings } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/agenda")({
   head: () => ({ meta: [{ title: "Agenda · fisioemocions" }] }),
@@ -21,6 +22,30 @@ export const Route = createFileRoute("/agenda")({
 function localISOForInput(d = new Date()) {
   const off = d.getTimezoneOffset();
   return new Date(d.getTime() - off * 60000).toISOString().slice(0, 16);
+}
+
+function startOfWeek(d: Date) {
+  const x = new Date(d);
+  const day = x.getDay();
+  const diff = day === 0 ? -6 : 1 - day; // Mon as start
+  x.setDate(x.getDate() + diff);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+
+function fmtHM(mins: number) {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+function parseHM(s: string) {
+  const [h, m] = s.split(":").map(Number);
+  return h * 60 + (m || 0);
+}
+
+function dateToISODate(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 const empty = {
@@ -39,9 +64,11 @@ function AgendaPage() {
   const { data: patients = [] } = usePatients();
   const { data: profiles = [] } = useProfiles();
   const { data: treatments = [] } = useTreatments();
+  const { data: schedule } = useScheduleSettings();
   const qc = useQueryClient();
   const [form, setForm] = useState(empty);
   const [filter, setFilter] = useState<"upcoming" | "past" | "all">("upcoming");
+  const [weekStart, setWeekStart] = useState<Date>(() => startOfWeek(new Date()));
 
   const add = useMutation({
     mutationFn: async () => {
@@ -106,11 +133,150 @@ function AgendaPage() {
     return p ? `${p.last_name}, ${p.first_name}` : "—";
   };
 
+  // Weekly view
+  const sch = schedule ?? { open: "09:00", close: "20:00", slot_min: 30, weekdays: [1,2,3,4,5,6], holidays: [] };
+  const openMin = parseHM(sch.open);
+  const closeMin = parseHM(sch.close);
+  const slotMin = sch.slot_min || 30;
+  const slotsPerDay = Math.max(0, Math.ceil((closeMin - openMin) / slotMin));
+  const days = useMemo(() => {
+    return Array.from({ length: 7 }).map((_, i) => {
+      const d = new Date(weekStart);
+      d.setDate(d.getDate() + i);
+      return d;
+    });
+  }, [weekStart]);
+
+  type Busy = { startMin: number; endMin: number; appt: typeof appts[number] };
+  const busyByDay = useMemo(() => {
+    const m = new Map<string, Busy[]>();
+    for (const a of appts) {
+      const d = new Date(a.appointment_at);
+      const key = dateToISODate(d);
+      const sMin = d.getHours() * 60 + d.getMinutes();
+      const eMin = sMin + (a.duration_min || 30);
+      const arr = m.get(key) ?? [];
+      arr.push({ startMin: sMin, endMin: eMin, appt: a });
+      m.set(key, arr);
+    }
+    return m;
+  }, [appts]);
+
+  const pickSlot = (day: Date, mins: number) => {
+    const d = new Date(day);
+    d.setHours(0, 0, 0, 0);
+    d.setMinutes(mins);
+    setForm((f) => ({ ...f, appointment_at: localISOForInput(d) }));
+    toast.success(`Slot seleccionat: ${d.toLocaleString("ca-ES", { dateStyle: "short", timeStyle: "short" })}`);
+    const el = document.getElementById("agenda-form");
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const shiftWeek = (n: number) => {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() + n * 7);
+    setWeekStart(d);
+  };
+
   return (
     <div className="px-10 py-8 max-w-[1400px] mx-auto">
-      <PageHeader title="Agenda de cites" subtitle="Programa cites amb diagnòstic i tractament aplicat." />
+      <PageHeader title="Agenda de cites" subtitle="Vista setmanal amb hores lliures i ocupades. Clica una hora lliure per crear cita." />
 
-      <Card className="mb-8 shadow-[var(--shadow-card)]">
+      {/* Weekly view */}
+      <Card className="mb-6 shadow-[var(--shadow-card)]">
+        <CardContent className="p-0">
+          <div className="px-6 py-3 border-b border-border flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" onClick={() => shiftWeek(-1)}><ChevronLeft className="h-4 w-4" /></Button>
+              <div className="font-display text-lg">
+                Setmana del {weekStart.toLocaleDateString("ca-ES", { day: "2-digit", month: "long", year: "numeric" })}
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => shiftWeek(1)}><ChevronRight className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="sm" onClick={() => setWeekStart(startOfWeek(new Date()))}>Avui</Button>
+            </div>
+            <div className="text-xs text-muted-foreground flex items-center gap-3">
+              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-muted border border-border" /> Lliure</span>
+              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-primary/80" /> Ocupat</span>
+              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-destructive/30 border border-destructive/50" /> Tancat</span>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <div className="min-w-[800px] grid" style={{ gridTemplateColumns: `64px repeat(7, minmax(0, 1fr))` }}>
+              {/* header row */}
+              <div></div>
+              {days.map((d) => {
+                const iso = dateToISODate(d);
+                const isHoliday = sch.holidays.includes(iso);
+                const isWeekend = !sch.weekdays.includes(d.getDay());
+                const closed = isHoliday || isWeekend;
+                const isToday = iso === dateToISODate(new Date());
+                return (
+                  <div key={iso} className={cn(
+                    "px-2 py-2 text-center border-l border-b border-border",
+                    isToday && "bg-accent/5",
+                  )}>
+                    <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                      {d.toLocaleDateString("ca-ES", { weekday: "short" })}
+                    </div>
+                    <div className={cn("font-display text-base", isToday && "text-primary")}>
+                      {d.getDate()}
+                    </div>
+                    {closed && <div className="text-[10px] text-destructive mt-0.5">{isHoliday ? "Festiu" : "Tancat"}</div>}
+                  </div>
+                );
+              })}
+              {/* time rows */}
+              {Array.from({ length: slotsPerDay }).map((_, sIdx) => {
+                const mins = openMin + sIdx * slotMin;
+                return (
+                  <>
+                    <div key={`t-${sIdx}`} className="px-2 py-1 text-[11px] text-muted-foreground text-right border-t border-border">
+                      {fmtHM(mins)}
+                    </div>
+                    {days.map((d) => {
+                      const iso = dateToISODate(d);
+                      const isHoliday = sch.holidays.includes(iso);
+                      const isWeekend = !sch.weekdays.includes(d.getDay());
+                      const closed = isHoliday || isWeekend;
+                      const slotEnd = mins + slotMin;
+                      const busy = (busyByDay.get(iso) ?? []).find((b) => b.startMin < slotEnd && b.endMin > mins);
+                      if (closed) {
+                        return <div key={`${iso}-${sIdx}`} className="border-t border-l border-border bg-destructive/10" style={{ minHeight: 28 }} />;
+                      }
+                      if (busy) {
+                        const p = patients.find((x) => x.id === busy.appt.patient_id);
+                        const isStart = busy.startMin === mins;
+                        return (
+                          <div
+                            key={`${iso}-${sIdx}`}
+                            title={`${p ? p.last_name + ", " + p.first_name : "Cita"} · ${fmtHM(busy.startMin)}-${fmtHM(busy.endMin)}`}
+                            className="border-t border-l border-border bg-primary/80 text-primary-foreground text-[10px] px-1 overflow-hidden"
+                            style={{ minHeight: 28 }}
+                          >
+                            {isStart && (
+                              <div className="truncate font-medium">{p ? `${p.last_name}, ${p.first_name}` : "Cita"}</div>
+                            )}
+                          </div>
+                        );
+                      }
+                      return (
+                        <button
+                          key={`${iso}-${sIdx}`}
+                          onClick={() => pickSlot(d, mins)}
+                          className="border-t border-l border-border bg-card hover:bg-accent/15 transition text-[10px] text-transparent hover:text-foreground"
+                          style={{ minHeight: 28 }}
+                        >+ {fmtHM(mins)}</button>
+                      );
+                    })}
+                  </>
+                );
+              })}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card id="agenda-form" className="mb-8 shadow-[var(--shadow-card)]">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             <Field className="md:col-span-3" label="Pacient *">
