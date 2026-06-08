@@ -77,6 +77,34 @@ export type ReminderTemplates = {
   email_subject: string;
   email_body: string;
 };
+export type ScheduleSettings = {
+  open: string;
+  close: string;
+  slot_min: number;
+  weekdays: number[];
+  holidays: string[];
+};
+
+export function useScheduleSettings() {
+  return useQuery({
+    queryKey: ["settings", "schedule"],
+    queryFn: async (): Promise<ScheduleSettings> => {
+      const { data, error } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "schedule")
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.value as ScheduleSettings) ?? {
+        open: "09:00",
+        close: "20:00",
+        slot_min: 30,
+        weekdays: [1, 2, 3, 4, 5, 6],
+        holidays: [],
+      };
+    },
+  });
+}
 
 export function useCompanySettings() {
   return useQuery({

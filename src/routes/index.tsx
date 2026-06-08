@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [{ title: "Panel · fisioemocions" }],
+    meta: [{ title: "Resultats Explotació · fisioemocions" }],
   }),
   component: Dashboard,
 });
@@ -119,7 +119,7 @@ function Dashboard() {
   return (
     <div className="px-10 py-8 max-w-[1400px] mx-auto">
       <PageHeader
-        title="Panel de control"
+        title="Resultats Explotació"
         subtitle="Compte d'explotació, ingressos per perfil i despeses del centre."
         actions={
           <div className="flex items-center gap-2">
