@@ -229,8 +229,8 @@ function AgendaPage() {
               {Array.from({ length: slotsPerDay }).map((_, sIdx) => {
                 const mins = openMin + sIdx * slotMin;
                 return (
-                  <>
-                    <div key={`t-${sIdx}`} className="px-2 py-1 text-[11px] text-muted-foreground text-right border-t border-border">
+                  <Fragment key={`row-${sIdx}`}>
+                    <div className="px-2 py-1 text-[11px] text-muted-foreground text-right border-t border-border">
                       {fmtHM(mins)}
                     </div>
                     {days.map((d) => {
@@ -268,7 +268,7 @@ function AgendaPage() {
                         >+ {fmtHM(mins)}</button>
                       );
                     })}
-                  </>
+                  </Fragment>
                 );
               })}
             </div>
