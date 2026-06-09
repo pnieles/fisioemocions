@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, Stethoscope, Package, Receipt, Activity, ClipboardList, CalendarDays, UserPlus, BarChart3, BellRing, Settings as SettingsIcon, Boxes, FileBarChart } from "lucide-react";
+import { LayoutDashboard, Stethoscope, Package, Receipt, Activity, ClipboardList, CalendarDays, UserPlus, BarChart3, BellRing, Settings as SettingsIcon, Boxes, FileBarChart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCompanySettings } from "@/lib/data-hooks";
 
