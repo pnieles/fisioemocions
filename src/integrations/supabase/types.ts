@@ -255,6 +255,7 @@ export type Database = {
         Row: {
           birth_date: string | null
           created_at: string
+          default_profile_id: string | null
           default_treatment: string | null
           email: string | null
           first_name: string
@@ -262,12 +263,14 @@ export type Database = {
           last_name: string
           nationality: string | null
           notes: string | null
+          passport_id: string | null
           phone: string | null
           updated_at: string
         }
         Insert: {
           birth_date?: string | null
           created_at?: string
+          default_profile_id?: string | null
           default_treatment?: string | null
           email?: string | null
           first_name: string
@@ -275,12 +278,14 @@ export type Database = {
           last_name: string
           nationality?: string | null
           notes?: string | null
+          passport_id?: string | null
           phone?: string | null
           updated_at?: string
         }
         Update: {
           birth_date?: string | null
           created_at?: string
+          default_profile_id?: string | null
           default_treatment?: string | null
           email?: string | null
           first_name?: string
@@ -288,10 +293,19 @@ export type Database = {
           last_name?: string
           nationality?: string | null
           notes?: string | null
+          passport_id?: string | null
           phone?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "patients_default_profile_id_fkey"
+            columns: ["default_profile_id"]
+            isOneToOne: false
+            referencedRelation: "client_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       treatments: {
         Row: {

@@ -288,6 +288,7 @@ function AgendaPage() {
                     ...f,
                     patient_id: v,
                     treatment: p?.default_treatment || f.treatment,
+                    profile_id: p?.default_profile_id || f.profile_id,
                   }));
                 }}
               >

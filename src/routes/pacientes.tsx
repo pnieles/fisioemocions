@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { usePatients, useTreatments, type Patient } from "@/lib/data-hooks";
+import { usePatients, useTreatments, useProfiles, type Patient } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,11 +26,14 @@ type FormState = {
   email: string;
   notes: string;
   default_treatment: string;
+  passport_id: string;
+  default_profile_id: string;
 };
 
 const empty: FormState = {
   first_name: "", last_name: "", nationality: "", birth_date: "",
-  phone: "", email: "", notes: "", default_treatment: "",
+  phone: "+376 ", email: "", notes: "", default_treatment: "",
+  passport_id: "", default_profile_id: "",
 };
 
 function ageOf(birth: string | null) {
@@ -43,6 +46,7 @@ function ageOf(birth: string | null) {
 function PatientsPage() {
   const { data: patients = [] } = usePatients();
   const { data: treatments = [] } = useTreatments();
+  const { data: profiles = [] } = useProfiles();
   const qc = useQueryClient();
   const [form, setForm] = useState<FormState>(empty);
   const [editing, setEditing] = useState<string | null>(null);
@@ -50,15 +54,23 @@ function PatientsPage() {
   const save = useMutation({
     mutationFn: async () => {
       if (!form.first_name || !form.last_name) throw new Error("Nom i cognoms obligatoris");
+      const cleanPhone = form.phone.replace(/[\s+\-]/g, "");
+      const hasPhone = cleanPhone.length > 0;
+      const hasEmail = form.email.trim().length > 0;
+      if (!hasPhone && !hasEmail) {
+        throw new Error("Cal omplir telèfon o correu electrònic per poder enviar avisos");
+      }
       const payload = {
         first_name: form.first_name,
         last_name: form.last_name,
         nationality: form.nationality || null,
         birth_date: form.birth_date || null,
-        phone: form.phone || null,
-        email: form.email || null,
+        phone: hasPhone ? form.phone.trim() : null,
+        email: hasEmail ? form.email.trim() : null,
         notes: form.notes || null,
         default_treatment: form.default_treatment || null,
+        passport_id: form.passport_id || null,
+        default_profile_id: form.default_profile_id || null,
       };
       if (editing) {
         const { error } = await supabase.from("patients").update(payload).eq("id", editing);
@@ -92,8 +104,10 @@ function PatientsPage() {
     setForm({
       first_name: p.first_name, last_name: p.last_name,
       nationality: p.nationality ?? "", birth_date: p.birth_date ?? "",
-      phone: p.phone ?? "", email: p.email ?? "", notes: p.notes ?? "",
+      phone: p.phone ?? "+376 ", email: p.email ?? "", notes: p.notes ?? "",
       default_treatment: p.default_treatment ?? "",
+      passport_id: p.passport_id ?? "",
+      default_profile_id: p.default_profile_id ?? "",
     });
   };
 
@@ -118,10 +132,24 @@ function PatientsPage() {
               <Input type="date" value={form.birth_date} onChange={(e) => setForm({ ...form, birth_date: e.target.value })} />
             </Field>
             <Field className="md:col-span-2" label="Telèfon (WhatsApp)">
-              <Input placeholder="+34 600 000 000" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              <Input placeholder="+376 ..." value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             </Field>
             <Field className="md:col-span-4" label="Correu electrònic">
               <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            </Field>
+            <Field className="md:col-span-3" label="Censo / Passaport">
+              <Input value={form.passport_id} onChange={(e) => setForm({ ...form, passport_id: e.target.value })} />
+            </Field>
+            <Field className="md:col-span-3" label="Perfil per defecte">
+              <Select value={form.default_profile_id || "__none"} onValueChange={(v) => setForm({ ...form, default_profile_id: v === "__none" ? "" : v })}>
+                <SelectTrigger><SelectValue placeholder="Cap" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none">— Cap —</SelectItem>
+                  {profiles.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
             <Field className="md:col-span-3" label="Tractament per defecte">
               <Select value={form.default_treatment || "__none"} onValueChange={(v) => setForm({ ...form, default_treatment: v === "__none" ? "" : v })}>
