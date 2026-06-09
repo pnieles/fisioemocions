@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { usePatients, useTreatments, type Patient } from "@/lib/data-hooks";
+import { usePatients, useTreatments, useProfiles, type Patient } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,11 +26,14 @@ type FormState = {
   email: string;
   notes: string;
   default_treatment: string;
+  passport_id: string;
+  default_profile_id: string;
 };
 
 const empty: FormState = {
   first_name: "", last_name: "", nationality: "", birth_date: "",
-  phone: "", email: "", notes: "", default_treatment: "",
+  phone: "+376 ", email: "", notes: "", default_treatment: "",
+  passport_id: "", default_profile_id: "",
 };
 
 function ageOf(birth: string | null) {
@@ -43,6 +46,7 @@ function ageOf(birth: string | null) {
 function PatientsPage() {
   const { data: patients = [] } = usePatients();
   const { data: treatments = [] } = useTreatments();
+  const { data: profiles = [] } = useProfiles();
   const qc = useQueryClient();
   const [form, setForm] = useState<FormState>(empty);
   const [editing, setEditing] = useState<string | null>(null);
