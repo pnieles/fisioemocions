@@ -54,15 +54,23 @@ function PatientsPage() {
   const save = useMutation({
     mutationFn: async () => {
       if (!form.first_name || !form.last_name) throw new Error("Nom i cognoms obligatoris");
+      const cleanPhone = form.phone.replace(/[\s+\-]/g, "");
+      const hasPhone = cleanPhone.length > 0;
+      const hasEmail = form.email.trim().length > 0;
+      if (!hasPhone && !hasEmail) {
+        throw new Error("Cal omplir telèfon o correu electrònic per poder enviar avisos");
+      }
       const payload = {
         first_name: form.first_name,
         last_name: form.last_name,
         nationality: form.nationality || null,
         birth_date: form.birth_date || null,
-        phone: form.phone || null,
-        email: form.email || null,
+        phone: hasPhone ? form.phone.trim() : null,
+        email: hasEmail ? form.email.trim() : null,
         notes: form.notes || null,
         default_treatment: form.default_treatment || null,
+        passport_id: form.passport_id || null,
+        default_profile_id: form.default_profile_id || null,
       };
       if (editing) {
         const { error } = await supabase.from("patients").update(payload).eq("id", editing);
@@ -96,8 +104,10 @@ function PatientsPage() {
     setForm({
       first_name: p.first_name, last_name: p.last_name,
       nationality: p.nationality ?? "", birth_date: p.birth_date ?? "",
-      phone: p.phone ?? "", email: p.email ?? "", notes: p.notes ?? "",
+      phone: p.phone ?? "+376 ", email: p.email ?? "", notes: p.notes ?? "",
       default_treatment: p.default_treatment ?? "",
+      passport_id: p.passport_id ?? "",
+      default_profile_id: p.default_profile_id ?? "",
     });
   };
 
