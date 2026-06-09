@@ -132,10 +132,24 @@ function PatientsPage() {
               <Input type="date" value={form.birth_date} onChange={(e) => setForm({ ...form, birth_date: e.target.value })} />
             </Field>
             <Field className="md:col-span-2" label="Telèfon (WhatsApp)">
-              <Input placeholder="+34 600 000 000" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              <Input placeholder="+376 ..." value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             </Field>
             <Field className="md:col-span-4" label="Correu electrònic">
               <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            </Field>
+            <Field className="md:col-span-3" label="Censo / Passaport">
+              <Input value={form.passport_id} onChange={(e) => setForm({ ...form, passport_id: e.target.value })} />
+            </Field>
+            <Field className="md:col-span-3" label="Perfil per defecte">
+              <Select value={form.default_profile_id || "__none"} onValueChange={(v) => setForm({ ...form, default_profile_id: v === "__none" ? "" : v })}>
+                <SelectTrigger><SelectValue placeholder="Cap" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none">— Cap —</SelectItem>
+                  {profiles.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
             <Field className="md:col-span-3" label="Tractament per defecte">
               <Select value={form.default_treatment || "__none"} onValueChange={(v) => setForm({ ...form, default_treatment: v === "__none" ? "" : v })}>
