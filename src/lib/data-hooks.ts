@@ -54,6 +54,8 @@ export type Patient = {
   email: string | null;
   notes: string | null;
   default_treatment: string | null;
+  passport_id: string | null;
+  default_profile_id: string | null;
 };
 
 export type Appointment = {

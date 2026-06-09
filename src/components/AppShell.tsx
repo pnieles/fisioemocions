@@ -24,7 +24,6 @@ const nav: NavEntry[] = [
     ],
   },
   { to: "/gastos", label: "Despeses", icon: Receipt },
-  { to: "/perfiles", label: "Perfils & Tarifes", icon: Users },
   { to: "/configuracion", label: "Configuració", icon: SettingsIcon },
 ];
 
