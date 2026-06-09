@@ -1,0 +1,2 @@
+ALTER TABLE public.patients ADD COLUMN IF NOT EXISTS passport_id text;
+ALTER TABLE public.patients ADD COLUMN IF NOT EXISTS default_profile_id uuid REFERENCES public.client_profiles(id) ON DELETE SET NULL;
