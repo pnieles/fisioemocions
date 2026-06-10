@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [{ title: "Resultats Explotació · fisioemocions" }],
+    meta: [{ title: "Resultados Explotación · fisioemocions" }],
   }),
   component: Dashboard,
 });
@@ -68,7 +68,7 @@ function Dashboard() {
   const incomeByProfile = useMemo(() => {
     const map = new Map<string, number>();
     for (const v of filt.visits) {
-      const key = v.profile_id ? profileMap[v.profile_id]?.name ?? "Sense perfil" : "Sense perfil";
+      const key = v.profile_id ? profileMap[v.profile_id]?.name ?? "Sin perfil" : "Sin perfil";
       map.set(key, (map.get(key) ?? 0) + Number(v.amount));
     }
     return Array.from(map, ([name, value]) => ({ name, value }));
@@ -95,7 +95,7 @@ function Dashboard() {
     if (!drill) return [];
     if (drill.kind === "income") {
       return filt.visits
-        .filter((v) => (profileMap[v.profile_id ?? ""]?.name ?? "Sense perfil") === drill.key)
+        .filter((v) => (profileMap[v.profile_id ?? ""]?.name ?? "Sin perfil") === drill.key)
         .map((v) => ({
           date: v.visit_date,
           label: v.patient_name,
@@ -117,10 +117,10 @@ function Dashboard() {
   }, [drill, filt, profileMap]);
 
   return (
-    <div className="px-10 py-8 max-w-[1400px] mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
       <PageHeader
-        title="Resultats Explotació"
-        subtitle="Compte d'explotació, ingressos per perfil i despeses del centre."
+        title="Resultados Explotación"
+        subtitle="Cuenta de explotación, ingresos por perfil y gastos del centro."
         actions={
           <div className="flex items-center gap-2">
             <Select value={period} onValueChange={(v) => setPeriod(v as Period)}>
@@ -128,16 +128,16 @@ function Dashboard() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="month">Aquest mes</SelectItem>
+                <SelectItem value="month">Este mes</SelectItem>
                 <SelectItem value="quarter">Trimestre</SelectItem>
-                <SelectItem value="year">Any en curs</SelectItem>
-                <SelectItem value="all">Tot l'històric</SelectItem>
+                <SelectItem value="year">Año en curso</SelectItem>
+                <SelectItem value="all">Todo el histórico</SelectItem>
               </SelectContent>
             </Select>
             <Tabs value={view} onValueChange={(v) => setView(v as ViewMode)}>
               <TabsList>
-                <TabsTrigger value="abs">€ Absolut</TabsTrigger>
-                <TabsTrigger value="pct">% Percentual</TabsTrigger>
+                <TabsTrigger value="abs">€ Absoluto</TabsTrigger>
+                <TabsTrigger value="pct">% Porcentual</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -146,15 +146,15 @@ function Dashboard() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <KPI label="Ingressos" value={eur(totalIncome)} icon={<Stethoscope className="h-4 w-4" />} accent="primary" />
-        <KPI label="Despeses" value={eur(totalExpense)} icon={<Receipt className="h-4 w-4" />} accent="muted" />
+        <KPI label="Ingresos" value={eur(totalIncome)} icon={<Stethoscope className="h-4 w-4" />} accent="primary" />
+        <KPI label="Gastos" value={eur(totalExpense)} icon={<Receipt className="h-4 w-4" />} accent="muted" />
         <KPI
-          label="Resultat net"
+          label="Resultado neto"
           value={eur(net)}
           icon={net >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
           accent={net >= 0 ? "success" : "destructive"}
         />
-        <KPI label="Marge" value={pct(margin)} icon={<Wallet className="h-4 w-4" />} accent="accent" />
+        <KPI label="Margen" value={pct(margin)} icon={<Wallet className="h-4 w-4" />} accent="accent" />
       </div>
 
       {/* Chart + Table */}
@@ -162,8 +162,8 @@ function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <Card className="lg:col-span-3 shadow-[var(--shadow-card)]">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-base font-medium">Ingressos vs Despeses per categoria</CardTitle>
-              <span className="text-xs text-muted-foreground">Clica una barra per veure el detall</span>
+              <CardTitle className="text-base font-medium">Ingresos vs Gastos por categoría</CardTitle>
+              <span className="text-xs text-muted-foreground">Haz clic en una barra para ver el detalle</span>
             </CardHeader>
             <CardContent>
               <DrillChart
@@ -178,7 +178,7 @@ function Dashboard() {
           </Card>
           <Card className="lg:col-span-2 shadow-[var(--shadow-card)]">
             <CardHeader>
-              <CardTitle className="text-base font-medium">Compte d'explotació</CardTitle>
+              <CardTitle className="text-base font-medium">Cuenta de explotación</CardTitle>
             </CardHeader>
             <CardContent>
               <PLTable
@@ -200,12 +200,12 @@ function Dashboard() {
                 onClick={() => setDrill(null)}
                 className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
               >
-                <ArrowLeft className="h-4 w-4" /> Tornar
+                <ArrowLeft className="h-4 w-4" /> Volver
               </button>
               <CardTitle className="text-base font-medium">
-                Detall · <span className="text-primary">{drill.key}</span>
+                Detalle · <span className="text-primary">{drill.key}</span>
                 <span className="text-muted-foreground font-normal text-sm ml-2">
-                  ({drill.kind === "income" ? "ingressos" : "despeses"})
+                  ({drill.kind === "income" ? "ingresos" : "despeses"})
                 </span>
               </CardTitle>
             </div>
@@ -219,15 +219,15 @@ function Dashboard() {
                 <thead>
                   <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground border-b border-border">
                     <th className="pb-2.5 font-medium">Data</th>
-                    <th className="pb-2.5 font-medium">Descripció</th>
-                    <th className="pb-2.5 font-medium">Notes</th>
+                    <th className="pb-2.5 font-medium">Descripción</th>
+                    <th className="pb-2.5 font-medium">Notas</th>
                     <th className="pb-2.5 font-medium text-right">Import</th>
                     <th className="pb-2.5 font-medium text-right">% del total</th>
                   </tr>
                 </thead>
                 <tbody>
                   {drillRows.length === 0 && (
-                    <tr><td colSpan={5} className="py-8 text-center text-muted-foreground">Sense registres en aquest període.</td></tr>
+                    <tr><td colSpan={5} className="py-8 text-center text-muted-foreground">Sin registros en este período.</td></tr>
                   )}
                   {drillRows.map((r, i) => {
                     const total = drillRows.reduce((s, x) => s + x.amount, 0);
@@ -313,8 +313,8 @@ function DrillChart({
     display: view === "abs" ? d.value : totalExpense > 0 ? (d.value / totalExpense) * 100 : 0,
   }));
   const data = [
-    ...incomeData.map((d) => ({ ...d, group: "Ingressos" })),
-    ...expenseData.map((d) => ({ ...d, group: "Despeses" })),
+    ...incomeData.map((d) => ({ ...d, group: "Ingresos" })),
+    ...expenseData.map((d) => ({ ...d, group: "Gastos" })),
   ];
 
   return (
@@ -387,7 +387,7 @@ function PLTable({
 
   return (
     <div className="text-sm">
-      <Section title="Ingressos" total={totalIncome} view={view} positive>
+      <Section title="Ingresos" total={totalIncome} view={view} positive>
         {income.length === 0 && <Empty />}
         {income
           .sort((a, b) => b.value - a.value)
@@ -395,7 +395,7 @@ function PLTable({
             <Row key={r.name} label={r.name} value={fmt(r.value, totalIncome)} onClick={() => onDrill("income", r.name)} />
           ))}
       </Section>
-      <Section title="Despeses" total={totalExpense} view={view}>
+      <Section title="Gastos" total={totalExpense} view={view}>
         {expense.length === 0 && <Empty />}
         {expense
           .sort((a, b) => b.value - a.value)
@@ -405,7 +405,7 @@ function PLTable({
       </Section>
       <div className="border-t-2 border-foreground/80 pt-3 mt-3">
         <div className="flex items-center justify-between">
-          <span className="font-display text-base">Resultat net</span>
+          <span className="font-display text-base">Resultado neto</span>
           <span
             className={cn(
               "font-display text-lg tabular-nums",
@@ -418,7 +418,7 @@ function PLTable({
           </span>
         </div>
         <div className="text-xs text-muted-foreground mt-1">
-          Marge: {pct(totalIncome > 0 ? (totalIncome - totalExpense) / totalIncome : 0)}
+          Margen: {pct(totalIncome > 0 ? (totalIncome - totalExpense) / totalIncome : 0)}
         </div>
       </div>
     </div>
@@ -467,5 +467,5 @@ function Row({ label, value, onClick }: { label: string; value: string; onClick:
 }
 
 function Empty() {
-  return <div className="text-xs text-muted-foreground py-1 pl-5">Sense moviments</div>;
+  return <div className="text-xs text-muted-foreground py-1 pl-5">Sin movimientos</div>;
 }

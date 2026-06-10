@@ -78,8 +78,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "fisioemocions · Gestió clínica" },
-      { name: "description", content: "Gestió d'ingressos, material i compte d'explotació del centre de fisioteràpia fisioemocions." },
+      { title: "fisioemocions · Gestión clínica" },
+      { name: "description", content: "Gestión de ingresos, material y cuenta de explotación del centro de fisioterapia fisioemocions." },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },

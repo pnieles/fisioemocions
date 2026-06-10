@@ -12,7 +12,7 @@ import { MessageCircle, Mail, Check, BellRing } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/recordatorios")({
-  head: () => ({ meta: [{ title: "Recordatoris · fisioemocions" }] }),
+  head: () => ({ meta: [{ title: "Recordatorios · fisioemocions" }] }),
   component: ReminderPage,
 });
 
@@ -42,7 +42,7 @@ function ReminderPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Recordatori marcat com a enviat");
+      toast.success("Recordatorio marcado como enviado");
       qc.invalidateQueries({ queryKey: ["appointments"] });
     },
   });
@@ -62,18 +62,18 @@ function ReminderPage() {
   const patientOf = (id: string | null) => patients.find((p) => p.id === id);
 
   return (
-    <div className="px-10 py-8 max-w-[1400px] mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
       <PageHeader
-        title="Recordatoris de cita"
-        subtitle="Cites pendents dins la finestra escollida. Prepara missatges via WhatsApp (wa.me) o correu i marca'ls com a enviats."
+        title="Recordatorios de cita"
+        subtitle="Citas pendientes dentro de la ventana escogida. Prepara mensajes vía WhatsApp (wa.me) o correo y márcalos como enviados."
         actions={
           <Select value={windowHours} onValueChange={setWindowHours}>
             <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="24">Pròximes 24h</SelectItem>
-              <SelectItem value="36">Pròximes 36h</SelectItem>
-              <SelectItem value="48">Pròximes 48h</SelectItem>
-              <SelectItem value="168">Pròxima setmana</SelectItem>
+              <SelectItem value="24">Próximas 24h</SelectItem>
+              <SelectItem value="36">Próximas 36h</SelectItem>
+              <SelectItem value="48">Próximas 48h</SelectItem>
+              <SelectItem value="168">Próxima semana</SelectItem>
             </SelectContent>
           </Select>
         }
@@ -84,7 +84,7 @@ function ReminderPage() {
           {upcoming.length === 0 && (
             <div className="px-6 py-16 text-center text-muted-foreground">
               <BellRing className="h-8 w-8 mx-auto mb-3 opacity-40" />
-              No hi ha cites pendents dins d'aquesta finestra.
+              No hay citas pendientes dentro de esta ventana.
             </div>
           )}
           {upcoming.map((a) => {
@@ -95,8 +95,8 @@ function ReminderPage() {
             const vars = {
               name,
               company: company?.name || "fisioemocions",
-              date: when.toLocaleDateString("ca-ES", { weekday: "long", day: "numeric", month: "long" }),
-              time: when.toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" }),
+              date: when.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" }),
+              time: when.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" }),
             };
             const waMsg = applyVars(tpl?.whatsapp || "", vars);
             const emailSubject = applyVars(tpl?.email_subject || "", vars);
@@ -113,7 +113,7 @@ function ReminderPage() {
                 <div className="md:col-span-3">
                   <div className="font-medium">{fullName}</div>
                   <div className="text-xs text-muted-foreground mt-0.5">
-                    {when.toLocaleString("ca-ES", { weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                    {when.toLocaleString("es-ES", { weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
                   </div>
                 </div>
                 <div className="md:col-span-5 text-sm text-muted-foreground bg-muted/40 rounded-md p-3 leading-relaxed whitespace-pre-wrap">
@@ -125,20 +125,20 @@ function ReminderPage() {
                       <Button size="sm" variant="secondary"><MessageCircle className="h-4 w-4 mr-1" /> WhatsApp</Button>
                     </a>
                   ) : (
-                    <Button size="sm" variant="secondary" disabled title="Sense telèfon"><MessageCircle className="h-4 w-4 mr-1" /> WhatsApp</Button>
+                    <Button size="sm" variant="secondary" disabled title="Sin teléfono"><MessageCircle className="h-4 w-4 mr-1" /> WhatsApp</Button>
                   )}
                   {mailto ? (
                     <a href={mailto}>
                       <Button size="sm" variant="secondary"><Mail className="h-4 w-4 mr-1" /> Correu</Button>
                     </a>
                   ) : (
-                    <Button size="sm" variant="secondary" disabled title="Sense correu"><Mail className="h-4 w-4 mr-1" /> Correu</Button>
+                    <Button size="sm" variant="secondary" disabled title="Sin correo"><Mail className="h-4 w-4 mr-1" /> Correu</Button>
                   )}
                 </div>
                 <div className="md:col-span-1 text-right">
                   {a.reminder_sent_at ? (
                     <span className="inline-flex items-center gap-1 text-xs text-success">
-                      <Check className="h-3 w-3" /> Enviat
+                      <Check className="h-3 w-3" /> Enviado
                     </span>
                   ) : (
                     <Button size="sm" variant="ghost" onClick={() => markSent.mutate(a.id)}>Marcar</Button>

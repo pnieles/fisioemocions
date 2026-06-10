@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { Trash2, Plus, Save } from "lucide-react";
 
 export const Route = createFileRoute("/perfiles")({
-  head: () => ({ meta: [{ title: "Perfils · fisioemocions" }] }),
+  head: () => ({ meta: [{ title: "Perfiles · fisioemocions" }] }),
   component: ProfilesPage,
 });
 
@@ -25,7 +25,7 @@ function ProfilesPage() {
 
   const add = useMutation({
     mutationFn: async () => {
-      if (!form.name || !form.default_rate) throw new Error("Nom i tarifa requerits");
+      if (!form.name || !form.default_rate) throw new Error("Nombre y tarifa requeridos");
       const { error } = await supabase.from("client_profiles").insert({
         name: form.name,
         default_rate: Number(form.default_rate),
@@ -33,7 +33,7 @@ function ProfilesPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Perfil creat");
+      toast.success("Perfil creado");
       qc.invalidateQueries({ queryKey: ["profiles"] });
       setForm({ name: "", default_rate: "" });
     },
@@ -46,7 +46,7 @@ function ProfilesPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Tarifa actualitzada");
+      toast.success("Tarifa actualizada");
       qc.invalidateQueries({ queryKey: ["profiles"] });
       setEdits({});
     },
@@ -58,25 +58,25 @@ function ProfilesPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Eliminat");
+      toast.success("Eliminado");
       qc.invalidateQueries({ queryKey: ["profiles"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
   return (
-    <div className="px-10 py-8 max-w-[1100px] mx-auto">
-      <PageHeader title="Perfils i tarifes" subtitle="Defineix els perfils de client i les tarifes per defecte que s'aplicaran a les visites." />
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1100px] mx-auto">
+      <PageHeader title="Perfiles y tarifas" subtitle="Define los perfiles de cliente y las tarifas por defecto que se aplicarán a las visitas." />
 
       <Card className="mb-8 shadow-[var(--shadow-card)]">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             <div className="md:col-span-6">
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nom del perfil *</Label>
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nombre del perfil *</Label>
               <Input placeholder="Ex: CASS 1, Privado..." value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             </div>
             <div className="md:col-span-4">
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Tarifa per defecte (€) *</Label>
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Tarifa por defecto (€) *</Label>
               <Input type="number" step="0.01" value={form.default_rate} onChange={(e) => setForm({ ...form, default_rate: e.target.value })} />
             </div>
             <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-2 h-10">
@@ -89,13 +89,13 @@ function ProfilesPage() {
       <Card className="shadow-[var(--shadow-card)]">
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border">
-            <h2 className="font-display text-lg">Perfils existents</h2>
+            <h2 className="font-display text-lg">Perfiles existentes</h2>
           </div>
           <table className="w-full text-sm">
             <thead className="bg-muted/40">
               <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
                 <th className="px-6 py-3 font-medium">Perfil</th>
-                <th className="px-6 py-3 font-medium text-right">Tarifa per defecte</th>
+                <th className="px-6 py-3 font-medium text-right">Tarifa por defecto</th>
                 <th className="px-6 py-3"></th>
               </tr>
             </thead>
@@ -123,7 +123,7 @@ function ProfilesPage() {
                     <td className="px-6 py-3 text-right space-x-2">
                       {editing ? (
                         <Button size="sm" variant="default" onClick={() => update.mutate({ id: p.id, rate: Number(edits[p.id]) })}>
-                          <Save className="h-3.5 w-3.5 mr-1" /> Desar
+                          <Save className="h-3.5 w-3.5 mr-1" /> Guardar
                         </Button>
                       ) : (
                         <Button size="sm" variant="outline" onClick={() => setEdits({ ...edits, [p.id]: String(p.default_rate) })}>

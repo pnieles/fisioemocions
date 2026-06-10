@@ -8,14 +8,14 @@ import { eur } from "@/lib/format";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 export const Route = createFileRoute("/consumo")({
-  head: () => ({ meta: [{ title: "Consum mensual · fisioemocions" }] }),
+  head: () => ({ meta: [{ title: "Consumo mensual · fisioemocions" }] }),
   component: ConsumoPage,
 });
 
 function monthKey(iso: string) { return iso.slice(0, 7); }
 function fmtMonth(key: string) {
   const [y, m] = key.split("-");
-  return new Intl.DateTimeFormat("ca-ES", { month: "long", year: "numeric" }).format(new Date(Number(y), Number(m) - 1, 1));
+  return new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(new Date(Number(y), Number(m) - 1, 1));
 }
 
 type MonthData = {
@@ -68,7 +68,7 @@ function ConsumoPage() {
     () =>
       months.slice().reverse().map((k) => {
         const r = byMonth.get(k)!;
-        return { month: fmtMonth(k), Unitats: r.units, Import: Number(r.amount.toFixed(2)) };
+        return { month: fmtMonth(k), Unidades: r.units, Import: Number(r.amount.toFixed(2)) };
       }),
     [months, byMonth],
   );
@@ -89,10 +89,10 @@ function ConsumoPage() {
     : [];
 
   return (
-    <div className="px-10 py-8 max-w-[1400px] mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
       <PageHeader
-        title="Consum de consumibles per període"
-        subtitle="Detall per producte (quantitat i import) i prorrateig per pacient segons les visites del mes."
+        title="Consumo de consumibles por período"
+        subtitle="Detallee por producto (cantidad e importe) y prorrateo por paciente según las visitas del mes."
         actions={
           <Select value={activeKey} onValueChange={setPeriod}>
             <SelectTrigger className="w-56"><SelectValue placeholder="Període" /></SelectTrigger>
@@ -106,14 +106,14 @@ function ConsumoPage() {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Kpi label="Unitats totals" value={active ? active.units.toLocaleString("es-ES") : "—"} />
-        <Kpi label="Import total" value={active ? eur(active.amount) : "—"} />
-        <Kpi label="Pacients atesos" value={active ? String(active.patients.size) : "—"} sub={active ? `${totalVisits} visites` : ""} />
+        <Kpi label="Unidades totales" value={active ? active.units.toLocaleString("es-ES") : "—"} />
+        <Kpi label="Importe total" value={active ? eur(active.amount) : "—"} />
+        <Kpi label="Pacientees atendidos" value={active ? String(active.patients.size) : "—"} sub={active ? `${totalVisits} visites` : ""} />
       </div>
 
       <Card className="shadow-[var(--shadow-card)] mb-6">
         <CardContent className="p-6">
-          <h3 className="font-display text-lg mb-4">Evolució mensual</h3>
+          <h3 className="font-display text-lg mb-4">Evolución mensual</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
@@ -122,7 +122,7 @@ function ConsumoPage() {
                 <YAxis yAxisId="l" tick={{ fontSize: 11 }} />
                 <YAxis yAxisId="r" orientation="right" tick={{ fontSize: 11 }} />
                 <Tooltip />
-                <Bar yAxisId="l" dataKey="Unitats" fill="oklch(0.55 0.08 200)" radius={[4, 4, 0, 0]} />
+                <Bar yAxisId="l" dataKey="Unidades" fill="oklch(0.55 0.08 200)" radius={[4, 4, 0, 0]} />
                 <Bar yAxisId="r" dataKey="Import" fill="oklch(0.65 0.12 35)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -133,22 +133,22 @@ function ConsumoPage() {
       <Card className="shadow-[var(--shadow-card)] mb-6">
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border">
-            <h2 className="font-display text-lg">Detall per producte · {activeKey ? fmtMonth(activeKey) : "—"}</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">Quantitats comprades i import per article del mes.</p>
+            <h2 className="font-display text-lg">Detallee por producto · {activeKey ? fmtMonth(activeKey) : "—"}</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Cantidades compradas e importe por artículo del mes.</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr className="text-left">
-                  <th className="px-6 py-3 font-medium">Producte</th>
-                  <th className="px-6 py-3 font-medium text-right">Unitats</th>
+                  <th className="px-6 py-3 font-medium">Producto</th>
+                  <th className="px-6 py-3 font-medium text-right">Unidades</th>
                   <th className="px-6 py-3 font-medium text-right">Import</th>
                   <th className="px-6 py-3 font-medium text-right">% import</th>
                 </tr>
               </thead>
               <tbody>
                 {perProduct.length === 0 && (
-                  <tr><td colSpan={4} className="px-6 py-10 text-center text-muted-foreground">Sense compres en aquest període.</td></tr>
+                  <tr><td colSpan={4} className="px-6 py-10 text-center text-muted-foreground">Sin compras en este período.</td></tr>
                 )}
                 {perProduct.map((p) => (
                   <tr key={p.name} className="border-t border-border hover:bg-muted/30">
@@ -179,22 +179,22 @@ function ConsumoPage() {
       <Card className="shadow-[var(--shadow-card)]">
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border">
-            <h2 className="font-display text-lg">Consum per pacient · {activeKey ? fmtMonth(activeKey) : "—"}</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">Prorrateig segons nombre de visites del mes.</p>
+            <h2 className="font-display text-lg">Consumo por paciente · {activeKey ? fmtMonth(activeKey) : "—"}</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Prorrateo según número de visitas del mes.</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr className="text-left">
-                  <th className="px-6 py-3 font-medium">Pacient</th>
-                  <th className="px-6 py-3 font-medium text-right">Visites</th>
-                  <th className="px-6 py-3 font-medium text-right">Unitats (estim.)</th>
-                  <th className="px-6 py-3 font-medium text-right">Import (estim.)</th>
+                  <th className="px-6 py-3 font-medium">Paciente</th>
+                  <th className="px-6 py-3 font-medium text-right">Visitas</th>
+                  <th className="px-6 py-3 font-medium text-right">Unidades (estim.)</th>
+                  <th className="px-6 py-3 font-medium text-right">Importe (estim.)</th>
                 </tr>
               </thead>
               <tbody>
                 {perPatient.length === 0 && (
-                  <tr><td colSpan={4} className="px-6 py-10 text-center text-muted-foreground">Sense dades per al període seleccionat.</td></tr>
+                  <tr><td colSpan={4} className="px-6 py-10 text-center text-muted-foreground">Sin datos para el período seleccionado.</td></tr>
                 )}
                 {perPatient.map((r) => (
                   <tr key={r.name} className="border-t border-border hover:bg-muted/30">

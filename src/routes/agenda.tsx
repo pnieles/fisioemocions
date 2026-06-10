@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Fragment, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAppointments, usePatients, useProfiles, useTreatments, useScheduleSettings } from "@/lib/data-hooks";
+import { useAppointments, usePatients, useProfiles, useTreatments, useScheduleSettings, type Appointment } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Trash2, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Trash2, Plus, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/agenda")({
@@ -69,10 +70,53 @@ function AgendaPage() {
   const [form, setForm] = useState(empty);
   const [filter, setFilter] = useState<"upcoming" | "past" | "all">("upcoming");
   const [weekStart, setWeekStart] = useState<Date>(() => startOfWeek(new Date()));
+  const [editing, setEditing] = useState<Appointment | null>(null);
+  const [editForm, setEditForm] = useState(empty);
+
+  const openEdit = (a: Appointment) => {
+    if (a.status !== "scheduled") {
+      toast.info("Solo se pueden editar citas en estado Programada");
+      return;
+    }
+    setEditing(a);
+    setEditForm({
+      patient_id: a.patient_id ?? "",
+      profile_id: a.profile_id ?? "",
+      appointment_at: localISOForInput(new Date(a.appointment_at)),
+      duration_min: String(a.duration_min ?? 30),
+      diagnosis: a.diagnosis ?? "",
+      treatment: a.treatment ?? "",
+      status: a.status,
+      notes: a.notes ?? "",
+    });
+  };
+
+  const updateAppt = useMutation({
+    mutationFn: async () => {
+      if (!editing) return;
+      if (!editForm.patient_id || !editForm.appointment_at) throw new Error("Paciente y fecha obligatorios");
+      const { error } = await supabase.from("appointments").update({
+        patient_id: editForm.patient_id,
+        profile_id: editForm.profile_id || null,
+        appointment_at: new Date(editForm.appointment_at).toISOString(),
+        duration_min: Number(editForm.duration_min) || 30,
+        diagnosis: editForm.diagnosis || null,
+        treatment: editForm.treatment || null,
+        notes: editForm.notes || null,
+      }).eq("id", editing.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Cita actualizada");
+      qc.invalidateQueries({ queryKey: ["appointments"] });
+      setEditing(null);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const add = useMutation({
     mutationFn: async () => {
-      if (!form.patient_id || !form.appointment_at) throw new Error("Pacient i data obligatoris");
+      if (!form.patient_id || !form.appointment_at) throw new Error("Paciente y fecha obligatorios");
       const { error } = await supabase.from("appointments").insert({
         patient_id: form.patient_id,
         profile_id: form.profile_id || null,
@@ -167,7 +211,7 @@ function AgendaPage() {
     d.setHours(0, 0, 0, 0);
     d.setMinutes(mins);
     setForm((f) => ({ ...f, appointment_at: localISOForInput(d) }));
-    toast.success(`Slot seleccionat: ${d.toLocaleString("ca-ES", { dateStyle: "short", timeStyle: "short" })}`);
+    toast.success(`Slot seleccionado: ${d.toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}`);
     const el = document.getElementById("agenda-form");
     el?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -179,8 +223,8 @@ function AgendaPage() {
   };
 
   return (
-    <div className="px-10 py-8 max-w-[1400px] mx-auto">
-      <PageHeader title="Agenda de cites" subtitle="Vista setmanal amb hores lliures i ocupades. Clica una hora lliure per crear cita." />
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
+      <PageHeader title="Agenda de citas" subtitle="Vista semanal con horas libres y ocupadas. Haz clic en una hora libre para crear cita." />
 
       {/* Weekly view */}
       <Card className="mb-6 shadow-[var(--shadow-card)]">
@@ -189,15 +233,15 @@ function AgendaPage() {
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="icon" onClick={() => shiftWeek(-1)}><ChevronLeft className="h-4 w-4" /></Button>
               <div className="font-display text-lg">
-                Setmana del {weekStart.toLocaleDateString("ca-ES", { day: "2-digit", month: "long", year: "numeric" })}
+                Semana del {weekStart.toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" })}
               </div>
               <Button variant="ghost" size="icon" onClick={() => shiftWeek(1)}><ChevronRight className="h-4 w-4" /></Button>
-              <Button variant="ghost" size="sm" onClick={() => setWeekStart(startOfWeek(new Date()))}>Avui</Button>
+              <Button variant="ghost" size="sm" onClick={() => setWeekStart(startOfWeek(new Date()))}>Hoy</Button>
             </div>
             <div className="text-xs text-muted-foreground flex items-center gap-3">
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-muted border border-border" /> Lliure</span>
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-primary/80" /> Ocupat</span>
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-destructive/30 border border-destructive/50" /> Tancat</span>
+              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-muted border border-border" /> Libre</span>
+              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-primary/80" /> Ocupado</span>
+              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-destructive/30 border border-destructive/50" /> Cerrado</span>
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -216,12 +260,12 @@ function AgendaPage() {
                     isToday && "bg-accent/5",
                   )}>
                     <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                      {d.toLocaleDateString("ca-ES", { weekday: "short" })}
+                      {d.toLocaleDateString("es-ES", { weekday: "short" })}
                     </div>
                     <div className={cn("font-display text-base", isToday && "text-primary")}>
                       {d.getDate()}
                     </div>
-                    {closed && <div className="text-[10px] text-destructive mt-0.5">{isHoliday ? "Festiu" : "Tancat"}</div>}
+                    {closed && <div className="text-[10px] text-destructive mt-0.5">{isHoliday ? "Festivo" : "Cerrado"}</div>}
                   </div>
                 );
               })}
@@ -246,17 +290,24 @@ function AgendaPage() {
                       if (busy) {
                         const p = patients.find((x) => x.id === busy.appt.patient_id);
                         const isStart = busy.startMin === mins;
+                        const editable = busy.appt.status === "scheduled";
                         return (
-                          <div
+                          <button
                             key={`${iso}-${sIdx}`}
-                            title={`${p ? p.last_name + ", " + p.first_name : "Cita"} · ${fmtHM(busy.startMin)}-${fmtHM(busy.endMin)}`}
-                            className="border-t border-l border-border bg-primary/80 text-primary-foreground text-[10px] px-1 overflow-hidden"
+                            type="button"
+                            onClick={() => openEdit(busy.appt)}
+                            disabled={!editable}
+                            title={`${p ? p.last_name + ", " + p.first_name : "Cita"} · ${fmtHM(busy.startMin)}-${fmtHM(busy.endMin)}${editable ? " · Clic para editar" : ""}`}
+                            className={cn(
+                              "border-t border-l border-border text-primary-foreground text-[10px] px-1 overflow-hidden text-left",
+                              editable ? "bg-primary/80 hover:bg-primary cursor-pointer" : "bg-muted-foreground/50 cursor-default",
+                            )}
                             style={{ minHeight: 28 }}
                           >
                             {isStart && (
                               <div className="truncate font-medium">{p ? `${p.last_name}, ${p.first_name}` : "Cita"}</div>
                             )}
-                          </div>
+                          </button>
                         );
                       }
                       return (
@@ -279,7 +330,7 @@ function AgendaPage() {
       <Card id="agenda-form" className="mb-8 shadow-[var(--shadow-card)]">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-            <Field className="md:col-span-3" label="Pacient *">
+            <Field className="md:col-span-3" label="Paciente *">
               <Select
                 value={form.patient_id}
                 onValueChange={(v) => {
@@ -316,7 +367,7 @@ function AgendaPage() {
                 </SelectContent>
               </Select>
             </Field>
-            <Field className="md:col-span-3" label="Tractament">
+            <Field className="md:col-span-3" label="Tratamiento">
               <Select value={form.treatment} onValueChange={(v) => setForm({ ...form, treatment: v })}>
                 <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
                 <SelectContent>
@@ -326,14 +377,14 @@ function AgendaPage() {
                 </SelectContent>
               </Select>
             </Field>
-            <Field className="md:col-span-6" label="Diagnòstic">
+            <Field className="md:col-span-6" label="Diagnóstico">
               <Input value={form.diagnosis} onChange={(e) => setForm({ ...form, diagnosis: e.target.value })} />
             </Field>
-            <Field className="md:col-span-5" label="Notes">
+            <Field className="md:col-span-5" label="Notas">
               <Textarea rows={1} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
             </Field>
             <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-1 h-10">
-              <Plus className="h-4 w-4 mr-1" /> Afegir
+              <Plus className="h-4 w-4 mr-1" /> Añadir
             </Button>
           </div>
         </CardContent>
@@ -343,15 +394,15 @@ function AgendaPage() {
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border flex items-center justify-between">
             <div>
-              <h2 className="font-display text-lg">Cites</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">{list.length} cites</p>
+              <h2 className="font-display text-lg">Citas</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">{list.length} citas</p>
             </div>
             <Select value={filter} onValueChange={(v: "upcoming" | "past" | "all") => setFilter(v)}>
               <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="upcoming">Pròximes</SelectItem>
-                <SelectItem value="past">Passades</SelectItem>
-                <SelectItem value="all">Totes</SelectItem>
+                <SelectItem value="upcoming">Próximas</SelectItem>
+                <SelectItem value="past">Pasadas</SelectItem>
+                <SelectItem value="all">Todas</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -359,17 +410,17 @@ function AgendaPage() {
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr className="text-left">
-                  <th className="px-6 py-3 font-medium">Data</th>
-                  <th className="px-6 py-3 font-medium">Pacient</th>
-                  <th className="px-6 py-3 font-medium">Tractament</th>
-                  <th className="px-6 py-3 font-medium">Diagnòstic</th>
-                  <th className="px-6 py-3 font-medium">Estat</th>
+                  <th className="px-6 py-3 font-medium">Fecha</th>
+                  <th className="px-6 py-3 font-medium">Paciente</th>
+                  <th className="px-6 py-3 font-medium">Tratamiento</th>
+                  <th className="px-6 py-3 font-medium">Diagnóstico</th>
+                  <th className="px-6 py-3 font-medium">Estado</th>
                   <th className="px-6 py-3"></th>
                 </tr>
               </thead>
               <tbody>
                 {list.length === 0 && (
-                  <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Sense cites.</td></tr>
+                  <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Sin citas.</td></tr>
                 )}
                 {list.map((a) => (
                   <tr key={a.id} className="border-t border-border hover:bg-muted/30">
@@ -388,14 +439,19 @@ function AgendaPage() {
                         <SelectTrigger className="h-8 w-32 text-xs"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="scheduled">Programada</SelectItem>
-                          <SelectItem value="completed">Realitzada</SelectItem>
-                          <SelectItem value="cancelled">Cancel·lada</SelectItem>
-                          <SelectItem value="no_show">No s'ha presentat</SelectItem>
+                          <SelectItem value="completed">Realizada</SelectItem>
+                          <SelectItem value="cancelled">Cancelada</SelectItem>
+                          <SelectItem value="no_show">No se presentó</SelectItem>
                         </SelectContent>
                       </Select>
                     </td>
-                    <td className="px-6 py-3 text-right">
-                      <button onClick={() => del.mutate(a.id)} className="text-muted-foreground hover:text-destructive">
+                    <td className="px-6 py-3 text-right whitespace-nowrap">
+                      {a.status === "scheduled" && (
+                        <button onClick={() => openEdit(a)} className="text-muted-foreground hover:text-primary mr-2 inline-block align-middle" title="Editar">
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                      )}
+                      <button onClick={() => del.mutate(a.id)} className="text-muted-foreground hover:text-destructive align-middle">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </td>
@@ -406,6 +462,53 @@ function AgendaPage() {
           </div>
         </CardContent>
       </Card>
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader><DialogTitle>Editar cita</DialogTitle></DialogHeader>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Field label="Paciente *">
+              <Select value={editForm.patient_id} onValueChange={(v) => setEditForm({ ...editForm, patient_id: v })}>
+                <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
+                <SelectContent>
+                  {patients.map((p) => <SelectItem key={p.id} value={p.id}>{p.last_name}, {p.first_name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Fecha y hora *">
+              <Input type="datetime-local" value={editForm.appointment_at} onChange={(e) => setEditForm({ ...editForm, appointment_at: e.target.value })} />
+            </Field>
+            <Field label="Duración (min)">
+              <Input type="number" value={editForm.duration_min} onChange={(e) => setEditForm({ ...editForm, duration_min: e.target.value })} />
+            </Field>
+            <Field label="Perfil">
+              <Select value={editForm.profile_id} onValueChange={(v) => setEditForm({ ...editForm, profile_id: v })}>
+                <SelectTrigger><SelectValue placeholder="Perfil" /></SelectTrigger>
+                <SelectContent>
+                  {profiles.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Tratamiento" className="sm:col-span-2">
+              <Select value={editForm.treatment} onValueChange={(v) => setEditForm({ ...editForm, treatment: v })}>
+                <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
+                <SelectContent>
+                  {treatments.map((t) => <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Diagnóstico" className="sm:col-span-2">
+              <Input value={editForm.diagnosis} onChange={(e) => setEditForm({ ...editForm, diagnosis: e.target.value })} />
+            </Field>
+            <Field label="Notas" className="sm:col-span-2">
+              <Textarea rows={2} value={editForm.notes} onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })} />
+            </Field>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setEditing(null)}>Cancelar</Button>
+            <Button onClick={() => updateAppt.mutate()} disabled={updateAppt.isPending}>Guardar cambios</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
