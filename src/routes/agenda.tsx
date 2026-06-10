@@ -290,17 +290,24 @@ function AgendaPage() {
                       if (busy) {
                         const p = patients.find((x) => x.id === busy.appt.patient_id);
                         const isStart = busy.startMin === mins;
+                        const editable = busy.appt.status === "scheduled";
                         return (
-                          <div
+                          <button
                             key={`${iso}-${sIdx}`}
-                            title={`${p ? p.last_name + ", " + p.first_name : "Cita"} · ${fmtHM(busy.startMin)}-${fmtHM(busy.endMin)}`}
-                            className="border-t border-l border-border bg-primary/80 text-primary-foreground text-[10px] px-1 overflow-hidden"
+                            type="button"
+                            onClick={() => openEdit(busy.appt)}
+                            disabled={!editable}
+                            title={`${p ? p.last_name + ", " + p.first_name : "Cita"} · ${fmtHM(busy.startMin)}-${fmtHM(busy.endMin)}${editable ? " · Clic para editar" : ""}`}
+                            className={cn(
+                              "border-t border-l border-border text-primary-foreground text-[10px] px-1 overflow-hidden text-left",
+                              editable ? "bg-primary/80 hover:bg-primary cursor-pointer" : "bg-muted-foreground/50 cursor-default",
+                            )}
                             style={{ minHeight: 28 }}
                           >
                             {isStart && (
                               <div className="truncate font-medium">{p ? `${p.last_name}, ${p.first_name}` : "Cita"}</div>
                             )}
-                          </div>
+                          </button>
                         );
                       }
                       return (
