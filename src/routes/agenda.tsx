@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Fragment, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAppointments, usePatients, useProfiles, useTreatments, useScheduleSettings } from "@/lib/data-hooks";
+import { useAppointments, usePatients, useProfiles, useTreatments, useScheduleSettings, type Appointment } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Trash2, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Trash2, Plus, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/agenda")({
@@ -69,10 +70,53 @@ function AgendaPage() {
   const [form, setForm] = useState(empty);
   const [filter, setFilter] = useState<"upcoming" | "past" | "all">("upcoming");
   const [weekStart, setWeekStart] = useState<Date>(() => startOfWeek(new Date()));
+  const [editing, setEditing] = useState<Appointment | null>(null);
+  const [editForm, setEditForm] = useState(empty);
+
+  const openEdit = (a: Appointment) => {
+    if (a.status !== "scheduled") {
+      toast.info("Solo se pueden editar citas en estado Programada");
+      return;
+    }
+    setEditing(a);
+    setEditForm({
+      patient_id: a.patient_id ?? "",
+      profile_id: a.profile_id ?? "",
+      appointment_at: localISOForInput(new Date(a.appointment_at)),
+      duration_min: String(a.duration_min ?? 30),
+      diagnosis: a.diagnosis ?? "",
+      treatment: a.treatment ?? "",
+      status: a.status,
+      notes: a.notes ?? "",
+    });
+  };
+
+  const updateAppt = useMutation({
+    mutationFn: async () => {
+      if (!editing) return;
+      if (!editForm.patient_id || !editForm.appointment_at) throw new Error("Paciente y fecha obligatorios");
+      const { error } = await supabase.from("appointments").update({
+        patient_id: editForm.patient_id,
+        profile_id: editForm.profile_id || null,
+        appointment_at: new Date(editForm.appointment_at).toISOString(),
+        duration_min: Number(editForm.duration_min) || 30,
+        diagnosis: editForm.diagnosis || null,
+        treatment: editForm.treatment || null,
+        notes: editForm.notes || null,
+      }).eq("id", editing.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Cita actualizada");
+      qc.invalidateQueries({ queryKey: ["appointments"] });
+      setEditing(null);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const add = useMutation({
     mutationFn: async () => {
-      if (!form.patient_id || !form.appointment_at) throw new Error("Pacientee y fecha obligatorios");
+      if (!form.patient_id || !form.appointment_at) throw new Error("Paciente y fecha obligatorios");
       const { error } = await supabase.from("appointments").insert({
         patient_id: form.patient_id,
         profile_id: form.profile_id || null,

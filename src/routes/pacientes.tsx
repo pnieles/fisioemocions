@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { Trash2, Plus, Phone, Mail } from "lucide-react";
 
 export const Route = createFileRoute("/pacientes")({
-  head: () => ({ meta: [{ title: "Pacientees · fisioemocions" }] }),
+  head: () => ({ meta: [{ title: "Pacientes · fisioemocions" }] }),
   component: PatientsPage,
 });
 
@@ -81,7 +81,7 @@ function PatientsPage() {
       }
     },
     onSuccess: () => {
-      toast.success(editing ? "Pacientee actualizado" : "Pacientee añadido");
+      toast.success(editing ? "Paciente actualizado" : "Paciente añadido");
       qc.invalidateQueries({ queryKey: ["patients"] });
       setForm(empty); setEditing(null);
     },
@@ -94,7 +94,7 @@ function PatientsPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Pacientee eliminado");
+      toast.success("Paciente eliminado");
       qc.invalidateQueries({ queryKey: ["patients"] });
     },
   });
@@ -114,7 +114,7 @@ function PatientsPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
-      <PageHeader title="Pacientees" subtitle="Ficha de contacto con datos para avisos vía WhatsApp y correo." />
+      <PageHeader title="Pacientes" subtitle="Ficha de contacto con datos para avisos vía WhatsApp y correo." />
 
       <Card className="mb-8 shadow-[var(--shadow-card)]">
         <CardContent className="p-6">
