@@ -228,6 +228,8 @@ function ConfigPage() {
 
       <ProfilesCard />
 
+      <RolesCard />
+
       <div className="flex justify-end">
         <Button onClick={() => save.mutate()} disabled={save.isPending}>Guardar cambios</Button>
       </div>
