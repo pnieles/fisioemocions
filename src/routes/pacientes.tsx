@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { Trash2, Plus, Phone, Mail } from "lucide-react";
 
 export const Route = createFileRoute("/pacientes")({
-  head: () => ({ meta: [{ title: "Pacients · fisioemocions" }] }),
+  head: () => ({ meta: [{ title: "Pacientees · fisioemocions" }] }),
   component: PatientsPage,
 });
 
@@ -53,12 +53,12 @@ function PatientsPage() {
 
   const save = useMutation({
     mutationFn: async () => {
-      if (!form.first_name || !form.last_name) throw new Error("Nom i cognoms obligatoris");
+      if (!form.first_name || !form.last_name) throw new Error("Nombre y apellidos obligatorios");
       const cleanPhone = form.phone.replace(/[\s+\-]/g, "");
       const hasPhone = cleanPhone.length > 0;
       const hasEmail = form.email.trim().length > 0;
       if (!hasPhone && !hasEmail) {
-        throw new Error("Cal omplir telèfon o correu electrònic per poder enviar avisos");
+        throw new Error("Hay que rellenar teléfono o correo electrónico para poder enviar avisos");
       }
       const payload = {
         first_name: form.first_name,
@@ -81,7 +81,7 @@ function PatientsPage() {
       }
     },
     onSuccess: () => {
-      toast.success(editing ? "Pacient actualitzat" : "Pacient afegit");
+      toast.success(editing ? "Pacientee actualizado" : "Pacientee añadido");
       qc.invalidateQueries({ queryKey: ["patients"] });
       setForm(empty); setEditing(null);
     },
@@ -94,7 +94,7 @@ function PatientsPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Pacient eliminat");
+      toast.success("Pacientee eliminado");
       qc.invalidateQueries({ queryKey: ["patients"] });
     },
   });
@@ -114,63 +114,63 @@ function PatientsPage() {
 
   return (
     <div className="px-10 py-8 max-w-[1400px] mx-auto">
-      <PageHeader title="Pacients" subtitle="Fitxa de contacte amb dades per a avisos via WhatsApp i correu." />
+      <PageHeader title="Pacientees" subtitle="Ficha de contacto con datos para avisos vía WhatsApp y correo." />
 
       <Card className="mb-8 shadow-[var(--shadow-card)]">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-            <Field className="md:col-span-3" label="Nom *">
+            <Field className="md:col-span-3" label="Nombre *">
               <Input value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} />
             </Field>
-            <Field className="md:col-span-3" label="Cognoms *">
+            <Field className="md:col-span-3" label="Apellidos *">
               <Input value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} />
             </Field>
-            <Field className="md:col-span-2" label="Nacionalitat">
+            <Field className="md:col-span-2" label="Nacionalidad">
               <Input value={form.nationality} onChange={(e) => setForm({ ...form, nationality: e.target.value })} />
             </Field>
-            <Field className="md:col-span-2" label="Data naixement">
+            <Field className="md:col-span-2" label="Fecha nacimiento">
               <Input type="date" value={form.birth_date} onChange={(e) => setForm({ ...form, birth_date: e.target.value })} />
             </Field>
-            <Field className="md:col-span-2" label="Telèfon (WhatsApp)">
+            <Field className="md:col-span-2" label="Teléfono (WhatsApp)">
               <Input placeholder="+376 ..." value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             </Field>
-            <Field className="md:col-span-4" label="Correu electrònic">
+            <Field className="md:col-span-4" label="Correo electrónico">
               <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             </Field>
-            <Field className="md:col-span-3" label="Censo / Passaport">
+            <Field className="md:col-span-3" label="Censo / Pasaporte">
               <Input value={form.passport_id} onChange={(e) => setForm({ ...form, passport_id: e.target.value })} />
             </Field>
-            <Field className="md:col-span-3" label="Perfil per defecte">
+            <Field className="md:col-span-3" label="Perfil por defecto">
               <Select value={form.default_profile_id || "__none"} onValueChange={(v) => setForm({ ...form, default_profile_id: v === "__none" ? "" : v })}>
                 <SelectTrigger><SelectValue placeholder="Cap" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__none">— Cap —</SelectItem>
+                  <SelectItem value="__none">— Ninguno —</SelectItem>
                   {profiles.map((p) => (
                     <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </Field>
-            <Field className="md:col-span-3" label="Tractament per defecte">
+            <Field className="md:col-span-3" label="Tratamiento por defecto">
               <Select value={form.default_treatment || "__none"} onValueChange={(v) => setForm({ ...form, default_treatment: v === "__none" ? "" : v })}>
                 <SelectTrigger><SelectValue placeholder="Cap" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__none">— Cap —</SelectItem>
+                  <SelectItem value="__none">— Ninguno —</SelectItem>
                   {treatments.map((t) => (
                     <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </Field>
-            <Field className="md:col-span-3" label="Notes">
+            <Field className="md:col-span-3" label="Notas">
               <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
             </Field>
             <div className="md:col-span-2 flex gap-2">
               <Button onClick={() => save.mutate()} disabled={save.isPending} className="flex-1 h-10">
-                <Plus className="h-4 w-4 mr-1" /> {editing ? "Desar" : "Afegir"}
+                <Plus className="h-4 w-4 mr-1" /> {editing ? "Guardar" : "Añadir"}
               </Button>
               {editing && (
-                <Button variant="ghost" onClick={() => { setEditing(null); setForm(empty); }}>Cancel·la</Button>
+                <Button variant="ghost" onClick={() => { setEditing(null); setForm(empty); }}>Cancelar</Button>
               )}
             </div>
           </div>
@@ -180,24 +180,24 @@ function PatientsPage() {
       <Card className="shadow-[var(--shadow-card)]">
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border">
-            <h2 className="font-display text-lg">Fitxes de pacients</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">{patients.length} pacients registrats</p>
+            <h2 className="font-display text-lg">Fichas de pacientes</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">{patients.length} pacientes registrados</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr className="text-left">
-                  <th className="px-6 py-3 font-medium">Pacient</th>
-                  <th className="px-6 py-3 font-medium">Nacionalitat</th>
+                  <th className="px-6 py-3 font-medium">Paciente</th>
+                  <th className="px-6 py-3 font-medium">Nacionalidad</th>
                   <th className="px-6 py-3 font-medium">Edat</th>
                   <th className="px-6 py-3 font-medium">Contacte</th>
-                  <th className="px-6 py-3 font-medium">Notes</th>
+                  <th className="px-6 py-3 font-medium">Notas</th>
                   <th className="px-6 py-3"></th>
                 </tr>
               </thead>
               <tbody>
                 {patients.length === 0 && (
-                  <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Encara no hi ha pacients.</td></tr>
+                  <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Aún no hay pacientes.</td></tr>
                 )}
                 {patients.map((p) => (
                   <tr key={p.id} className="border-t border-border hover:bg-muted/30">

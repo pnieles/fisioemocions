@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { Trash2, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/gastos")({
-  head: () => ({ meta: [{ title: "Despeses · fisioemocions" }] }),
+  head: () => ({ meta: [{ title: "Gastos · fisioemocions" }] }),
   component: ExpensesPage,
 });
 
@@ -31,7 +31,7 @@ function ExpensesPage() {
 
   const add = useMutation({
     mutationFn: async () => {
-      if (!form.description || !form.amount) throw new Error("Descripció i import requerits");
+      if (!form.description || !form.amount) throw new Error("Descripción i import requerits");
       const { error } = await supabase.from("expenses").insert({
         expense_date: form.expense_date,
         category: form.category,
@@ -41,7 +41,7 @@ function ExpensesPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Despesa registrada");
+      toast.success("Gasto registrado");
       qc.invalidateQueries({ queryKey: ["expenses"] });
       setForm({ ...form, description: "", amount: "" });
     },
@@ -54,7 +54,7 @@ function ExpensesPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Eliminat");
+      toast.success("Eliminado");
       qc.invalidateQueries({ queryKey: ["expenses"] });
     },
   });
@@ -63,7 +63,7 @@ function ExpensesPage() {
 
   return (
     <div className="px-10 py-8 max-w-[1400px] mx-auto">
-      <PageHeader title="Despeses" subtitle="Lloguer, impostos, útils, inversions i altres despeses operatives." />
+      <PageHeader title="Gastos" subtitle="Alquiler, impuestos, útiles, inversiones y otros gastos operativos." />
 
       <Card className="mb-8 shadow-[var(--shadow-card)]">
         <CardContent className="p-6">
@@ -71,7 +71,7 @@ function ExpensesPage() {
             <Field className="md:col-span-2" label="Data">
               <Input type="date" value={form.expense_date} onChange={(e) => setForm({ ...form, expense_date: e.target.value })} />
             </Field>
-            <Field className="md:col-span-2" label="Categoria">
+            <Field className="md:col-span-2" label="Categoría">
               <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -79,14 +79,14 @@ function ExpensesPage() {
                 </SelectContent>
               </Select>
             </Field>
-            <Field className="md:col-span-5" label="Descripció *">
-              <Input placeholder="Ex: Lloguer Gener" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            <Field className="md:col-span-5" label="Descripción *">
+              <Input placeholder="Ex: Alquiler Enero" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
             </Field>
             <Field className="md:col-span-2" label="Import (€) *">
               <Input type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
             </Field>
             <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-1 h-10">
-              <Plus className="h-4 w-4 mr-1" /> Afegir
+              <Plus className="h-4 w-4 mr-1" /> Añadir
             </Button>
           </div>
         </CardContent>
@@ -95,23 +95,23 @@ function ExpensesPage() {
       <Card className="shadow-[var(--shadow-card)]">
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border">
-            <h2 className="font-display text-lg">Despeses registrades</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">{expenses.length} entrades · {eur(total)} totals</p>
+            <h2 className="font-display text-lg">Gastos registrados</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">{expenses.length} entradas · {eur(total)} totales</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/40">
                 <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
                   <th className="px-6 py-3 font-medium">Data</th>
-                  <th className="px-6 py-3 font-medium">Categoria</th>
-                  <th className="px-6 py-3 font-medium">Descripció</th>
+                  <th className="px-6 py-3 font-medium">Categoría</th>
+                  <th className="px-6 py-3 font-medium">Descripción</th>
                   <th className="px-6 py-3 font-medium text-right">Import</th>
                   <th className="px-6 py-3"></th>
                 </tr>
               </thead>
               <tbody>
                 {expenses.length === 0 && (
-                  <tr><td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">Cap despesa registrada.</td></tr>
+                  <tr><td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">Sin gastos registrados.</td></tr>
                 )}
                 {expenses.map((e) => (
                   <tr key={e.id} className="border-t border-border hover:bg-muted/30">

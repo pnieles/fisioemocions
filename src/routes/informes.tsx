@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { eur, fmtDate } from "@/lib/format";
 
 export const Route = createFileRoute("/informes")({
-  head: () => ({ meta: [{ title: "Informes de visites · fisioemocions" }] }),
+  head: () => ({ meta: [{ title: "Informes de visitas · fisioemocions" }] }),
   component: InformesPage,
 });
 
@@ -125,39 +125,39 @@ function InformesPage() {
   return (
     <div className="px-10 py-8 max-w-[1400px] mx-auto">
       <PageHeader
-        title="Informes de visites"
-        subtitle="Visites per pacient i totals per dia, setmana i mes amb promitjos."
+        title="Informes de visitas"
+        subtitle="Visitas per pacient i totales per dia, setmana i mes amb promitjos."
         actions={
           <Select value={period} onValueChange={(v) => setPeriod(v as Period)}>
             <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="month">Aquest mes</SelectItem>
+              <SelectItem value="month">Este mes</SelectItem>
               <SelectItem value="quarter">Trimestre</SelectItem>
-              <SelectItem value="year">Any en curs</SelectItem>
-              <SelectItem value="all">Tot l'històric</SelectItem>
+              <SelectItem value="year">Año en curso</SelectItem>
+              <SelectItem value="all">Todo el histórico</SelectItem>
             </SelectContent>
           </Select>
         }
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Kpi label="Visites totals" value={String(totalCount)} />
-        <Kpi label="Import total" value={eur(totalAmount)} />
-        <Kpi label="Pacients diferents" value={String(perPatient.length)} />
+        <Kpi label="Visitas totales" value={String(totalCount)} />
+        <Kpi label="Importe total" value={eur(totalAmount)} />
+        <Kpi label="Pacientees diferentes" value={String(perPatient.length)} />
       </div>
 
       <Tabs defaultValue="patient" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="patient">Per pacient</TabsTrigger>
-          <TabsTrigger value="day">Per dia</TabsTrigger>
-          <TabsTrigger value="week">Per setmana</TabsTrigger>
-          <TabsTrigger value="month">Per mes</TabsTrigger>
+          <TabsTrigger value="patient">Por paciente</TabsTrigger>
+          <TabsTrigger value="day">Por día</TabsTrigger>
+          <TabsTrigger value="week">Por semana</TabsTrigger>
+          <TabsTrigger value="month">Por mes</TabsTrigger>
         </TabsList>
 
         <TabsContent value="patient">
           <Card className="shadow-[var(--shadow-card)]">
             <CardContent className="p-0">
-              <Table headers={["Pacient", "Visites", "Import", "Última visita"]}>
+              <Table headers={["Paciente", "Visitas", "Import", "Última visita"]}>
                 {perPatient.length === 0 ? (
                   <EmptyRow span={4} />
                 ) : (
@@ -178,7 +178,7 @@ function InformesPage() {
         <TabsContent value="day">
           <Card className="shadow-[var(--shadow-card)]">
             <CardContent className="p-0">
-              <Table headers={["Dia", "Visites", "Import"]}>
+              <Table headers={["Dia", "Visitas", "Import"]}>
                 {byDay.length === 0 ? (
                   <EmptyRow span={3} />
                 ) : (
@@ -191,12 +191,12 @@ function InformesPage() {
                       </tr>
                     ))}
                     <tr className="border-t border-border bg-muted/20 font-medium">
-                      <td className="px-6 py-3">Total ({byDay.length} dies amb activitat)</td>
+                      <td className="px-6 py-3">Total ({byDay.length} días con actividad)</td>
                       <td className="px-6 py-3 text-right tabular-nums">{totalCount}</td>
                       <td className="px-6 py-3 text-right tabular-nums">{eur(totalAmount)}</td>
                     </tr>
                     <tr className="border-t border-border text-muted-foreground">
-                      <td className="px-6 py-3">Promig per dia amb activitat</td>
+                      <td className="px-6 py-3">Promedio por día con actividad</td>
                       <td className="px-6 py-3 text-right tabular-nums">{(totalCount / byDay.length).toFixed(2)}</td>
                       <td className="px-6 py-3 text-right tabular-nums">{eur(totalAmount / byDay.length)}</td>
                     </tr>
@@ -210,7 +210,7 @@ function InformesPage() {
         <TabsContent value="week">
           <Card className="shadow-[var(--shadow-card)]">
             <CardContent className="p-0">
-              <Table headers={["Setmana", "Dies amb dades", "Visites", "Import", "Promig visites/dia"]}>
+              <Table headers={["Semana", "Días con datos", "Visitas", "Import", "Promedio visitas/día"]}>
                 {byWeek.length === 0 ? (
                   <EmptyRow span={5} />
                 ) : (
@@ -225,12 +225,12 @@ function InformesPage() {
                       </tr>
                     ))}
                     <tr className="border-t border-border bg-muted/20 font-medium">
-                      <td className="px-6 py-3">Total ({byWeek.length} setmanes)</td>
+                      <td className="px-6 py-3">Total ({byWeek.length} semanas)</td>
                       <td className="px-6 py-3 text-right tabular-nums">—</td>
                       <td className="px-6 py-3 text-right tabular-nums">{totalCount}</td>
                       <td className="px-6 py-3 text-right tabular-nums">{eur(totalAmount)}</td>
                       <td className="px-6 py-3 text-right tabular-nums">
-                        {(totalCount / byWeek.length).toFixed(2)} /set.
+                        {(totalCount / byWeek.length).toFixed(2)} /sem.
                       </td>
                     </tr>
                   </>
@@ -243,14 +243,14 @@ function InformesPage() {
         <TabsContent value="month">
           <Card className="shadow-[var(--shadow-card)]">
             <CardContent className="p-0">
-              <Table headers={["Mes", "Dies amb dades", "Visites", "Import", "Promig visites/dia amb dades"]}>
+              <Table headers={["Mes", "Días con datos", "Visitas", "Import", "Promedio visitas/día con datos"]}>
                 {byMonth.length === 0 ? (
                   <EmptyRow span={5} />
                 ) : (
                   <>
                     {byMonth.map((r) => {
                       const [y, m] = r.month.split("-");
-                      const label = new Intl.DateTimeFormat("ca-ES", { month: "long", year: "numeric" }).format(new Date(Number(y), Number(m) - 1, 1));
+                      const label = new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(new Date(Number(y), Number(m) - 1, 1));
                       return (
                         <tr key={r.month} className="border-t border-border hover:bg-muted/30">
                           <td className="px-6 py-3 font-medium capitalize">{label}</td>
@@ -262,7 +262,7 @@ function InformesPage() {
                       );
                     })}
                     <tr className="border-t border-border bg-muted/20 font-medium">
-                      <td className="px-6 py-3">Total ({byMonth.length} mesos)</td>
+                      <td className="px-6 py-3">Total ({byMonth.length} meses)</td>
                       <td className="px-6 py-3 text-right tabular-nums">—</td>
                       <td className="px-6 py-3 text-right tabular-nums">{totalCount}</td>
                       <td className="px-6 py-3 text-right tabular-nums">{eur(totalAmount)}</td>
@@ -299,7 +299,7 @@ function Table({ headers, children }: { headers: string[]; children: React.React
 }
 
 function EmptyRow({ span }: { span: number }) {
-  return <tr><td colSpan={span} className="px-6 py-10 text-center text-muted-foreground">Sense dades en aquest període.</td></tr>;
+  return <tr><td colSpan={span} className="px-6 py-10 text-center text-muted-foreground">Sin datos en este período.</td></tr>;
 }
 
 function Kpi({ label, value }: { label: string; value: string }) {

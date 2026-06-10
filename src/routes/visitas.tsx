@@ -17,7 +17,7 @@ import { Trash2, Plus, Check, ChevronsUpDown, CalendarCheck } from "lucide-react
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/visitas")({
-  head: () => ({ meta: [{ title: "Visites · fisioemocions" }] }),
+  head: () => ({ meta: [{ title: "Visitas · fisioemocions" }] }),
   component: VisitsPage,
 });
 
@@ -42,7 +42,7 @@ function VisitsPage() {
   const add = useMutation({
     mutationFn: async () => {
       if (!form.patient_id || !form.profile_id || !form.amount) {
-        throw new Error("Omple tots els camps requerits");
+        throw new Error("Rellena todos los campos requeridos");
       }
       const { error } = await supabase.from("patient_visits").insert({
         visit_date: form.visit_date,
@@ -107,7 +107,7 @@ function VisitsPage() {
       amount: prof ? String(prof.default_rate) : "",
       notes: a.treatment ? `Cita: ${a.treatment}` : "",
     });
-    toast.success("Cita carregada al formulari. Revisa i desa.");
+    toast.success("Cita cargada en el formulario. Revisa y guarda.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -134,7 +134,7 @@ function VisitsPage() {
     }
     await markApptCompleted.mutateAsync(apptId);
     qc.invalidateQueries({ queryKey: ["visits"] });
-    toast.success("Visita registrada des de l'agenda");
+    toast.success("Visita registrada desde la agenda");
   };
 
   const handleProfile = (id: string) => {
@@ -158,20 +158,20 @@ function VisitsPage() {
 
   return (
     <div className="px-10 py-8 max-w-[1400px] mx-auto">
-      <PageHeader title="Visites de pacients" subtitle="Registra cada visita amb la tarifa segons el perfil de client." />
+      <PageHeader title="Visitas de pacientes" subtitle="Registra cada visita con la tarifa según el perfil de cliente." />
 
       {todaysAppts.length > 0 && (
         <Card className="mb-6 shadow-[var(--shadow-card)]">
           <CardContent className="p-0">
             <div className="px-6 py-4 border-b border-border flex items-center gap-2">
               <CalendarCheck className="h-4 w-4 text-primary" />
-              <h2 className="font-display text-lg">Agenda d'avui</h2>
-              <span className="text-xs text-muted-foreground ml-1">{todaysAppts.length} pendents</span>
+              <h2 className="font-display text-lg">Agenda de hoy</h2>
+              <span className="text-xs text-muted-foreground ml-1">{todaysAppts.length} pendientes</span>
             </div>
             <div className="divide-y divide-border">
               {todaysAppts.map((a) => {
                 const p = patients.find((x) => x.id === a.patient_id);
-                const time = new Date(a.appointment_at).toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" });
+                const time = new Date(a.appointment_at).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
                 return (
                   <div key={a.id} className="px-6 py-3 flex items-center gap-4 hover:bg-muted/30">
                     <div className="text-sm font-medium tabular-nums w-14">{time}</div>
@@ -198,7 +198,7 @@ function VisitsPage() {
             <Field className="md:col-span-2" label="Data">
               <Input type="date" value={form.visit_date} onChange={(e) => setForm({ ...form, visit_date: e.target.value })} />
             </Field>
-            <Field className="md:col-span-3" label="Pacient *">
+            <Field className="md:col-span-3" label="Paciente *">
               <Popover open={patientOpen} onOpenChange={setPatientOpen}>
                 <PopoverTrigger asChild>
                   <Button
@@ -209,15 +209,15 @@ function VisitsPage() {
                   >
                     {selectedPatient
                       ? `${selectedPatient.last_name}, ${selectedPatient.first_name}`
-                      : "Selecciona un pacient..."}
+                      : "Selecciona un paciente..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                   <Command>
-                    <CommandInput placeholder="Cerca pacient..." />
+                    <CommandInput placeholder="Buscar paciente..." />
                     <CommandList>
-                      <CommandEmpty>No s'ha trobat cap pacient.</CommandEmpty>
+                      <CommandEmpty>No se ha encontrado ningún paciente.</CommandEmpty>
                       <CommandGroup>
                         {patients.map((p) => (
                           <CommandItem
@@ -253,11 +253,11 @@ function VisitsPage() {
             <Field className="md:col-span-2" label="Import (€) *">
               <Input type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
             </Field>
-            <Field className="md:col-span-2" label="Notes">
+            <Field className="md:col-span-2" label="Notas">
               <Input placeholder="Opcional" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
             </Field>
             <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-1 h-10">
-              <Plus className="h-4 w-4 mr-1" /> Afegir
+              <Plus className="h-4 w-4 mr-1" /> Añadir
             </Button>
           </div>
         </CardContent>
@@ -267,8 +267,8 @@ function VisitsPage() {
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border flex items-center justify-between">
             <div>
-              <h2 className="font-display text-lg">Historial de visites</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">{visits.length} visites · {eur(total)} acumulat</p>
+              <h2 className="font-display text-lg">Historial de visitas</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">{visits.length} visitas · {eur(total)} acumulado</p>
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -276,16 +276,16 @@ function VisitsPage() {
               <thead className="bg-muted/40">
                 <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
                   <th className="px-6 py-3 font-medium">Data</th>
-                  <th className="px-6 py-3 font-medium">Pacient</th>
+                  <th className="px-6 py-3 font-medium">Paciente</th>
                   <th className="px-6 py-3 font-medium">Perfil</th>
-                  <th className="px-6 py-3 font-medium">Notes</th>
+                  <th className="px-6 py-3 font-medium">Notas</th>
                   <th className="px-6 py-3 font-medium text-right">Import</th>
                   <th className="px-6 py-3"></th>
                 </tr>
               </thead>
               <tbody>
                 {visits.length === 0 && (
-                  <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Encara no hi ha visites registrades.</td></tr>
+                  <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Aún no hay visitas registradas.</td></tr>
                 )}
                 {visits.map((v) => {
                   const prof = profiles.find((x) => x.id === v.profile_id);

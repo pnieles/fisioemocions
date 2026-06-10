@@ -31,7 +31,7 @@ function MaterialsPage() {
 
   const add = useMutation({
     mutationFn: async () => {
-      if (!form.description || !form.unit_cost) throw new Error("Descripció i cost requerits");
+      if (!form.description || !form.unit_cost) throw new Error("Descripciónn y coste requeridos");
       const { error } = await supabase.from("materials").insert({
         purchase_date: form.purchase_date,
         description: form.description,
@@ -42,7 +42,7 @@ function MaterialsPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Material registrat");
+      toast.success("Material registrado");
       qc.invalidateQueries({ queryKey: ["materials"] });
       setForm({ ...form, description: "", quantity: "1", unit_cost: "", supplier: "" });
     },
@@ -55,7 +55,7 @@ function MaterialsPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Eliminat");
+      toast.success("Eliminado");
       qc.invalidateQueries({ queryKey: ["materials"] });
     },
   });
@@ -64,7 +64,7 @@ function MaterialsPage() {
 
   return (
     <div className="px-10 py-8 max-w-[1400px] mx-auto">
-      <PageHeader title="Material consumible" subtitle="Compres de material i consumibles per al centre." />
+      <PageHeader title="Material consumible" subtitle="Compras de material y consumibles para el centro." />
 
       <Card className="mb-8 shadow-[var(--shadow-card)]">
         <CardContent className="p-6">
@@ -72,20 +72,20 @@ function MaterialsPage() {
             <Field className="md:col-span-2" label="Data">
               <Input type="date" value={form.purchase_date} onChange={(e) => setForm({ ...form, purchase_date: e.target.value })} />
             </Field>
-            <Field className="md:col-span-4" label="Descripció *">
+            <Field className="md:col-span-4" label="Descripción *">
               <Input placeholder="Ex: Crema massatge 500ml" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
             </Field>
             <Field className="md:col-span-1" label="Qtat">
               <Input type="number" step="0.01" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
             </Field>
-            <Field className="md:col-span-2" label="Cost unit. (€) *">
+            <Field className="md:col-span-2" label="Coste unit. (€) *">
               <Input type="number" step="0.01" value={form.unit_cost} onChange={(e) => setForm({ ...form, unit_cost: e.target.value })} />
             </Field>
-            <Field className="md:col-span-2" label="Proveïdor">
+            <Field className="md:col-span-2" label="Proveedor">
               <Input value={form.supplier} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
             </Field>
             <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-1 h-10">
-              <Plus className="h-4 w-4 mr-1" /> Afegir
+              <Plus className="h-4 w-4 mr-1" /> Añadir
             </Button>
           </div>
         </CardContent>
@@ -94,25 +94,25 @@ function MaterialsPage() {
       <Card className="shadow-[var(--shadow-card)]">
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border">
-            <h2 className="font-display text-lg">Compres</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">{materials.length} entrades · {eur(total)} en material</p>
+            <h2 className="font-display text-lg">Compras</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">{materials.length} entradas · {eur(total)} en material</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/40">
                 <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
                   <th className="px-6 py-3 font-medium">Data</th>
-                  <th className="px-6 py-3 font-medium">Descripció</th>
-                  <th className="px-6 py-3 font-medium">Proveïdor</th>
+                  <th className="px-6 py-3 font-medium">Descripción</th>
+                  <th className="px-6 py-3 font-medium">Proveedor</th>
                   <th className="px-6 py-3 font-medium text-right">Qtat</th>
-                  <th className="px-6 py-3 font-medium text-right">Cost unit.</th>
+                  <th className="px-6 py-3 font-medium text-right">Coste unit.</th>
                   <th className="px-6 py-3 font-medium text-right">Total</th>
                   <th className="px-6 py-3"></th>
                 </tr>
               </thead>
               <tbody>
                 {materials.length === 0 && (
-                  <tr><td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">Cap entrada de material.</td></tr>
+                  <tr><td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">Sin entradas de material.</td></tr>
                 )}
                 {materials.map((m) => (
                   <tr key={m.id} className="border-t border-border hover:bg-muted/30">

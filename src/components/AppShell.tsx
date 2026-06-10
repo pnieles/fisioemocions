@@ -8,23 +8,23 @@ type NavGroup = { label: string; icon: React.ComponentType<{ className?: string;
 type NavEntry = NavItem | NavGroup;
 
 const nav: NavEntry[] = [
-  { to: "/", label: "Resultats Explotació", icon: LayoutDashboard },
+  { to: "/", label: "Resultados Explotación", icon: LayoutDashboard },
   { to: "/agenda", label: "Agenda", icon: CalendarDays },
-  { to: "/recordatorios", label: "Recordatoris", icon: BellRing },
-  { to: "/pacientes", label: "Pacients", icon: UserPlus },
-  { to: "/visitas", label: "Visites", icon: Stethoscope },
-  { to: "/informes", label: "Informes visites", icon: FileBarChart },
+  { to: "/recordatorios", label: "Recordatorios", icon: BellRing },
+  { to: "/pacientes", label: "Pacientees", icon: UserPlus },
+  { to: "/visitas", label: "Visitas", icon: Stethoscope },
+  { to: "/informes", label: "Informes visitas", icon: FileBarChart },
   {
     label: "Consumibles",
     icon: Boxes,
     children: [
       { to: "/material", label: "Material", icon: Package },
-      { to: "/inventario", label: "Inventari", icon: ClipboardList },
-      { to: "/consumo", label: "Consum mensual", icon: BarChart3 },
+      { to: "/inventario", label: "Inventario", icon: ClipboardList },
+      { to: "/consumo", label: "Consumo mensual", icon: BarChart3 },
     ],
   },
-  { to: "/gastos", label: "Despeses", icon: Receipt },
-  { to: "/configuracion", label: "Configuració", icon: SettingsIcon },
+  { to: "/gastos", label: "Gastos", icon: Receipt },
+  { to: "/configuracion", label: "Configuración", icon: SettingsIcon },
 ];
 
 export function AppShell() {
@@ -46,7 +46,7 @@ export function AppShell() {
             <div>
               <div className="font-display text-xl leading-none">{companyName}</div>
               <div className="text-[11px] uppercase tracking-[0.18em] text-sidebar-foreground/55 mt-1">
-                Centre de fisioteràpia
+                Centro de fisioterapia
               </div>
             </div>
           </div>
@@ -103,7 +103,7 @@ export function AppShell() {
           })}
         </nav>
         <div className="px-6 py-4 text-[11px] text-sidebar-foreground/45 border-t border-sidebar-border">
-          v1.0 · Gestió interna
+          v1.0 · Gestión interna
         </div>
       </aside>
       <main className="flex-1 min-w-0 overflow-x-hidden">

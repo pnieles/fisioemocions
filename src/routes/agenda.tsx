@@ -72,7 +72,7 @@ function AgendaPage() {
 
   const add = useMutation({
     mutationFn: async () => {
-      if (!form.patient_id || !form.appointment_at) throw new Error("Pacient i data obligatoris");
+      if (!form.patient_id || !form.appointment_at) throw new Error("Pacientee y fecha obligatorios");
       const { error } = await supabase.from("appointments").insert({
         patient_id: form.patient_id,
         profile_id: form.profile_id || null,
@@ -167,7 +167,7 @@ function AgendaPage() {
     d.setHours(0, 0, 0, 0);
     d.setMinutes(mins);
     setForm((f) => ({ ...f, appointment_at: localISOForInput(d) }));
-    toast.success(`Slot seleccionat: ${d.toLocaleString("ca-ES", { dateStyle: "short", timeStyle: "short" })}`);
+    toast.success(`Slot seleccionado: ${d.toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}`);
     const el = document.getElementById("agenda-form");
     el?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -180,7 +180,7 @@ function AgendaPage() {
 
   return (
     <div className="px-10 py-8 max-w-[1400px] mx-auto">
-      <PageHeader title="Agenda de cites" subtitle="Vista setmanal amb hores lliures i ocupades. Clica una hora lliure per crear cita." />
+      <PageHeader title="Agenda de citas" subtitle="Vista semanal con horas libres y ocupadas. Haz clic en una hora libre para crear cita." />
 
       {/* Weekly view */}
       <Card className="mb-6 shadow-[var(--shadow-card)]">
@@ -189,15 +189,15 @@ function AgendaPage() {
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="icon" onClick={() => shiftWeek(-1)}><ChevronLeft className="h-4 w-4" /></Button>
               <div className="font-display text-lg">
-                Setmana del {weekStart.toLocaleDateString("ca-ES", { day: "2-digit", month: "long", year: "numeric" })}
+                Semana del {weekStart.toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" })}
               </div>
               <Button variant="ghost" size="icon" onClick={() => shiftWeek(1)}><ChevronRight className="h-4 w-4" /></Button>
-              <Button variant="ghost" size="sm" onClick={() => setWeekStart(startOfWeek(new Date()))}>Avui</Button>
+              <Button variant="ghost" size="sm" onClick={() => setWeekStart(startOfWeek(new Date()))}>Hoy</Button>
             </div>
             <div className="text-xs text-muted-foreground flex items-center gap-3">
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-muted border border-border" /> Lliure</span>
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-primary/80" /> Ocupat</span>
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-destructive/30 border border-destructive/50" /> Tancat</span>
+              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-muted border border-border" /> Libre</span>
+              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-primary/80" /> Ocupado</span>
+              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-destructive/30 border border-destructive/50" /> Cerrado</span>
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -216,12 +216,12 @@ function AgendaPage() {
                     isToday && "bg-accent/5",
                   )}>
                     <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                      {d.toLocaleDateString("ca-ES", { weekday: "short" })}
+                      {d.toLocaleDateString("es-ES", { weekday: "short" })}
                     </div>
                     <div className={cn("font-display text-base", isToday && "text-primary")}>
                       {d.getDate()}
                     </div>
-                    {closed && <div className="text-[10px] text-destructive mt-0.5">{isHoliday ? "Festiu" : "Tancat"}</div>}
+                    {closed && <div className="text-[10px] text-destructive mt-0.5">{isHoliday ? "Festivo" : "Cerrado"}</div>}
                   </div>
                 );
               })}
@@ -279,7 +279,7 @@ function AgendaPage() {
       <Card id="agenda-form" className="mb-8 shadow-[var(--shadow-card)]">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-            <Field className="md:col-span-3" label="Pacient *">
+            <Field className="md:col-span-3" label="Paciente *">
               <Select
                 value={form.patient_id}
                 onValueChange={(v) => {
@@ -316,7 +316,7 @@ function AgendaPage() {
                 </SelectContent>
               </Select>
             </Field>
-            <Field className="md:col-span-3" label="Tractament">
+            <Field className="md:col-span-3" label="Tratamiento">
               <Select value={form.treatment} onValueChange={(v) => setForm({ ...form, treatment: v })}>
                 <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
                 <SelectContent>
@@ -326,14 +326,14 @@ function AgendaPage() {
                 </SelectContent>
               </Select>
             </Field>
-            <Field className="md:col-span-6" label="Diagnòstic">
+            <Field className="md:col-span-6" label="Diagnóstico">
               <Input value={form.diagnosis} onChange={(e) => setForm({ ...form, diagnosis: e.target.value })} />
             </Field>
-            <Field className="md:col-span-5" label="Notes">
+            <Field className="md:col-span-5" label="Notas">
               <Textarea rows={1} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
             </Field>
             <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-1 h-10">
-              <Plus className="h-4 w-4 mr-1" /> Afegir
+              <Plus className="h-4 w-4 mr-1" /> Añadir
             </Button>
           </div>
         </CardContent>
@@ -343,15 +343,15 @@ function AgendaPage() {
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border flex items-center justify-between">
             <div>
-              <h2 className="font-display text-lg">Cites</h2>
+              <h2 className="font-display text-lg">Citas</h2>
               <p className="text-xs text-muted-foreground mt-0.5">{list.length} cites</p>
             </div>
             <Select value={filter} onValueChange={(v: "upcoming" | "past" | "all") => setFilter(v)}>
               <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="upcoming">Pròximes</SelectItem>
-                <SelectItem value="past">Passades</SelectItem>
-                <SelectItem value="all">Totes</SelectItem>
+                <SelectItem value="upcoming">Próximas</SelectItem>
+                <SelectItem value="past">Pasadas</SelectItem>
+                <SelectItem value="all">Todas</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -360,10 +360,10 @@ function AgendaPage() {
               <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr className="text-left">
                   <th className="px-6 py-3 font-medium">Data</th>
-                  <th className="px-6 py-3 font-medium">Pacient</th>
-                  <th className="px-6 py-3 font-medium">Tractament</th>
-                  <th className="px-6 py-3 font-medium">Diagnòstic</th>
-                  <th className="px-6 py-3 font-medium">Estat</th>
+                  <th className="px-6 py-3 font-medium">Paciente</th>
+                  <th className="px-6 py-3 font-medium">Tratamiento</th>
+                  <th className="px-6 py-3 font-medium">Diagnóstico</th>
+                  <th className="px-6 py-3 font-medium">Estado</th>
                   <th className="px-6 py-3"></th>
                 </tr>
               </thead>
@@ -388,9 +388,9 @@ function AgendaPage() {
                         <SelectTrigger className="h-8 w-32 text-xs"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="scheduled">Programada</SelectItem>
-                          <SelectItem value="completed">Realitzada</SelectItem>
-                          <SelectItem value="cancelled">Cancel·lada</SelectItem>
-                          <SelectItem value="no_show">No s'ha presentat</SelectItem>
+                          <SelectItem value="completed">Realizada</SelectItem>
+                          <SelectItem value="cancelled">Cancelarda</SelectItem>
+                          <SelectItem value="no_show">No se presentó</SelectItem>
                         </SelectContent>
                       </Select>
                     </td>

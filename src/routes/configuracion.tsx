@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { Upload, X, Plus, Trash2, Save } from "lucide-react";
 
 export const Route = createFileRoute("/configuracion")({
-  head: () => ({ meta: [{ title: "Configuració · fisioemocions" }] }),
+  head: () => ({ meta: [{ title: "Configuración · fisioemocions" }] }),
   component: ConfigPage,
 });
 
@@ -27,7 +27,7 @@ function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
-const WEEKDAY_LABELS = ["Dg", "Dl", "Dt", "Dc", "Dj", "Dv", "Ds"];
+const WEEKDAY_LABELS = ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sá"];
 
 function ConfigPage() {
   const { data: company } = useCompanySettings();
@@ -90,7 +90,7 @@ function ConfigPage() {
       if (e3) throw e3;
     },
     onSuccess: () => {
-      toast.success("Configuració desada");
+      toast.success("Configuraciónn guardada");
       qc.invalidateQueries({ queryKey: ["settings"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -99,7 +99,7 @@ function ConfigPage() {
   const onPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (f.size > 500_000) { toast.error("Imatge massa gran (màx 500KB)"); return; }
+    if (f.size > 500_000) { toast.error("Imagen demasiado grande (máx 500KB)"); return; }
     setLogo(await fileToDataUrl(f));
   };
 
@@ -116,13 +116,13 @@ function ConfigPage() {
 
   return (
     <div className="px-10 py-8 max-w-[1000px] mx-auto">
-      <PageHeader title="Configuració" subtitle="Personalitza la marca, els missatges i el calendari d'explotació." />
+      <PageHeader title="Configuración" subtitle="Personaliza la marca, los mensajes y el calendario de explotación." />
 
       <Card className="mb-6 shadow-[var(--shadow-card)]">
         <CardContent className="p-6 space-y-5">
           <h2 className="font-display text-lg">Empresa</h2>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nom de l'empresa</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nombre de la empresa</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </div>
           <div>
@@ -133,38 +133,38 @@ function ConfigPage() {
               </div>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPick} />
               <Button variant="secondary" type="button" onClick={() => fileRef.current?.click()}>
-                <Upload className="h-4 w-4 mr-1" /> Pujar imatge
+                <Upload className="h-4 w-4 mr-1" /> Subir imagen
               </Button>
               {logo && (
                 <Button variant="ghost" type="button" onClick={() => setLogo(null)}>
-                  <X className="h-4 w-4 mr-1" /> Treure
+                  <X className="h-4 w-4 mr-1" /> Quitar
                 </Button>
               )}
             </div>
-            <p className="text-xs text-muted-foreground mt-2">Recomanat: PNG/JPG quadrat, &lt; 500KB.</p>
+            <p className="text-xs text-muted-foreground mt-2">Recomendado: PNG/JPG cuadrado, &lt; 500KB.</p>
           </div>
         </CardContent>
       </Card>
 
       <Card className="mb-6 shadow-[var(--shadow-card)]">
         <CardContent className="p-6 space-y-5">
-          <h2 className="font-display text-lg">Horari d'explotació</h2>
+          <h2 className="font-display text-lg">Horario de explotación</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Obertura</Label>
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Apertura</Label>
               <Input type="time" value={open} onChange={(e) => setOpen(e.target.value)} />
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Tancament</Label>
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Cierre</Label>
               <Input type="time" value={close} onChange={(e) => setClose(e.target.value)} />
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Duració slot (min)</Label>
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Duraciónn slot (min)</Label>
               <Input type="number" min="5" step="5" value={slot} onChange={(e) => setSlot(e.target.value)} />
             </div>
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-2 block">Dies laborables</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-2 block">Días laborables</Label>
             <div className="flex gap-2 flex-wrap">
               {WEEKDAY_LABELS.map((lbl, d) => {
                 const active = weekdays.includes(d);
@@ -180,16 +180,16 @@ function ConfigPage() {
             </div>
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-2 block">Festius i vacances</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-2 block">Festivos y vacaciones</Label>
             <div className="flex gap-2 mb-3">
               <Input type="date" value={newHoliday} onChange={(e) => setNewHoliday(e.target.value)} className="w-48" />
-              <Button type="button" variant="secondary" onClick={addHoliday}><Plus className="h-4 w-4 mr-1" />Afegir</Button>
+              <Button type="button" variant="secondary" onClick={addHoliday}><Plus className="h-4 w-4 mr-1" />Añadir</Button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {holidays.length === 0 && <span className="text-xs text-muted-foreground">Cap data afegida.</span>}
+              {holidays.length === 0 && <span className="text-xs text-muted-foreground">Sin fechas añadidas.</span>}
               {holidays.map((h) => (
                 <span key={h} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted text-sm">
-                  {new Date(h + "T00:00:00").toLocaleDateString("ca-ES", { day: "2-digit", month: "short", year: "numeric" })}
+                  {new Date(h + "T00:00:00").toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })}
                   <button type="button" onClick={() => setHolidays(holidays.filter((x) => x !== h))} className="text-muted-foreground hover:text-destructive">
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -203,7 +203,7 @@ function ConfigPage() {
       <Card className="mb-6 shadow-[var(--shadow-card)]">
         <CardContent className="p-6 space-y-5">
           <div>
-            <h2 className="font-display text-lg">Missatges de recordatori</h2>
+            <h2 className="font-display text-lg">Mensajes de recordatorio</h2>
             <p className="text-xs text-muted-foreground mt-1">
               Variables disponibles: <code className="bg-muted px-1 rounded">{"{name}"}</code>,{" "}
               <code className="bg-muted px-1 rounded">{"{date}"}</code>,{" "}
@@ -216,11 +216,11 @@ function ConfigPage() {
             <Textarea rows={4} value={wa} onChange={(e) => setWa(e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Assumpte del correu</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Asunto del correo</Label>
             <Input value={subj} onChange={(e) => setSubj(e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Cos del correu</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Cuerpo del correo</Label>
             <Textarea rows={7} value={body} onChange={(e) => setBody(e.target.value)} />
           </div>
         </CardContent>
@@ -229,7 +229,7 @@ function ConfigPage() {
       <ProfilesCard />
 
       <div className="flex justify-end">
-        <Button onClick={() => save.mutate()} disabled={save.isPending}>Desar canvis</Button>
+        <Button onClick={() => save.mutate()} disabled={save.isPending}>Guardar cambios</Button>
       </div>
     </div>
   );
@@ -243,7 +243,7 @@ function ProfilesCard() {
 
   const add = useMutation({
     mutationFn: async () => {
-      if (!form.name || !form.default_rate) throw new Error("Nom i tarifa requerits");
+      if (!form.name || !form.default_rate) throw new Error("Nombre y tarifa requeridos");
       const { error } = await supabase.from("client_profiles").insert({
         name: form.name,
         default_rate: Number(form.default_rate),
@@ -251,7 +251,7 @@ function ProfilesCard() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Perfil creat");
+      toast.success("Perfil creado");
       qc.invalidateQueries({ queryKey: ["profiles"] });
       setForm({ name: "", default_rate: "" });
     },
@@ -264,7 +264,7 @@ function ProfilesCard() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Tarifa actualitzada");
+      toast.success("Tarifa actualizada");
       qc.invalidateQueries({ queryKey: ["profiles"] });
       setEdits({});
     },
@@ -276,7 +276,7 @@ function ProfilesCard() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Eliminat");
+      toast.success("Eliminado");
       qc.invalidateQueries({ queryKey: ["profiles"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -286,16 +286,16 @@ function ProfilesCard() {
     <Card className="mb-6 shadow-[var(--shadow-card)]">
       <CardContent className="p-6 space-y-5">
         <div>
-          <h2 className="font-display text-lg">Perfils i tarifes de pacients</h2>
-          <p className="text-xs text-muted-foreground mt-1">Defineix els perfils (CASS, Privat...) i la tarifa per defecte que s'aplicarà a les visites.</p>
+          <h2 className="font-display text-lg">Perfiles y tarifas de pacientes</h2>
+          <p className="text-xs text-muted-foreground mt-1">Define los perfiles (CASS, Privado...) y la tarifa por defecto que se aplicará a las visitas.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
           <div className="md:col-span-6">
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nom del perfil</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nombre del perfil</Label>
             <Input placeholder="Ex: CASS 1, Privat..." value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </div>
           <div className="md:col-span-4">
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Tarifa per defecte (€)</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Tarifa por defecto (€)</Label>
             <Input type="number" step="0.01" value={form.default_rate} onChange={(e) => setForm({ ...form, default_rate: e.target.value })} />
           </div>
           <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-2 h-10">
@@ -332,7 +332,7 @@ function ProfilesCard() {
                       <td className="px-4 py-2 text-right space-x-2 whitespace-nowrap">
                         {editing ? (
                           <Button size="sm" variant="default" onClick={() => update.mutate({ id: p.id, rate: Number(edits[p.id]) })}>
-                            <Save className="h-3.5 w-3.5 mr-1" /> Desar
+                            <Save className="h-3.5 w-3.5 mr-1" /> Guardar
                           </Button>
                         ) : (
                           <Button size="sm" variant="outline" onClick={() => setEdits({ ...edits, [p.id]: String(p.default_rate) })}>
