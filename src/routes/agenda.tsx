@@ -344,7 +344,7 @@ function AgendaPage() {
           <div className="px-6 py-4 border-b border-border flex items-center justify-between">
             <div>
               <h2 className="font-display text-lg">Citas</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">{list.length} cites</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{list.length} citas</p>
             </div>
             <Select value={filter} onValueChange={(v: "upcoming" | "past" | "all") => setFilter(v)}>
               <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
@@ -359,7 +359,7 @@ function AgendaPage() {
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr className="text-left">
-                  <th className="px-6 py-3 font-medium">Data</th>
+                  <th className="px-6 py-3 font-medium">Fecha</th>
                   <th className="px-6 py-3 font-medium">Paciente</th>
                   <th className="px-6 py-3 font-medium">Tratamiento</th>
                   <th className="px-6 py-3 font-medium">Diagnóstico</th>
@@ -389,7 +389,7 @@ function AgendaPage() {
                         <SelectContent>
                           <SelectItem value="scheduled">Programada</SelectItem>
                           <SelectItem value="completed">Realizada</SelectItem>
-                          <SelectItem value="cancelled">Cancelarda</SelectItem>
+                          <SelectItem value="cancelled">Cancelada</SelectItem>
                           <SelectItem value="no_show">No se presentó</SelectItem>
                         </SelectContent>
                       </Select>
