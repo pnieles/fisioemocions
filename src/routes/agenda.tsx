@@ -445,8 +445,13 @@ function AgendaPage() {
                         </SelectContent>
                       </Select>
                     </td>
-                    <td className="px-6 py-3 text-right">
-                      <button onClick={() => del.mutate(a.id)} className="text-muted-foreground hover:text-destructive">
+                    <td className="px-6 py-3 text-right whitespace-nowrap">
+                      {a.status === "scheduled" && (
+                        <button onClick={() => openEdit(a)} className="text-muted-foreground hover:text-primary mr-2 inline-block align-middle" title="Editar">
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                      )}
+                      <button onClick={() => del.mutate(a.id)} className="text-muted-foreground hover:text-destructive align-middle">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </td>
@@ -457,6 +462,53 @@ function AgendaPage() {
           </div>
         </CardContent>
       </Card>
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader><DialogTitle>Editar cita</DialogTitle></DialogHeader>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Field label="Paciente *">
+              <Select value={editForm.patient_id} onValueChange={(v) => setEditForm({ ...editForm, patient_id: v })}>
+                <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
+                <SelectContent>
+                  {patients.map((p) => <SelectItem key={p.id} value={p.id}>{p.last_name}, {p.first_name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Fecha y hora *">
+              <Input type="datetime-local" value={editForm.appointment_at} onChange={(e) => setEditForm({ ...editForm, appointment_at: e.target.value })} />
+            </Field>
+            <Field label="Duración (min)">
+              <Input type="number" value={editForm.duration_min} onChange={(e) => setEditForm({ ...editForm, duration_min: e.target.value })} />
+            </Field>
+            <Field label="Perfil">
+              <Select value={editForm.profile_id} onValueChange={(v) => setEditForm({ ...editForm, profile_id: v })}>
+                <SelectTrigger><SelectValue placeholder="Perfil" /></SelectTrigger>
+                <SelectContent>
+                  {profiles.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Tratamiento" className="sm:col-span-2">
+              <Select value={editForm.treatment} onValueChange={(v) => setEditForm({ ...editForm, treatment: v })}>
+                <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
+                <SelectContent>
+                  {treatments.map((t) => <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Diagnóstico" className="sm:col-span-2">
+              <Input value={editForm.diagnosis} onChange={(e) => setEditForm({ ...editForm, diagnosis: e.target.value })} />
+            </Field>
+            <Field label="Notas" className="sm:col-span-2">
+              <Textarea rows={2} value={editForm.notes} onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })} />
+            </Field>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setEditing(null)}>Cancelar</Button>
+            <Button onClick={() => updateAppt.mutate()} disabled={updateAppt.isPending}>Guardar cambios</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
