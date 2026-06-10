@@ -142,7 +142,7 @@ function PatientsPage() {
             </Field>
             <Field className="md:col-span-3" label="Perfil por defecto">
               <Select value={form.default_profile_id || "__none"} onValueChange={(v) => setForm({ ...form, default_profile_id: v === "__none" ? "" : v })}>
-                <SelectTrigger><SelectValue placeholder="Cap" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Ninguno" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__none">— Ninguno —</SelectItem>
                   {profiles.map((p) => (
@@ -153,7 +153,7 @@ function PatientsPage() {
             </Field>
             <Field className="md:col-span-3" label="Tratamiento por defecto">
               <Select value={form.default_treatment || "__none"} onValueChange={(v) => setForm({ ...form, default_treatment: v === "__none" ? "" : v })}>
-                <SelectTrigger><SelectValue placeholder="Cap" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Ninguno" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__none">— Ninguno —</SelectItem>
                   {treatments.map((t) => (
