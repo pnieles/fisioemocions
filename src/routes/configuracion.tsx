@@ -90,7 +90,7 @@ function ConfigPage() {
       if (e3) throw e3;
     },
     onSuccess: () => {
-      toast.success("Configuraciónn guardada");
+      toast.success("Configuración guardada");
       qc.invalidateQueries({ queryKey: ["settings"] });
     },
     onError: (e: Error) => toast.error(e.message),

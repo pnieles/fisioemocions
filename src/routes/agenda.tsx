@@ -369,7 +369,7 @@ function AgendaPage() {
               </thead>
               <tbody>
                 {list.length === 0 && (
-                  <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Sense cites.</td></tr>
+                  <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Sin citas.</td></tr>
                 )}
                 {list.map((a) => (
                   <tr key={a.id} className="border-t border-border hover:bg-muted/30">

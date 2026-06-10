@@ -418,7 +418,7 @@ function PLTable({
           </span>
         </div>
         <div className="text-xs text-muted-foreground mt-1">
-          Margenn: {pct(totalIncome > 0 ? (totalIncome - totalExpense) / totalIncome : 0)}
+          Margen: {pct(totalIncome > 0 ? (totalIncome - totalExpense) / totalIncome : 0)}
         </div>
       </div>
     </div>

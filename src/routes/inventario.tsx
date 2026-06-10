@@ -15,8 +15,8 @@ import { Trash2, Plus, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 export const Route = createFileRoute("/inventario")({
-  head: () => ({ meta: [{ title: "Inventarioo · fisioemocions" }] }),
-  component: InventariooPage,
+  head: () => ({ meta: [{ title: "Inventario · fisioemocions" }] }),
+  component: InventarioPage,
 });
 
 function currentPeriodISO() {
@@ -29,7 +29,7 @@ function fmtPeriod(iso: string) {
   return new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(d);
 }
 
-function InventariooPage() {
+function InventarioPage() {
   const { data: counts = [] } = useInventoryCounts();
   const { data: materials = [] } = useMaterials();
   const qc = useQueryClient();
@@ -134,7 +134,7 @@ function InventariooPage() {
   return (
     <div className="px-10 py-8 max-w-[1400px] mx-auto">
       <PageHeader
-        title="Inventarioo de consumibles"
+        title="Inventario de consumibles"
         subtitle="Recuentos físicos mensuales y valoración del stock final."
       />
 
