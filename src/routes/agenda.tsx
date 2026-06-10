@@ -179,7 +179,7 @@ function AgendaPage() {
   };
 
   return (
-    <div className="px-10 py-8 max-w-[1400px] mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
       <PageHeader title="Agenda de citas" subtitle="Vista semanal con horas libres y ocupadas. Haz clic en una hora libre para crear cita." />
 
       {/* Weekly view */}

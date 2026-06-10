@@ -115,7 +115,7 @@ function ConfigPage() {
   };
 
   return (
-    <div className="px-10 py-8 max-w-[1000px] mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1000px] mx-auto">
       <PageHeader title="Configuración" subtitle="Personaliza la marca, los mensajes y el calendario de explotación." />
 
       <Card className="mb-6 shadow-[var(--shadow-card)]">

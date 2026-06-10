@@ -65,7 +65,7 @@ function ProfilesPage() {
   });
 
   return (
-    <div className="px-10 py-8 max-w-[1100px] mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1100px] mx-auto">
       <PageHeader title="Perfiles y tarifas" subtitle="Define los perfiles de cliente y las tarifas por defecto que se aplicarán a las visitas." />
 
       <Card className="mb-8 shadow-[var(--shadow-card)]">

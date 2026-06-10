@@ -123,7 +123,7 @@ function InformesPage() {
   const totalAmount = filtered.reduce((s, v) => s + Number(v.amount), 0);
 
   return (
-    <div className="px-10 py-8 max-w-[1400px] mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
       <PageHeader
         title="Informes de visitas"
         subtitle="Visitas per pacient i totales per dia, setmana i mes amb promitjos."

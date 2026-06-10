@@ -89,7 +89,7 @@ function ConsumoPage() {
     : [];
 
   return (
-    <div className="px-10 py-8 max-w-[1400px] mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
       <PageHeader
         title="Consumo de consumibles por período"
         subtitle="Detallee por producto (cantidad e importe) y prorrateo por paciente según las visitas del mes."

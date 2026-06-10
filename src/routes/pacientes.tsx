@@ -113,7 +113,7 @@ function PatientsPage() {
 
 
   return (
-    <div className="px-10 py-8 max-w-[1400px] mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
       <PageHeader title="Pacientees" subtitle="Ficha de contacto con datos para avisos vía WhatsApp y correo." />
 
       <Card className="mb-8 shadow-[var(--shadow-card)]">

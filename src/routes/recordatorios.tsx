@@ -62,7 +62,7 @@ function ReminderPage() {
   const patientOf = (id: string | null) => patients.find((p) => p.id === id);
 
   return (
-    <div className="px-10 py-8 max-w-[1400px] mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
       <PageHeader
         title="Recordatorios de cita"
         subtitle="Citas pendientes dentro de la ventana escogida. Prepara mensajes vía WhatsApp (wa.me) o correo y márcalos como enviados."

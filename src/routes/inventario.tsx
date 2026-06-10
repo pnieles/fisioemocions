@@ -132,7 +132,7 @@ function InventarioPage() {
   }
 
   return (
-    <div className="px-10 py-8 max-w-[1400px] mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
       <PageHeader
         title="Inventario de consumibles"
         subtitle="Recuentos físicos mensuales y valoración del stock final."

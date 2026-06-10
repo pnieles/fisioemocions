@@ -62,7 +62,7 @@ function ExpensesPage() {
   const total = expenses.reduce((s, e) => s + Number(e.amount), 0);
 
   return (
-    <div className="px-10 py-8 max-w-[1400px] mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
       <PageHeader title="Gastos" subtitle="Alquiler, impuestos, útiles, inversiones y otros gastos operativos." />
 
       <Card className="mb-8 shadow-[var(--shadow-card)]">

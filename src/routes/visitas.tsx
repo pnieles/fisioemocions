@@ -157,7 +157,7 @@ function VisitsPage() {
   const selectedPatient = patients.find((p) => p.id === form.patient_id);
 
   return (
-    <div className="px-10 py-8 max-w-[1400px] mx-auto">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
       <PageHeader title="Visitas de pacientes" subtitle="Registra cada visita con la tarifa según el perfil de cliente." />
 
       {todaysAppts.length > 0 && (
