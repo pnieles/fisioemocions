@@ -27,6 +27,7 @@ function VisitsPage() {
   const { data: patients = [] } = usePatients();
   const { data: visits = [] } = useVisits();
   const { data: appts = [] } = useAppointments();
+  const { data: igiRates = [] } = useIgiRates();
   const qc = useQueryClient();
 
   const [form, setForm] = useState({
