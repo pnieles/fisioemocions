@@ -17,6 +17,7 @@ import { Route as MaterialRouteImport } from './routes/material'
 import { Route as InventarioRouteImport } from './routes/inventario'
 import { Route as InformesRouteImport } from './routes/informes'
 import { Route as GastosRouteImport } from './routes/gastos'
+import { Route as FacturasRouteImport } from './routes/facturas'
 import { Route as ConsumoRouteImport } from './routes/consumo'
 import { Route as ConfiguracionRouteImport } from './routes/configuracion'
 import { Route as AgendaRouteImport } from './routes/agenda'
@@ -62,6 +63,11 @@ const GastosRoute = GastosRouteImport.update({
   path: '/gastos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FacturasRoute = FacturasRouteImport.update({
+  id: '/facturas',
+  path: '/facturas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConsumoRoute = ConsumoRouteImport.update({
   id: '/consumo',
   path: '/consumo',
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/agenda': typeof AgendaRoute
   '/configuracion': typeof ConfiguracionRoute
   '/consumo': typeof ConsumoRoute
+  '/facturas': typeof FacturasRoute
   '/gastos': typeof GastosRoute
   '/informes': typeof InformesRoute
   '/inventario': typeof InventarioRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/agenda': typeof AgendaRoute
   '/configuracion': typeof ConfiguracionRoute
   '/consumo': typeof ConsumoRoute
+  '/facturas': typeof FacturasRoute
   '/gastos': typeof GastosRoute
   '/informes': typeof InformesRoute
   '/inventario': typeof InventarioRoute
@@ -117,6 +125,7 @@ export interface FileRoutesById {
   '/agenda': typeof AgendaRoute
   '/configuracion': typeof ConfiguracionRoute
   '/consumo': typeof ConsumoRoute
+  '/facturas': typeof FacturasRoute
   '/gastos': typeof GastosRoute
   '/informes': typeof InformesRoute
   '/inventario': typeof InventarioRoute
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
     | '/agenda'
     | '/configuracion'
     | '/consumo'
+    | '/facturas'
     | '/gastos'
     | '/informes'
     | '/inventario'
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/agenda'
     | '/configuracion'
     | '/consumo'
+    | '/facturas'
     | '/gastos'
     | '/informes'
     | '/inventario'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/agenda'
     | '/configuracion'
     | '/consumo'
+    | '/facturas'
     | '/gastos'
     | '/informes'
     | '/inventario'
@@ -176,6 +188,7 @@ export interface RootRouteChildren {
   AgendaRoute: typeof AgendaRoute
   ConfiguracionRoute: typeof ConfiguracionRoute
   ConsumoRoute: typeof ConsumoRoute
+  FacturasRoute: typeof FacturasRoute
   GastosRoute: typeof GastosRoute
   InformesRoute: typeof InformesRoute
   InventarioRoute: typeof InventarioRoute
@@ -244,6 +257,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GastosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/facturas': {
+      id: '/facturas'
+      path: '/facturas'
+      fullPath: '/facturas'
+      preLoaderRoute: typeof FacturasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/consumo': {
       id: '/consumo'
       path: '/consumo'
@@ -280,6 +300,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgendaRoute: AgendaRoute,
   ConfiguracionRoute: ConfiguracionRoute,
   ConsumoRoute: ConsumoRoute,
+  FacturasRoute: FacturasRoute,
   GastosRoute: GastosRoute,
   InformesRoute: InformesRoute,
   InventarioRoute: InventarioRoute,
