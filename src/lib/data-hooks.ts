@@ -56,6 +56,30 @@ export type Patient = {
   default_treatment: string | null;
   passport_id: string | null;
   default_profile_id: string | null;
+  patient_type: string | null;
+  wants_invoice: boolean;
+  igi_rate_id: string | null;
+  cass_coverage: number | null;
+};
+
+export type IgiRate = { id: string; name: string; rate: number };
+
+export type Invoice = {
+  id: string;
+  visit_id: string | null;
+  patient_id: string | null;
+  patient_type: string;
+  invoice_number: string | null;
+  issue_date: string;
+  patient_name: string | null;
+  patient_passport: string | null;
+  base_amount: number;
+  igi_rate: number;
+  igi_amount: number;
+  total_amount: number;
+  service_description: string | null;
+  status: string;
+  notes: string | null;
 };
 
 export type Appointment = {
