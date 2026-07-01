@@ -322,6 +322,8 @@ function ConfigPage() {
 
       <ProfilesCard />
 
+      <IgiRatesCard />
+
       <RolesCard />
 
       <div className="flex justify-end">
