@@ -297,3 +297,29 @@ export function useTreatments() {
   });
 }
 
+export function useIgiRates() {
+  return useQuery({
+    queryKey: ["igi_rates"],
+    queryFn: async (): Promise<IgiRate[]> => {
+      const { data, error } = await supabase.from("igi_rates" as never).select("*").order("rate");
+      if (error) throw error;
+      return (data ?? []) as unknown as IgiRate[];
+    },
+  });
+}
+
+export function useInvoices() {
+  return useQuery({
+    queryKey: ["invoices"],
+    queryFn: async (): Promise<Invoice[]> => {
+      const { data, error } = await supabase
+        .from("invoices" as never)
+        .select("*")
+        .order("issue_date", { ascending: false })
+        .limit(2000);
+      if (error) throw error;
+      return (data ?? []) as unknown as Invoice[];
+    },
+  });
+}
+
