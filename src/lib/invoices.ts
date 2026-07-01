@@ -111,7 +111,7 @@ export function exportInvoicePdf(inv: Invoice, company: CompanySettings, patient
 
   // Service table
   const tableY = M + 80;
-  doc.setFillColor(240);
+  doc.setFillColor(240, 240, 240);
   doc.rect(M, tableY, W - M * 2, 8, "F");
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10);
