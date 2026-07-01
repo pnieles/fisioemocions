@@ -2,13 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { usePatients, useTreatments, useProfiles, type Patient } from "@/lib/data-hooks";
+import { usePatients, useProfiles, useIgiRates, type Patient } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Trash2, Plus, Phone, Mail } from "lucide-react";
 
@@ -20,20 +21,23 @@ export const Route = createFileRoute("/pacientes")({
 type FormState = {
   first_name: string;
   last_name: string;
-  nationality: string;
   birth_date: string;
   phone: string;
   email: string;
   notes: string;
-  default_treatment: string;
   passport_id: string;
   default_profile_id: string;
+  patient_type: string;
+  wants_invoice: boolean;
+  igi_rate_id: string;
+  cass_coverage: string;
 };
 
 const empty: FormState = {
-  first_name: "", last_name: "", nationality: "", birth_date: "",
-  phone: "+376 ", email: "", notes: "", default_treatment: "",
+  first_name: "", last_name: "", birth_date: "",
+  phone: "+376 ", email: "", notes: "",
   passport_id: "", default_profile_id: "",
+  patient_type: "", wants_invoice: false, igi_rate_id: "", cass_coverage: "",
 };
 
 function ageOf(birth: string | null) {
@@ -45,8 +49,8 @@ function ageOf(birth: string | null) {
 
 function PatientsPage() {
   const { data: patients = [] } = usePatients();
-  const { data: treatments = [] } = useTreatments();
   const { data: profiles = [] } = useProfiles();
+  const { data: igiRates = [] } = useIgiRates();
   const qc = useQueryClient();
   const [form, setForm] = useState<FormState>(empty);
   const [editing, setEditing] = useState<string | null>(null);
@@ -63,14 +67,16 @@ function PatientsPage() {
       const payload = {
         first_name: form.first_name,
         last_name: form.last_name,
-        nationality: form.nationality || null,
         birth_date: form.birth_date || null,
         phone: hasPhone ? form.phone.trim() : null,
         email: hasEmail ? form.email.trim() : null,
         notes: form.notes || null,
-        default_treatment: form.default_treatment || null,
         passport_id: form.passport_id || null,
         default_profile_id: form.default_profile_id || null,
+        patient_type: form.patient_type || null,
+        wants_invoice: form.wants_invoice,
+        igi_rate_id: form.igi_rate_id || null,
+        cass_coverage: form.cass_coverage === "" ? null : Number(form.cass_coverage),
       };
       if (editing) {
         const { error } = await supabase.from("patients").update(payload).eq("id", editing);
@@ -103,18 +109,20 @@ function PatientsPage() {
     setEditing(p.id);
     setForm({
       first_name: p.first_name, last_name: p.last_name,
-      nationality: p.nationality ?? "", birth_date: p.birth_date ?? "",
+      birth_date: p.birth_date ?? "",
       phone: p.phone ?? "+376 ", email: p.email ?? "", notes: p.notes ?? "",
-      default_treatment: p.default_treatment ?? "",
       passport_id: p.passport_id ?? "",
       default_profile_id: p.default_profile_id ?? "",
+      patient_type: p.patient_type ?? "",
+      wants_invoice: !!p.wants_invoice,
+      igi_rate_id: p.igi_rate_id ?? "",
+      cass_coverage: p.cass_coverage == null ? "" : String(p.cass_coverage),
     });
   };
 
-
   return (
     <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
-      <PageHeader title="Pacientes" subtitle="Ficha de contacto con datos para avisos vía WhatsApp y correo." />
+      <PageHeader title="Pacientes" subtitle="Ficha de contacto y datos de facturación." />
 
       <Card className="mb-8 shadow-[var(--shadow-card)]">
         <CardContent className="p-6">
@@ -125,22 +133,30 @@ function PatientsPage() {
             <Field className="md:col-span-3" label="Apellidos *">
               <Input value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} />
             </Field>
-            <Field className="md:col-span-2" label="Nacionalidad">
-              <Input value={form.nationality} onChange={(e) => setForm({ ...form, nationality: e.target.value })} />
-            </Field>
             <Field className="md:col-span-2" label="Fecha nacimiento">
               <Input type="date" value={form.birth_date} onChange={(e) => setForm({ ...form, birth_date: e.target.value })} />
             </Field>
             <Field className="md:col-span-2" label="Teléfono (WhatsApp)">
               <Input placeholder="+376 ..." value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             </Field>
+            <Field className="md:col-span-2" label="Censo / Pasaporte">
+              <Input value={form.passport_id} onChange={(e) => setForm({ ...form, passport_id: e.target.value })} />
+            </Field>
             <Field className="md:col-span-4" label="Correo electrónico">
               <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             </Field>
-            <Field className="md:col-span-3" label="Censo / Pasaporte">
-              <Input value={form.passport_id} onChange={(e) => setForm({ ...form, passport_id: e.target.value })} />
+
+            <Field className="md:col-span-2" label="Tipo de paciente">
+              <Select value={form.patient_type || "__none"} onValueChange={(v) => setForm({ ...form, patient_type: v === "__none" ? "" : v })}>
+                <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none">— Sin definir —</SelectItem>
+                  <SelectItem value="cass">CASS</SelectItem>
+                  <SelectItem value="privado">Privado</SelectItem>
+                </SelectContent>
+              </Select>
             </Field>
-            <Field className="md:col-span-3" label="Perfil por defecto">
+            <Field className="md:col-span-3" label="Perfil (tarifa)">
               <Select value={form.default_profile_id || "__none"} onValueChange={(v) => setForm({ ...form, default_profile_id: v === "__none" ? "" : v })}>
                 <SelectTrigger><SelectValue placeholder="Ninguno" /></SelectTrigger>
                 <SelectContent>
@@ -151,21 +167,35 @@ function PatientsPage() {
                 </SelectContent>
               </Select>
             </Field>
-            <Field className="md:col-span-3" label="Tratamiento por defecto">
-              <Select value={form.default_treatment || "__none"} onValueChange={(v) => setForm({ ...form, default_treatment: v === "__none" ? "" : v })}>
-                <SelectTrigger><SelectValue placeholder="Ninguno" /></SelectTrigger>
+            <Field className="md:col-span-2" label="IGI aplicable">
+              <Select value={form.igi_rate_id || "__none"} onValueChange={(v) => setForm({ ...form, igi_rate_id: v === "__none" ? "" : v })}>
+                <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__none">— Ninguno —</SelectItem>
-                  {treatments.map((t) => (
-                    <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
+                  {igiRates.map((r) => (
+                    <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </Field>
-            <Field className="md:col-span-3" label="Notas">
+            {form.patient_type === "cass" && (
+              <Field className="md:col-span-2" label="Cobertura CASS (%)">
+                <Input type="number" step="0.01" value={form.cass_coverage} onChange={(e) => setForm({ ...form, cass_coverage: e.target.value })} />
+              </Field>
+            )}
+            <div className="md:col-span-2 flex items-center gap-2 pb-1">
+              <Checkbox
+                id="wants_invoice"
+                checked={form.wants_invoice}
+                onCheckedChange={(v) => setForm({ ...form, wants_invoice: Boolean(v) })}
+              />
+              <Label htmlFor="wants_invoice" className="text-sm">¿Desea factura?</Label>
+            </div>
+
+            <Field className="md:col-span-9" label="Notas">
               <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
             </Field>
-            <div className="md:col-span-2 flex gap-2">
+            <div className="md:col-span-3 flex gap-2">
               <Button onClick={() => save.mutate()} disabled={save.isPending} className="flex-1 h-10">
                 <Plus className="h-4 w-4 mr-1" /> {editing ? "Guardar" : "Añadir"}
               </Button>
@@ -188,10 +218,10 @@ function PatientsPage() {
               <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr className="text-left">
                   <th className="px-6 py-3 font-medium">Paciente</th>
-                  <th className="px-6 py-3 font-medium">Nacionalidad</th>
-                  <th className="px-6 py-3 font-medium">Edat</th>
-                  <th className="px-6 py-3 font-medium">Contacte</th>
-                  <th className="px-6 py-3 font-medium">Notas</th>
+                  <th className="px-6 py-3 font-medium">Tipo</th>
+                  <th className="px-6 py-3 font-medium">Edad</th>
+                  <th className="px-6 py-3 font-medium">Contacto</th>
+                  <th className="px-6 py-3 font-medium">Factura</th>
                   <th className="px-6 py-3"></th>
                 </tr>
               </thead>
@@ -202,13 +232,17 @@ function PatientsPage() {
                 {patients.map((p) => (
                   <tr key={p.id} className="border-t border-border hover:bg-muted/30">
                     <td className="px-6 py-3 font-medium">{p.last_name}, {p.first_name}</td>
-                    <td className="px-6 py-3 text-muted-foreground">{p.nationality ?? "—"}</td>
+                    <td className="px-6 py-3 text-muted-foreground">
+                      {p.patient_type === "cass" ? "CASS" : p.patient_type === "privado" ? "Privado" : "—"}
+                    </td>
                     <td className="px-6 py-3 tabular-nums">{ageOf(p.birth_date)}</td>
                     <td className="px-6 py-3 text-xs space-y-1">
                       {p.phone && <div className="flex items-center gap-1.5"><Phone className="h-3 w-3" />{p.phone}</div>}
                       {p.email && <div className="flex items-center gap-1.5"><Mail className="h-3 w-3" />{p.email}</div>}
                     </td>
-                    <td className="px-6 py-3 text-muted-foreground text-xs max-w-xs truncate">{p.notes ?? ""}</td>
+                    <td className="px-6 py-3 text-xs">
+                      {p.wants_invoice ? <span className="text-primary font-medium">Sí</span> : <span className="text-muted-foreground">—</span>}
+                    </td>
                     <td className="px-6 py-3 text-right space-x-2 whitespace-nowrap">
                       <button onClick={() => startEdit(p)} className="text-xs text-accent hover:underline">Editar</button>
                       <button onClick={() => del.mutate(p.id)} className="text-muted-foreground hover:text-destructive inline-block align-middle">

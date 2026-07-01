@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Stethoscope, Package, Receipt, Activity, ClipboardList, CalendarDays, UserPlus, BarChart3, BellRing, Settings as SettingsIcon, Boxes, FileBarChart, Menu, X } from "lucide-react";
+import { LayoutDashboard, Stethoscope, Package, Receipt, Activity, ClipboardList, CalendarDays, UserPlus, BarChart3, BellRing, Settings as SettingsIcon, Boxes, FileBarChart, FileText, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useCompanySettings } from "@/lib/data-hooks";
@@ -16,6 +16,7 @@ const nav: NavEntry[] = [
   { to: "/pacientes", label: "Pacientes", icon: UserPlus, key: "pacientes" },
   { to: "/visitas", label: "Visitas", icon: Stethoscope, key: "visitas" },
   { to: "/informes", label: "Informes visitas", icon: FileBarChart, key: "informes" },
+  { to: "/facturas", label: "Facturas", icon: FileText, key: "facturas" },
   {
     label: "Consumibles",
     icon: Boxes,

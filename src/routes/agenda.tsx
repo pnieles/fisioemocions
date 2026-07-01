@@ -184,12 +184,17 @@ function AgendaPage() {
   const slotMin = sch.slot_min || 30;
   const slotsPerDay = Math.max(0, Math.ceil((closeMin - openMin) / slotMin));
   const days = useMemo(() => {
-    return Array.from({ length: 7 }).map((_, i) => {
-      const d = new Date(weekStart);
-      d.setDate(d.getDate() + i);
-      return d;
-    });
-  }, [weekStart]);
+    return Array.from({ length: 7 })
+      .map((_, i) => {
+        const d = new Date(weekStart);
+        d.setDate(d.getDate() + i);
+        return d;
+      })
+      .filter((d) => {
+        const iso = dateToISODate(d);
+        return sch.weekdays.includes(d.getDay()) && !sch.holidays.includes(iso);
+      });
+  }, [weekStart, sch.weekdays, sch.holidays]);
 
   type Busy = { startMin: number; endMin: number; appt: typeof appts[number] };
   const busyByDay = useMemo(() => {
@@ -241,11 +246,10 @@ function AgendaPage() {
             <div className="text-xs text-muted-foreground flex items-center gap-3">
               <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-muted border border-border" /> Libre</span>
               <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-primary/80" /> Ocupado</span>
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-destructive/30 border border-destructive/50" /> Cerrado</span>
             </div>
           </div>
           <div className="overflow-x-auto">
-            <div className="min-w-[800px] grid" style={{ gridTemplateColumns: `64px repeat(7, minmax(0, 1fr))` }}>
+            <div className="min-w-[700px] grid" style={{ gridTemplateColumns: `64px repeat(${days.length}, minmax(0, 1fr))` }}>
               {/* header row */}
               <div></div>
               {days.map((d) => {

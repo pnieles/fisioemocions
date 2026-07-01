@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useCompanySettings, useReminderTemplates, useScheduleSettings, useProfiles } from "@/lib/data-hooks";
+import { useCompanySettings, useReminderTemplates, useScheduleSettings, useProfiles, useIgiRates } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -322,6 +322,8 @@ function ConfigPage() {
 
       <ProfilesCard />
 
+      <IgiRatesCard />
+
       <RolesCard />
 
       <div className="flex justify-end">
@@ -442,6 +444,87 @@ function ProfilesCard() {
                     </tr>
                   );
                 })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function IgiRatesCard() {
+  const { data: rates = [] } = useIgiRates();
+  const qc = useQueryClient();
+  const [form, setForm] = useState({ name: "", rate: "" });
+
+  const add = useMutation({
+    mutationFn: async () => {
+      if (!form.name || form.rate === "") throw new Error("Nombre y porcentaje requeridos");
+      const { error } = await supabase.from("igi_rates").insert({ name: form.name, rate: Number(form.rate) });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("IGI creado");
+      qc.invalidateQueries({ queryKey: ["igi_rates"] });
+      setForm({ name: "", rate: "" });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const del = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("igi_rates").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Eliminado");
+      qc.invalidateQueries({ queryKey: ["igi_rates"] });
+    },
+  });
+
+  return (
+    <Card className="mb-6 shadow-[var(--shadow-card)]">
+      <CardContent className="p-6 space-y-5">
+        <div>
+          <h2 className="font-display text-lg">Tipos de IGI</h2>
+          <p className="text-xs text-muted-foreground mt-1">Tarifas de IGI aplicables a las facturas de pacientes.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+          <div className="md:col-span-6">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nombre</Label>
+            <Input placeholder="Ex: IGI 4,5%" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          </div>
+          <div className="md:col-span-4">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Porcentaje (%)</Label>
+            <Input type="number" step="0.01" value={form.rate} onChange={(e) => setForm({ ...form, rate: e.target.value })} />
+          </div>
+          <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-2 h-10">
+            <Plus className="h-4 w-4 mr-1" /> Crear
+          </Button>
+        </div>
+        {rates.length > 0 && (
+          <div className="border border-border rounded-md overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40">
+                <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
+                  <th className="px-4 py-2 font-medium">Nombre</th>
+                  <th className="px-4 py-2 font-medium text-right">Porcentaje</th>
+                  <th className="px-4 py-2"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {rates.map((r) => (
+                  <tr key={r.id} className="border-t border-border">
+                    <td className="px-4 py-2 font-medium">{r.name}</td>
+                    <td className="px-4 py-2 text-right tabular-nums">{r.rate}%</td>
+                    <td className="px-4 py-2 text-right">
+                      <button onClick={() => del.mutate(r.id)} className="text-muted-foreground hover:text-destructive align-middle">
+                        <Trash2 className="h-4 w-4 inline" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

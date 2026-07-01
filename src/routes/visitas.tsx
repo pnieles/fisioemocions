@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useProfiles, useVisits, usePatients, useAppointments } from "@/lib/data-hooks";
+import { useProfiles, useVisits, usePatients, useAppointments, useIgiRates } from "@/lib/data-hooks";
+import { createInvoiceFromVisit } from "@/lib/invoices";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ function VisitsPage() {
   const { data: patients = [] } = usePatients();
   const { data: visits = [] } = useVisits();
   const { data: appts = [] } = useAppointments();
+  const { data: igiRates = [] } = useIgiRates();
   const qc = useQueryClient();
 
   const [form, setForm] = useState({
@@ -44,15 +46,39 @@ function VisitsPage() {
       if (!form.patient_id || !form.profile_id || !form.amount) {
         throw new Error("Rellena todos los campos requeridos");
       }
-      const { error } = await supabase.from("patient_visits").insert({
+      const { data: visit, error } = await supabase.from("patient_visits").insert({
         visit_date: form.visit_date,
         patient_id: form.patient_id,
         patient_name: form.patient_name,
         profile_id: form.profile_id,
         amount: Number(form.amount),
         notes: form.notes || null,
-      });
+      }).select("*").single();
       if (error) throw error;
+      // Auto-create invoice if applicable
+      const p = patients.find((x) => x.id === form.patient_id) ?? null;
+      if (p) {
+        const ptype = (p.patient_type as "cass" | "privado" | null) ?? null;
+        const igi = igiRates.find((r) => r.id === p.igi_rate_id);
+        if (ptype && (ptype === "cass" || p.wants_invoice)) {
+          try {
+            await createInvoiceFromVisit({
+              visit_id: visit?.id ?? null,
+              patient: p,
+              patient_name: `${p.first_name} ${p.last_name}`,
+              patient_type: ptype,
+              wants_invoice: !!p.wants_invoice,
+              service_description: form.notes || "Sesión de fisioterapia",
+              gross_amount: Number(form.amount),
+              igi_rate: igi?.rate ?? 0,
+              issue_date: new Date(form.visit_date + "T" + new Date().toTimeString().slice(0, 8)).toISOString(),
+            });
+            qc.invalidateQueries({ queryKey: ["invoices"] });
+          } catch (e) {
+            toast.error("Visita guardada, pero falló la factura: " + (e as Error).message);
+          }
+        }
+      }
     },
     onSuccess: () => {
       toast.success("Visita registrada");
@@ -116,21 +142,41 @@ function VisitsPage() {
     if (!a) return;
     const p = patients.find((x) => x.id === a.patient_id);
     const prof = a.profile_id ? profiles.find((x) => x.id === a.profile_id) : null;
-    if (!a.patient_id || !prof) {
+    if (!a.patient_id || !prof || !p) {
       prefillFromAppt(apptId);
       return;
     }
-    const { error } = await supabase.from("patient_visits").insert({
+    const { data: visit, error } = await supabase.from("patient_visits").insert({
       visit_date: a.appointment_at.slice(0, 10),
       patient_id: a.patient_id,
-      patient_name: p ? `${p.first_name} ${p.last_name}` : "",
+      patient_name: `${p.first_name} ${p.last_name}`,
       profile_id: prof.id,
       amount: prof.default_rate,
       notes: a.treatment ?? null,
-    });
+    }).select("*").single();
     if (error) {
       toast.error(error.message);
       return;
+    }
+    const ptype = (p.patient_type as "cass" | "privado" | null) ?? null;
+    const igi = igiRates.find((r) => r.id === p.igi_rate_id);
+    if (ptype && (ptype === "cass" || p.wants_invoice)) {
+      try {
+        await createInvoiceFromVisit({
+          visit_id: visit?.id ?? null,
+          patient: p,
+          patient_name: `${p.first_name} ${p.last_name}`,
+          patient_type: ptype,
+          wants_invoice: !!p.wants_invoice,
+          service_description: a.treatment || "Sesión de fisioterapia",
+          gross_amount: Number(prof.default_rate),
+          igi_rate: igi?.rate ?? 0,
+          issue_date: a.appointment_at,
+        });
+        qc.invalidateQueries({ queryKey: ["invoices"] });
+      } catch (e) {
+        toast.error("Visita creada, pero falló la factura: " + (e as Error).message);
+      }
     }
     await markApptCompleted.mutateAsync(apptId);
     qc.invalidateQueries({ queryKey: ["visits"] });
