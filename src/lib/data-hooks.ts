@@ -301,9 +301,9 @@ export function useIgiRates() {
   return useQuery({
     queryKey: ["igi_rates"],
     queryFn: async (): Promise<IgiRate[]> => {
-      const { data, error } = await supabase.from("igi_rates" as never).select("*").order("rate");
+      const { data, error } = await supabase.from("igi_rates").select("*").order("rate");
       if (error) throw error;
-      return (data ?? []) as unknown as IgiRate[];
+      return (data ?? []) as IgiRate[];
     },
   });
 }
@@ -313,12 +313,12 @@ export function useInvoices() {
     queryKey: ["invoices"],
     queryFn: async (): Promise<Invoice[]> => {
       const { data, error } = await supabase
-        .from("invoices" as never)
+        .from("invoices")
         .select("*")
         .order("issue_date", { ascending: false })
         .limit(2000);
       if (error) throw error;
-      return (data ?? []) as unknown as Invoice[];
+      return (data ?? []) as Invoice[];
     },
   });
 }
