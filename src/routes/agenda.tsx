@@ -184,12 +184,17 @@ function AgendaPage() {
   const slotMin = sch.slot_min || 30;
   const slotsPerDay = Math.max(0, Math.ceil((closeMin - openMin) / slotMin));
   const days = useMemo(() => {
-    return Array.from({ length: 7 }).map((_, i) => {
-      const d = new Date(weekStart);
-      d.setDate(d.getDate() + i);
-      return d;
-    });
-  }, [weekStart]);
+    return Array.from({ length: 7 })
+      .map((_, i) => {
+        const d = new Date(weekStart);
+        d.setDate(d.getDate() + i);
+        return d;
+      })
+      .filter((d) => {
+        const iso = dateToISODate(d);
+        return sch.weekdays.includes(d.getDay()) && !sch.holidays.includes(iso);
+      });
+  }, [weekStart, sch.weekdays, sch.holidays]);
 
   type Busy = { startMin: number; endMin: number; appt: typeof appts[number] };
   const busyByDay = useMemo(() => {
