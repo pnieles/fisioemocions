@@ -15,6 +15,7 @@ export const MENU_KEYS = [
   { key: "pacientes", label: "Pacientes" },
   { key: "visitas", label: "Visitas" },
   { key: "informes", label: "Informes visitas" },
+  { key: "facturas", label: "Facturas" },
   { key: "material", label: "Material" },
   { key: "inventario", label: "Inventario" },
   { key: "consumo", label: "Consumo mensual" },
