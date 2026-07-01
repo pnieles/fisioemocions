@@ -16,6 +16,7 @@ const nav: NavEntry[] = [
   { to: "/pacientes", label: "Pacientes", icon: UserPlus, key: "pacientes" },
   { to: "/visitas", label: "Visitas", icon: Stethoscope, key: "visitas" },
   { to: "/informes", label: "Informes visitas", icon: FileBarChart, key: "informes" },
+  { to: "/facturas", label: "Facturas", icon: FileText, key: "facturas" },
   {
     label: "Consumibles",
     icon: Boxes,
