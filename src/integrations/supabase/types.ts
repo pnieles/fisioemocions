@@ -143,6 +143,27 @@ export type Database = {
         }
         Relationships: []
       }
+      igi_rates: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          rate: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          rate?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          rate?: number
+        }
+        Relationships: []
+      }
       inventory_counts: {
         Row: {
           created_at: string
@@ -170,6 +191,66 @@ export type Database = {
           period_month?: string
           quantity?: number
           unit_cost?: number
+        }
+        Relationships: []
+      }
+      invoices: {
+        Row: {
+          base_amount: number
+          created_at: string
+          id: string
+          igi_amount: number
+          igi_rate: number
+          invoice_number: string | null
+          issue_date: string
+          notes: string | null
+          patient_id: string | null
+          patient_name: string | null
+          patient_passport: string | null
+          patient_type: string
+          service_description: string | null
+          status: string
+          total_amount: number
+          updated_at: string
+          visit_id: string | null
+        }
+        Insert: {
+          base_amount?: number
+          created_at?: string
+          id?: string
+          igi_amount?: number
+          igi_rate?: number
+          invoice_number?: string | null
+          issue_date?: string
+          notes?: string | null
+          patient_id?: string | null
+          patient_name?: string | null
+          patient_passport?: string | null
+          patient_type: string
+          service_description?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          visit_id?: string | null
+        }
+        Update: {
+          base_amount?: number
+          created_at?: string
+          id?: string
+          igi_amount?: number
+          igi_rate?: number
+          invoice_number?: string | null
+          issue_date?: string
+          notes?: string | null
+          patient_id?: string | null
+          patient_name?: string | null
+          patient_passport?: string | null
+          patient_type?: string
+          service_description?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          visit_id?: string | null
         }
         Relationships: []
       }
@@ -254,48 +335,60 @@ export type Database = {
       patients: {
         Row: {
           birth_date: string | null
+          cass_coverage: number | null
           created_at: string
           default_profile_id: string | null
           default_treatment: string | null
           email: string | null
           first_name: string
           id: string
+          igi_rate_id: string | null
           last_name: string
           nationality: string | null
           notes: string | null
           passport_id: string | null
+          patient_type: string | null
           phone: string | null
           updated_at: string
+          wants_invoice: boolean
         }
         Insert: {
           birth_date?: string | null
+          cass_coverage?: number | null
           created_at?: string
           default_profile_id?: string | null
           default_treatment?: string | null
           email?: string | null
           first_name: string
           id?: string
+          igi_rate_id?: string | null
           last_name: string
           nationality?: string | null
           notes?: string | null
           passport_id?: string | null
+          patient_type?: string | null
           phone?: string | null
           updated_at?: string
+          wants_invoice?: boolean
         }
         Update: {
           birth_date?: string | null
+          cass_coverage?: number | null
           created_at?: string
           default_profile_id?: string | null
           default_treatment?: string | null
           email?: string | null
           first_name?: string
           id?: string
+          igi_rate_id?: string | null
           last_name?: string
           nationality?: string | null
           notes?: string | null
           passport_id?: string | null
+          patient_type?: string | null
           phone?: string | null
           updated_at?: string
+          wants_invoice?: boolean
         }
         Relationships: [
           {
