@@ -46,15 +46,39 @@ function VisitsPage() {
       if (!form.patient_id || !form.profile_id || !form.amount) {
         throw new Error("Rellena todos los campos requeridos");
       }
-      const { error } = await supabase.from("patient_visits").insert({
+      const { data: visit, error } = await supabase.from("patient_visits").insert({
         visit_date: form.visit_date,
         patient_id: form.patient_id,
         patient_name: form.patient_name,
         profile_id: form.profile_id,
         amount: Number(form.amount),
         notes: form.notes || null,
-      });
+      }).select("*").single();
       if (error) throw error;
+      // Auto-create invoice if applicable
+      const p = patients.find((x) => x.id === form.patient_id) ?? null;
+      if (p) {
+        const ptype = (p.patient_type as "cass" | "privado" | null) ?? null;
+        const igi = igiRates.find((r) => r.id === p.igi_rate_id);
+        if (ptype && (ptype === "cass" || p.wants_invoice)) {
+          try {
+            await createInvoiceFromVisit({
+              visit_id: visit?.id ?? null,
+              patient: p,
+              patient_name: `${p.first_name} ${p.last_name}`,
+              patient_type: ptype,
+              wants_invoice: !!p.wants_invoice,
+              service_description: form.notes || "Sesión de fisioterapia",
+              gross_amount: Number(form.amount),
+              igi_rate: igi?.rate ?? 0,
+              issue_date: new Date(form.visit_date + "T" + new Date().toTimeString().slice(0, 8)).toISOString(),
+            });
+            qc.invalidateQueries({ queryKey: ["invoices"] });
+          } catch (e) {
+            toast.error("Visita guardada, pero falló la factura: " + (e as Error).message);
+          }
+        }
+      }
     },
     onSuccess: () => {
       toast.success("Visita registrada");
