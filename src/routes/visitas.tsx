@@ -142,21 +142,41 @@ function VisitsPage() {
     if (!a) return;
     const p = patients.find((x) => x.id === a.patient_id);
     const prof = a.profile_id ? profiles.find((x) => x.id === a.profile_id) : null;
-    if (!a.patient_id || !prof) {
+    if (!a.patient_id || !prof || !p) {
       prefillFromAppt(apptId);
       return;
     }
-    const { error } = await supabase.from("patient_visits").insert({
+    const { data: visit, error } = await supabase.from("patient_visits").insert({
       visit_date: a.appointment_at.slice(0, 10),
       patient_id: a.patient_id,
-      patient_name: p ? `${p.first_name} ${p.last_name}` : "",
+      patient_name: `${p.first_name} ${p.last_name}`,
       profile_id: prof.id,
       amount: prof.default_rate,
       notes: a.treatment ?? null,
-    });
+    }).select("*").single();
     if (error) {
       toast.error(error.message);
       return;
+    }
+    const ptype = (p.patient_type as "cass" | "privado" | null) ?? null;
+    const igi = igiRates.find((r) => r.id === p.igi_rate_id);
+    if (ptype && (ptype === "cass" || p.wants_invoice)) {
+      try {
+        await createInvoiceFromVisit({
+          visit_id: visit?.id ?? null,
+          patient: p,
+          patient_name: `${p.first_name} ${p.last_name}`,
+          patient_type: ptype,
+          wants_invoice: !!p.wants_invoice,
+          service_description: a.treatment || "Sesión de fisioterapia",
+          gross_amount: Number(prof.default_rate),
+          igi_rate: igi?.rate ?? 0,
+          issue_date: a.appointment_at,
+        });
+        qc.invalidateQueries({ queryKey: ["invoices"] });
+      } catch (e) {
+        toast.error("Visita creada, pero falló la factura: " + (e as Error).message);
+      }
     }
     await markApptCompleted.mutateAsync(apptId);
     qc.invalidateQueries({ queryKey: ["visits"] });
