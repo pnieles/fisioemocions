@@ -12,7 +12,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { eur } from "@/lib/format";
 import { toast } from "sonner";
 import { Upload, X, Plus, Trash2, Save } from "lucide-react";
-import { useRoles, MENU_KEYS, permissionLabel, type Permission, type Role } from "@/lib/roles";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 function RolesCard() {
