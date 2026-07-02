@@ -26,8 +26,9 @@ const nav: NavEntry[] = [
       { to: "/consumo", label: "Consumo mensual", icon: BarChart3, key: "consumo" },
     ],
   },
-  { to: "/gastos", label: "Gastos", icon: Receipt, key: "gastos" },
-  { to: "/configuracion", label: "Configuración", icon: SettingsIcon, key: "configuracion" },
+ { to: "/gastos", label: "Gastos", icon: Receipt, key: "gastos" },
+ { to: "/usuarios", label: "Usuarios", icon: UsersIcon, key: "usuarios" },
+ { to: "/configuracion", label: "Configuración", icon: SettingsIcon, key: "configuracion" },
 ];
 
 export function AppShell() {
