@@ -20,6 +20,7 @@ export const MENU_KEYS = [
   { key: "inventario", label: "Inventario" },
   { key: "consumo", label: "Consumo mensual" },
   { key: "gastos", label: "Gastos" },
+  { key: "usuarios", label: "Usuarios" },
   { key: "configuracion", label: "Configuración" },
 ] as const;
 
