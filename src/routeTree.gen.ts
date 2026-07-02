@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VisitasRouteImport } from './routes/visitas'
+import { Route as UsuariosRouteImport } from './routes/usuarios'
 import { Route as RecordatoriosRouteImport } from './routes/recordatorios'
 import { Route as PerfilesRouteImport } from './routes/perfiles'
 import { Route as PacientesRouteImport } from './routes/pacientes'
@@ -26,6 +27,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const VisitasRoute = VisitasRouteImport.update({
   id: '/visitas',
   path: '/visitas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsuariosRoute = UsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RecordatoriosRoute = RecordatoriosRouteImport.update({
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/pacientes': typeof PacientesRoute
   '/perfiles': typeof PerfilesRoute
   '/recordatorios': typeof RecordatoriosRoute
+  '/usuarios': typeof UsuariosRoute
   '/visitas': typeof VisitasRoute
 }
 export interface FileRoutesByTo {
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/pacientes': typeof PacientesRoute
   '/perfiles': typeof PerfilesRoute
   '/recordatorios': typeof RecordatoriosRoute
+  '/usuarios': typeof UsuariosRoute
   '/visitas': typeof VisitasRoute
 }
 export interface FileRoutesById {
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/pacientes': typeof PacientesRoute
   '/perfiles': typeof PerfilesRoute
   '/recordatorios': typeof RecordatoriosRoute
+  '/usuarios': typeof UsuariosRoute
   '/visitas': typeof VisitasRoute
 }
 export interface FileRouteTypes {
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/pacientes'
     | '/perfiles'
     | '/recordatorios'
+    | '/usuarios'
     | '/visitas'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
     | '/pacientes'
     | '/perfiles'
     | '/recordatorios'
+    | '/usuarios'
     | '/visitas'
   id:
     | '__root__'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/pacientes'
     | '/perfiles'
     | '/recordatorios'
+    | '/usuarios'
     | '/visitas'
   fileRoutesById: FileRoutesById
 }
@@ -196,6 +208,7 @@ export interface RootRouteChildren {
   PacientesRoute: typeof PacientesRoute
   PerfilesRoute: typeof PerfilesRoute
   RecordatoriosRoute: typeof RecordatoriosRoute
+  UsuariosRoute: typeof UsuariosRoute
   VisitasRoute: typeof VisitasRoute
 }
 
@@ -206,6 +219,13 @@ declare module '@tanstack/react-router' {
       path: '/visitas'
       fullPath: '/visitas'
       preLoaderRoute: typeof VisitasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/usuarios': {
+      id: '/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof UsuariosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/recordatorios': {
@@ -308,6 +328,7 @@ const rootRouteChildren: RootRouteChildren = {
   PacientesRoute: PacientesRoute,
   PerfilesRoute: PerfilesRoute,
   RecordatoriosRoute: RecordatoriosRoute,
+  UsuariosRoute: UsuariosRoute,
   VisitasRoute: VisitasRoute,
 }
 export const routeTree = rootRouteImport
