@@ -97,18 +97,15 @@ export const sendAppointmentConfirmation = createServerFn({ method: "POST" })
     if (apptErr) throw new Error(apptErr.message);
     if (!appt) throw new Error("Cita no encontrada");
 
-    let patient: {
-      first_name: string;
-      last_name: string;
-      email: string | null;
-    } | null = null;
+    type PatientLite = { first_name: string; last_name: string; email: string | null };
+    let patient: PatientLite | null = null;
     if (appt.patient_id) {
       const { data: p } = await supabase
         .from("patients")
         .select("first_name,last_name,email")
         .eq("id", appt.patient_id)
         .maybeSingle();
-      patient = p as typeof patient;
+      patient = (p as unknown as PatientLite | null) ?? null;
     }
 
     const { data: emailRow } = await supabase
