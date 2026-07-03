@@ -445,3 +445,199 @@ function IgiRatesCard() {
     </Card>
   );
 }
+
+const PROVIDER_PRESETS: Record<string, { smtp_host: string; smtp_port: number; smtp_secure: boolean; imap_host: string; imap_port: number; caldav_url: string; help: string }> = {
+  google: {
+    smtp_host: "smtp.gmail.com", smtp_port: 465, smtp_secure: true,
+    imap_host: "imap.gmail.com", imap_port: 993,
+    caldav_url: "https://apidata.googleusercontent.com/caldav/v2/",
+    help: "Usa una contraseña de aplicación de Google (myaccount.google.com/apppasswords). El ID de calendario suele ser tu correo o uno específico.",
+  },
+  outlook: {
+    smtp_host: "smtp.office365.com", smtp_port: 587, smtp_secure: false,
+    imap_host: "outlook.office365.com", imap_port: 993,
+    caldav_url: "https://outlook.office365.com/EWS/Exchange.asmx",
+    help: "Genera una contraseña de aplicación en account.microsoft.com si tienes 2FA.",
+  },
+  icloud: {
+    smtp_host: "smtp.mail.me.com", smtp_port: 587, smtp_secure: false,
+    imap_host: "imap.mail.me.com", imap_port: 993,
+    caldav_url: "https://caldav.icloud.com/",
+    help: "Necesitas una contraseña específica de app desde appleid.apple.com.",
+  },
+  caldav: {
+    smtp_host: "", smtp_port: 465, smtp_secure: true,
+    imap_host: "", imap_port: 993,
+    caldav_url: "",
+    help: "Indica manualmente los servidores SMTP y la URL CalDAV de tu proveedor.",
+  },
+  other: {
+    smtp_host: "", smtp_port: 465, smtp_secure: true,
+    imap_host: "", imap_port: 993,
+    caldav_url: "",
+    help: "Completa manualmente los datos SMTP/IMAP y calendario.",
+  },
+};
+
+function EmailAccountCard() {
+  const { data: account } = useEmailAccount();
+  const qc = useQueryClient();
+  const [form, setForm] = useState({
+    email: "", password: "",
+    smtp_host: "", smtp_port: "465", smtp_secure: true,
+    imap_host: "", imap_port: "993",
+    calendar_provider: "google" as "google" | "outlook" | "icloud" | "caldav" | "other",
+    calendar_id: "", caldav_url: "",
+    sync_enabled: false,
+  });
+
+  useEffect(() => {
+    if (account) {
+      setForm({
+        email: account.email || "",
+        password: account.password || "",
+        smtp_host: account.smtp_host || "",
+        smtp_port: String(account.smtp_port ?? 465),
+        smtp_secure: account.smtp_secure ?? true,
+        imap_host: account.imap_host || "",
+        imap_port: String(account.imap_port ?? 993),
+        calendar_provider: account.calendar_provider || "google",
+        calendar_id: account.calendar_id || "",
+        caldav_url: account.caldav_url || "",
+        sync_enabled: account.sync_enabled ?? false,
+      });
+    }
+  }, [account]);
+
+  const applyPreset = (provider: keyof typeof PROVIDER_PRESETS) => {
+    const p = PROVIDER_PRESETS[provider];
+    setForm((f) => ({
+      ...f,
+      calendar_provider: provider,
+      smtp_host: f.smtp_host || p.smtp_host,
+      smtp_port: f.smtp_port === "465" || f.smtp_port === "" ? String(p.smtp_port) : f.smtp_port,
+      smtp_secure: p.smtp_secure,
+      imap_host: f.imap_host || p.imap_host,
+      imap_port: f.imap_port === "993" || f.imap_port === "" ? String(p.imap_port) : f.imap_port,
+      caldav_url: f.caldav_url || p.caldav_url,
+    }));
+  };
+
+  const save = useMutation({
+    mutationFn: async () => {
+      if (!form.email) throw new Error("El correo es obligatorio");
+      const { error } = await supabase.from("app_settings").upsert({
+        key: "email_account",
+        value: {
+          email: form.email,
+          password: form.password,
+          smtp_host: form.smtp_host,
+          smtp_port: Number(form.smtp_port) || 465,
+          smtp_secure: form.smtp_secure,
+          imap_host: form.imap_host,
+          imap_port: Number(form.imap_port) || 993,
+          calendar_provider: form.calendar_provider,
+          calendar_id: form.calendar_id,
+          caldav_url: form.caldav_url,
+          sync_enabled: form.sync_enabled,
+        },
+        updated_at: new Date().toISOString(),
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Cuenta de correo guardada");
+      qc.invalidateQueries({ queryKey: ["settings", "email_account"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const preset = PROVIDER_PRESETS[form.calendar_provider];
+
+  return (
+    <Card className="mb-6 shadow-[var(--shadow-card)]">
+      <CardContent className="p-6 space-y-5">
+        <div>
+          <h2 className="font-display text-lg">Cuenta de correo y calendario</h2>
+          <p className="text-xs text-muted-foreground mt-1">
+            Cuenta usada para enviar recordatorios por correo y sincronizar la agenda local con el calendario del proveedor.
+            La contraseña se guarda para uso del servidor; se recomienda usar una <strong>contraseña de aplicación</strong>.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Correo electrónico</Label>
+            <Input type="email" placeholder="tu@correo.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Contraseña / App password</Label>
+            <Input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+          </div>
+        </div>
+
+        <div>
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Proveedor de calendario</Label>
+          <Select value={form.calendar_provider} onValueChange={(v) => applyPreset(v as keyof typeof PROVIDER_PRESETS)}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="google">Google (Gmail / Google Calendar)</SelectItem>
+              <SelectItem value="outlook">Microsoft Outlook / 365</SelectItem>
+              <SelectItem value="icloud">Apple iCloud</SelectItem>
+              <SelectItem value="caldav">CalDAV genérico</SelectItem>
+              <SelectItem value="other">Otro (manual)</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground mt-2">{preset.help}</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">ID del calendario</Label>
+            <Input placeholder="p.ej. tu@correo.com o ID del calendario" value={form.calendar_id} onChange={(e) => setForm({ ...form, calendar_id: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">URL CalDAV</Label>
+            <Input placeholder="https://..." value={form.caldav_url} onChange={(e) => setForm({ ...form, caldav_url: e.target.value })} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">SMTP host</Label>
+            <Input value={form.smtp_host} onChange={(e) => setForm({ ...form, smtp_host: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">SMTP puerto</Label>
+            <Input type="number" value={form.smtp_port} onChange={(e) => setForm({ ...form, smtp_port: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">IMAP host</Label>
+            <Input value={form.imap_host} onChange={(e) => setForm({ ...form, imap_host: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">IMAP puerto</Label>
+            <Input type="number" value={form.imap_port} onChange={(e) => setForm({ ...form, imap_port: e.target.value })} />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-6 items-center">
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" checked={form.smtp_secure} onChange={(e) => setForm({ ...form, smtp_secure: e.target.checked })} />
+            SMTP con SSL/TLS
+          </label>
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" checked={form.sync_enabled} onChange={(e) => setForm({ ...form, sync_enabled: e.target.checked })} />
+            Sincronizar agenda con el calendario del correo
+          </label>
+        </div>
+
+        <div className="flex justify-end">
+          <Button onClick={() => save.mutate()} disabled={save.isPending}>
+            <Save className="h-4 w-4 mr-1" /> Guardar cuenta
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
