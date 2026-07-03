@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Fragment, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { sendAppointmentConfirmation } from "@/lib/appointment-email.functions";
 import { useAppointments, usePatients, useProfiles, useTreatments, useScheduleSettings, type Appointment } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
@@ -67,6 +69,7 @@ function AgendaPage() {
   const { data: treatments = [] } = useTreatments();
   const { data: schedule } = useScheduleSettings();
   const qc = useQueryClient();
+  const sendConfirmation = useServerFn(sendAppointmentConfirmation);
   const [form, setForm] = useState(empty);
   const [filter, setFilter] = useState<"upcoming" | "past" | "all">("upcoming");
   const [weekStart, setWeekStart] = useState<Date>(() => startOfWeek(new Date()));
@@ -117,7 +120,7 @@ function AgendaPage() {
   const add = useMutation({
     mutationFn: async () => {
       if (!form.patient_id || !form.appointment_at) throw new Error("Paciente y fecha obligatorios");
-      const { error } = await supabase.from("appointments").insert({
+      const { data: inserted, error } = await supabase.from("appointments").insert({
         patient_id: form.patient_id,
         profile_id: form.profile_id || null,
         appointment_at: new Date(form.appointment_at).toISOString(),
@@ -126,13 +129,26 @@ function AgendaPage() {
         treatment: form.treatment || null,
         status: form.status,
         notes: form.notes || null,
-      });
+      }).select("id").single();
       if (error) throw error;
+      return inserted?.id as string | undefined;
     },
-    onSuccess: () => {
+    onSuccess: async (id) => {
       toast.success("Cita programada");
       qc.invalidateQueries({ queryKey: ["appointments"] });
       setForm({ ...empty, appointment_at: localISOForInput() });
+      if (id) {
+        try {
+          const res = await sendConfirmation({ data: { appointmentId: id } });
+          if (res?.ok) {
+            toast.success("Confirmación enviada por correo");
+          } else if (res?.skipped) {
+            toast.info(res.reason || "Correo no enviado");
+          }
+        } catch (e) {
+          toast.error("No se pudo enviar el correo: " + (e as Error).message);
+        }
+      }
     },
     onError: (e: Error) => toast.error(e.message),
   });
