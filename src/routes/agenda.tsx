@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Fragment, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { sendAppointmentConfirmation } from "@/lib/appointment-email.functions";
 import { useAppointments, usePatients, useProfiles, useTreatments, useScheduleSettings, type Appointment } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
