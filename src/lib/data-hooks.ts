@@ -110,6 +110,19 @@ export type ScheduleSettings = {
   weekdays: number[];
   holidays: string[];
 };
+export type EmailAccount = {
+  email: string;
+  password: string;
+  smtp_host: string;
+  smtp_port: number;
+  smtp_secure: boolean;
+  imap_host: string;
+  imap_port: number;
+  calendar_provider: "google" | "outlook" | "icloud" | "caldav" | "other";
+  calendar_id: string;
+  caldav_url: string;
+  sync_enabled: boolean;
+};
 
 export function useScheduleSettings() {
   return useQuery({
