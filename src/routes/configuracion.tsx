@@ -578,7 +578,7 @@ function EmailAccountCard() {
 
         <div>
           <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Proveedor de calendario</Label>
-          <Select value={form.calendar_provider} onValueChange={(v) => applyPreset(v as keyof typeof PROVIDER_PRESETS)}>
+          <Select value={form.calendar_provider} onValueChange={(v) => applyPreset(v as "google" | "outlook" | "icloud" | "caldav" | "other")}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="google">Google (Gmail / Google Calendar)</SelectItem>
