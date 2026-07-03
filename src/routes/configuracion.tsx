@@ -509,10 +509,11 @@ function EmailAccountCard() {
     }
   }, [account]);
 
-  const applyPreset = (provider: keyof typeof PROVIDER_PRESETS) => {
+  const applyPreset = (provider: "google" | "outlook" | "icloud" | "caldav" | "other") => {
     const p = PROVIDER_PRESETS[provider];
     setForm((f) => ({
       ...f,
+      calendar_provider: provider,
       calendar_provider: provider,
       smtp_host: f.smtp_host || p.smtp_host,
       smtp_port: f.smtp_port === "465" || f.smtp_port === "" ? String(p.smtp_port) : f.smtp_port,
