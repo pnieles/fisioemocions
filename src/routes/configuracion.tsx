@@ -230,6 +230,8 @@ function ConfigPage() {
         </CardContent>
       </Card>
 
+      <EmailAccountCard />
+
       <ProfilesCard />
 
       <IgiRatesCard />
