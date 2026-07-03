@@ -514,7 +514,6 @@ function EmailAccountCard() {
     setForm((f) => ({
       ...f,
       calendar_provider: provider,
-      calendar_provider: provider,
       smtp_host: f.smtp_host || p.smtp_host,
       smtp_port: f.smtp_port === "465" || f.smtp_port === "" ? String(p.smtp_port) : f.smtp_port,
       smtp_secure: p.smtp_secure,
