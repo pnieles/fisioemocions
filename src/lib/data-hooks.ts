@@ -110,6 +110,19 @@ export type ScheduleSettings = {
   weekdays: number[];
   holidays: string[];
 };
+export type EmailAccount = {
+  email: string;
+  password: string;
+  smtp_host: string;
+  smtp_port: number;
+  smtp_secure: boolean;
+  imap_host: string;
+  imap_port: number;
+  calendar_provider: "google" | "outlook" | "icloud" | "caldav" | "other";
+  calendar_id: string;
+  caldav_url: string;
+  sync_enabled: boolean;
+};
 
 export function useScheduleSettings() {
   return useQuery({
@@ -162,6 +175,35 @@ export function useReminderTemplates() {
           whatsapp: "",
           email_subject: "",
           email_body: "",
+        }
+      );
+    },
+  });
+}
+
+export function useEmailAccount() {
+  return useQuery({
+    queryKey: ["settings", "email_account"],
+    queryFn: async (): Promise<EmailAccount> => {
+      const { data, error } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "email_account")
+        .maybeSingle();
+      if (error) throw error;
+      return (
+        (data?.value as EmailAccount) ?? {
+          email: "",
+          password: "",
+          smtp_host: "",
+          smtp_port: 465,
+          smtp_secure: true,
+          imap_host: "",
+          imap_port: 993,
+          calendar_provider: "google",
+          calendar_id: "",
+          caldav_url: "",
+          sync_enabled: false,
         }
       );
     },
