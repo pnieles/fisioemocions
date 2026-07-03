@@ -69,6 +69,7 @@ function AgendaPage() {
   const { data: treatments = [] } = useTreatments();
   const { data: schedule } = useScheduleSettings();
   const qc = useQueryClient();
+  const sendConfirmation = useServerFn(sendAppointmentConfirmation);
   const [form, setForm] = useState(empty);
   const [filter, setFilter] = useState<"upcoming" | "past" | "all">("upcoming");
   const [weekStart, setWeekStart] = useState<Date>(() => startOfWeek(new Date()));
