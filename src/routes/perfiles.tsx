@@ -42,7 +42,10 @@ function ProfilesPage() {
 
   const update = useMutation({
     mutationFn: async ({ id, rate }: { id: string; rate: number }) => {
-      const { error } = await supabase.from("client_profiles").update({ default_rate: rate }).eq("id", id);
+      const { error } = await supabase
+        .from("client_profiles")
+        .update({ default_rate: rate })
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -66,20 +69,40 @@ function ProfilesPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1100px] mx-auto">
-      <PageHeader title="Perfiles y tarifas" subtitle="Define los perfiles de cliente y las tarifas por defecto que se aplicarán a las visitas." />
+      <PageHeader
+        title="Perfiles y tarifas"
+        subtitle="Define los perfiles de cliente y las tarifas por defecto que se aplicarán a las visitas."
+      />
 
       <Card className="mb-8 shadow-[var(--shadow-card)]">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             <div className="md:col-span-6">
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nombre del perfil *</Label>
-              <Input placeholder="Ex: CASS 1, Privado..." value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+                Nombre del perfil *
+              </Label>
+              <Input
+                placeholder="Ex: CASS 1, Privado..."
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
             </div>
             <div className="md:col-span-4">
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Tarifa por defecto (€) *</Label>
-              <Input type="number" step="0.01" value={form.default_rate} onChange={(e) => setForm({ ...form, default_rate: e.target.value })} />
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+                Tarifa por defecto (€) *
+              </Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={form.default_rate}
+                onChange={(e) => setForm({ ...form, default_rate: e.target.value })}
+              />
             </div>
-            <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-2 h-10">
+            <Button
+              onClick={() => add.mutate()}
+              disabled={add.isPending}
+              className="md:col-span-2 h-10"
+            >
               <Plus className="h-4 w-4 mr-1" /> Crear
             </Button>
           </div>
@@ -105,7 +128,9 @@ function ProfilesPage() {
                 return (
                   <tr key={p.id} className="border-t border-border hover:bg-muted/30">
                     <td className="px-6 py-3 font-medium">
-                      <span className="inline-flex px-2 py-0.5 rounded-md bg-accent/10 text-accent">{p.name}</span>
+                      <span className="inline-flex px-2 py-0.5 rounded-md bg-accent/10 text-accent">
+                        {p.name}
+                      </span>
                     </td>
                     <td className="px-6 py-3 text-right">
                       {editing ? (
@@ -117,20 +142,33 @@ function ProfilesPage() {
                           className="w-32 ml-auto text-right"
                         />
                       ) : (
-                        <span className="tabular-nums font-medium">{eur(Number(p.default_rate))}</span>
+                        <span className="tabular-nums font-medium">
+                          {eur(Number(p.default_rate))}
+                        </span>
                       )}
                     </td>
                     <td className="px-6 py-3 text-right space-x-2">
                       {editing ? (
-                        <Button size="sm" variant="default" onClick={() => update.mutate({ id: p.id, rate: Number(edits[p.id]) })}>
+                        <Button
+                          size="sm"
+                          variant="default"
+                          onClick={() => update.mutate({ id: p.id, rate: Number(edits[p.id]) })}
+                        >
                           <Save className="h-3.5 w-3.5 mr-1" /> Guardar
                         </Button>
                       ) : (
-                        <Button size="sm" variant="outline" onClick={() => setEdits({ ...edits, [p.id]: String(p.default_rate) })}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setEdits({ ...edits, [p.id]: String(p.default_rate) })}
+                        >
                           Editar
                         </Button>
                       )}
-                      <button onClick={() => del.mutate(p.id)} className="text-muted-foreground hover:text-destructive align-middle">
+                      <button
+                        onClick={() => del.mutate(p.id)}
+                        className="text-muted-foreground hover:text-destructive align-middle"
+                      >
                         <Trash2 className="h-4 w-4 inline" />
                       </button>
                     </td>

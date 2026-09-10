@@ -8,7 +8,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Trash2, Plus, Phone, Mail } from "lucide-react";
@@ -34,10 +40,18 @@ type FormState = {
 };
 
 const empty: FormState = {
-  first_name: "", last_name: "", birth_date: "",
-  phone: "+376 ", email: "", notes: "",
-  passport_id: "", default_profile_id: "",
-  patient_type: "", wants_invoice: false, igi_rate_id: "", cass_coverage: "",
+  first_name: "",
+  last_name: "",
+  birth_date: "",
+  phone: "+376 ",
+  email: "",
+  notes: "",
+  passport_id: "",
+  default_profile_id: "",
+  patient_type: "",
+  wants_invoice: false,
+  igi_rate_id: "",
+  cass_coverage: "",
 };
 
 function ageOf(birth: string | null) {
@@ -58,7 +72,7 @@ function PatientsPage() {
   const save = useMutation({
     mutationFn: async () => {
       if (!form.first_name || !form.last_name) throw new Error("Nombre y apellidos obligatorios");
-      const cleanPhone = form.phone.replace(/[\s+\-]/g, "");
+      const cleanPhone = form.phone.replace(/[\s+-]/g, "");
       const hasPhone = cleanPhone.length > 0;
       const hasEmail = form.email.trim().length > 0;
       if (!hasPhone && !hasEmail) {
@@ -89,7 +103,8 @@ function PatientsPage() {
     onSuccess: () => {
       toast.success(editing ? "Paciente actualizado" : "Paciente añadido");
       qc.invalidateQueries({ queryKey: ["patients"] });
-      setForm(empty); setEditing(null);
+      setForm(empty);
+      setEditing(null);
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -108,9 +123,12 @@ function PatientsPage() {
   const startEdit = (p: Patient) => {
     setEditing(p.id);
     setForm({
-      first_name: p.first_name, last_name: p.last_name,
+      first_name: p.first_name,
+      last_name: p.last_name,
       birth_date: p.birth_date ?? "",
-      phone: p.phone ?? "+376 ", email: p.email ?? "", notes: p.notes ?? "",
+      phone: p.phone ?? "+376 ",
+      email: p.email ?? "",
+      notes: p.notes ?? "",
       passport_id: p.passport_id ?? "",
       default_profile_id: p.default_profile_id ?? "",
       patient_type: p.patient_type ?? "",
@@ -128,59 +146,107 @@ function PatientsPage() {
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             <Field className="md:col-span-3" label="Nombre *">
-              <Input value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} />
+              <Input
+                value={form.first_name}
+                onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+              />
             </Field>
             <Field className="md:col-span-3" label="Apellidos *">
-              <Input value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} />
+              <Input
+                value={form.last_name}
+                onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+              />
             </Field>
             <Field className="md:col-span-2" label="Fecha nacimiento">
-              <Input type="date" value={form.birth_date} onChange={(e) => setForm({ ...form, birth_date: e.target.value })} />
+              <Input
+                type="date"
+                value={form.birth_date}
+                onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
+              />
             </Field>
             <Field className="md:col-span-2" label="Teléfono (WhatsApp)">
-              <Input placeholder="+376 ..." value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              <Input
+                placeholder="+376 ..."
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
             </Field>
             <Field className="md:col-span-2" label="Censo / Pasaporte">
-              <Input value={form.passport_id} onChange={(e) => setForm({ ...form, passport_id: e.target.value })} />
+              <Input
+                value={form.passport_id}
+                onChange={(e) => setForm({ ...form, passport_id: e.target.value })}
+              />
             </Field>
             <Field className="md:col-span-4" label="Correo electrónico">
-              <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+              <Input
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
             </Field>
 
             <Field className="md:col-span-2" label="Tipo de paciente">
-              <Select value={form.patient_type || "__none"} onValueChange={(v) => setForm({ ...form, patient_type: v === "__none" ? "" : v })}>
-                <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+              <Select
+                value={form.patient_type || "__none"}
+                onValueChange={(v) => setForm({ ...form, patient_type: v === "__none" ? "" : v })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="—" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__none">— Sin definir —</SelectItem>
                   <SelectItem value="cass">CASS</SelectItem>
                   <SelectItem value="privado">Privado</SelectItem>
+                  <SelectItem value="mixto">Mixto</SelectItem>
                 </SelectContent>
               </Select>
             </Field>
             <Field className="md:col-span-3" label="Perfil (tarifa)">
-              <Select value={form.default_profile_id || "__none"} onValueChange={(v) => setForm({ ...form, default_profile_id: v === "__none" ? "" : v })}>
-                <SelectTrigger><SelectValue placeholder="Ninguno" /></SelectTrigger>
+              <Select
+                value={form.default_profile_id || "__none"}
+                onValueChange={(v) =>
+                  setForm({ ...form, default_profile_id: v === "__none" ? "" : v })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Ninguno" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__none">— Ninguno —</SelectItem>
                   {profiles.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </Field>
             <Field className="md:col-span-2" label="IGI aplicable">
-              <Select value={form.igi_rate_id || "__none"} onValueChange={(v) => setForm({ ...form, igi_rate_id: v === "__none" ? "" : v })}>
-                <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+              <Select
+                value={form.igi_rate_id || "__none"}
+                onValueChange={(v) => setForm({ ...form, igi_rate_id: v === "__none" ? "" : v })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="—" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__none">— Ninguno —</SelectItem>
                   {igiRates.map((r) => (
-                    <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+                    <SelectItem key={r.id} value={r.id}>
+                      {r.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </Field>
-            {form.patient_type === "cass" && (
+            {(form.patient_type === "cass" || form.patient_type === "mixto") && (
               <Field className="md:col-span-2" label="Cobertura CASS (%)">
-                <Input type="number" step="0.01" value={form.cass_coverage} onChange={(e) => setForm({ ...form, cass_coverage: e.target.value })} />
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={form.cass_coverage}
+                  onChange={(e) => setForm({ ...form, cass_coverage: e.target.value })}
+                />
               </Field>
             )}
             <div className="md:col-span-2 flex items-center gap-2 pb-1">
@@ -189,18 +255,35 @@ function PatientsPage() {
                 checked={form.wants_invoice}
                 onCheckedChange={(v) => setForm({ ...form, wants_invoice: Boolean(v) })}
               />
-              <Label htmlFor="wants_invoice" className="text-sm">¿Desea factura?</Label>
+              <Label htmlFor="wants_invoice" className="text-sm">
+                ¿Desea factura?
+              </Label>
             </div>
 
             <Field className="md:col-span-9" label="Notas">
-              <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+              <Input
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              />
             </Field>
             <div className="md:col-span-3 flex gap-2">
-              <Button onClick={() => save.mutate()} disabled={save.isPending} className="flex-1 h-10">
+              <Button
+                onClick={() => save.mutate()}
+                disabled={save.isPending}
+                className="flex-1 h-10"
+              >
                 <Plus className="h-4 w-4 mr-1" /> {editing ? "Guardar" : "Añadir"}
               </Button>
               {editing && (
-                <Button variant="ghost" onClick={() => { setEditing(null); setForm(empty); }}>Cancelar</Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setEditing(null);
+                    setForm(empty);
+                  }}
+                >
+                  Cancelar
+                </Button>
               )}
             </div>
           </div>
@@ -211,7 +294,9 @@ function PatientsPage() {
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border">
             <h2 className="font-display text-lg">Fichas de pacientes</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">{patients.length} pacientes registrados</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {patients.length} pacientes registrados
+            </p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -227,25 +312,57 @@ function PatientsPage() {
               </thead>
               <tbody>
                 {patients.length === 0 && (
-                  <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Aún no hay pacientes.</td></tr>
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                      Aún no hay pacientes.
+                    </td>
+                  </tr>
                 )}
                 {patients.map((p) => (
                   <tr key={p.id} className="border-t border-border hover:bg-muted/30">
-                    <td className="px-6 py-3 font-medium">{p.last_name}, {p.first_name}</td>
+                    <td className="px-6 py-3 font-medium">
+                      {p.last_name}, {p.first_name}
+                    </td>
                     <td className="px-6 py-3 text-muted-foreground">
-                      {p.patient_type === "cass" ? "CASS" : p.patient_type === "privado" ? "Privado" : "—"}
+                      {p.patient_type === "cass"
+                        ? "CASS"
+                        : p.patient_type === "privado"
+                          ? "Privado"
+                          : "—"}
                     </td>
                     <td className="px-6 py-3 tabular-nums">{ageOf(p.birth_date)}</td>
                     <td className="px-6 py-3 text-xs space-y-1">
-                      {p.phone && <div className="flex items-center gap-1.5"><Phone className="h-3 w-3" />{p.phone}</div>}
-                      {p.email && <div className="flex items-center gap-1.5"><Mail className="h-3 w-3" />{p.email}</div>}
+                      {p.phone && (
+                        <div className="flex items-center gap-1.5">
+                          <Phone className="h-3 w-3" />
+                          {p.phone}
+                        </div>
+                      )}
+                      {p.email && (
+                        <div className="flex items-center gap-1.5">
+                          <Mail className="h-3 w-3" />
+                          {p.email}
+                        </div>
+                      )}
                     </td>
                     <td className="px-6 py-3 text-xs">
-                      {p.wants_invoice ? <span className="text-primary font-medium">Sí</span> : <span className="text-muted-foreground">—</span>}
+                      {p.wants_invoice ? (
+                        <span className="text-primary font-medium">Sí</span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </td>
                     <td className="px-6 py-3 text-right space-x-2 whitespace-nowrap">
-                      <button onClick={() => startEdit(p)} className="text-xs text-accent hover:underline">Editar</button>
-                      <button onClick={() => del.mutate(p.id)} className="text-muted-foreground hover:text-destructive inline-block align-middle">
+                      <button
+                        onClick={() => startEdit(p)}
+                        className="text-xs text-accent hover:underline"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => del.mutate(p.id)}
+                        className="text-muted-foreground hover:text-destructive inline-block align-middle"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </td>
@@ -260,10 +377,20 @@ function PatientsPage() {
   );
 }
 
-function Field({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
+function Field({
+  label,
+  children,
+  className,
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div className={className}>
-      <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">{label}</Label>
+      <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+        {label}
+      </Label>
       {children}
     </div>
   );

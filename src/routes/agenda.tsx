@@ -4,15 +4,34 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { sendAppointmentConfirmation } from "@/lib/appointment-email.functions";
-import { useAppointments, usePatients, useProfiles, useTreatments, useScheduleSettings, type Appointment } from "@/lib/data-hooks";
+import {
+  useAppointments,
+  usePatients,
+  useProfiles,
+  useTreatments,
+  useScheduleSettings,
+  type Appointment,
+} from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Trash2, Plus, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -97,16 +116,20 @@ function AgendaPage() {
   const updateAppt = useMutation({
     mutationFn: async () => {
       if (!editing) return;
-      if (!editForm.patient_id || !editForm.appointment_at) throw new Error("Paciente y fecha obligatorios");
-      const { error } = await supabase.from("appointments").update({
-        patient_id: editForm.patient_id,
-        profile_id: editForm.profile_id || null,
-        appointment_at: new Date(editForm.appointment_at).toISOString(),
-        duration_min: Number(editForm.duration_min) || 30,
-        diagnosis: editForm.diagnosis || null,
-        treatment: editForm.treatment || null,
-        notes: editForm.notes || null,
-      }).eq("id", editing.id);
+      if (!editForm.patient_id || !editForm.appointment_at)
+        throw new Error("Paciente y fecha obligatorios");
+      const { error } = await supabase
+        .from("appointments")
+        .update({
+          patient_id: editForm.patient_id,
+          profile_id: editForm.profile_id || null,
+          appointment_at: new Date(editForm.appointment_at).toISOString(),
+          duration_min: Number(editForm.duration_min) || 30,
+          diagnosis: editForm.diagnosis || null,
+          treatment: editForm.treatment || null,
+          notes: editForm.notes || null,
+        })
+        .eq("id", editing.id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -119,17 +142,22 @@ function AgendaPage() {
 
   const add = useMutation({
     mutationFn: async () => {
-      if (!form.patient_id || !form.appointment_at) throw new Error("Paciente y fecha obligatorios");
-      const { data: inserted, error } = await supabase.from("appointments").insert({
-        patient_id: form.patient_id,
-        profile_id: form.profile_id || null,
-        appointment_at: new Date(form.appointment_at).toISOString(),
-        duration_min: Number(form.duration_min) || 30,
-        diagnosis: form.diagnosis || null,
-        treatment: form.treatment || null,
-        status: form.status,
-        notes: form.notes || null,
-      }).select("id").single();
+      if (!form.patient_id || !form.appointment_at)
+        throw new Error("Paciente y fecha obligatorios");
+      const { data: inserted, error } = await supabase
+        .from("appointments")
+        .insert({
+          patient_id: form.patient_id,
+          profile_id: form.profile_id || null,
+          appointment_at: new Date(form.appointment_at).toISOString(),
+          duration_min: Number(form.duration_min) || 30,
+          diagnosis: form.diagnosis || null,
+          treatment: form.treatment || null,
+          status: form.status,
+          notes: form.notes || null,
+        })
+        .select("id")
+        .single();
       if (error) throw error;
       return inserted?.id as string | undefined;
     },
@@ -194,7 +222,13 @@ function AgendaPage() {
   };
 
   // Weekly view
-  const sch = schedule ?? { open: "09:00", close: "20:00", slot_min: 30, weekdays: [1,2,3,4,5,6], holidays: [] };
+  const sch = schedule ?? {
+    open: "09:00",
+    close: "20:00",
+    slot_min: 30,
+    weekdays: [1, 2, 3, 4, 5, 6],
+    holidays: [],
+  };
   const openMin = parseHM(sch.open);
   const closeMin = parseHM(sch.close);
   const slotMin = sch.slot_min || 30;
@@ -212,7 +246,7 @@ function AgendaPage() {
       });
   }, [weekStart, sch.weekdays, sch.holidays]);
 
-  type Busy = { startMin: number; endMin: number; appt: typeof appts[number] };
+  type Busy = { startMin: number; endMin: number; appt: (typeof appts)[number] };
   const busyByDay = useMemo(() => {
     const m = new Map<string, Busy[]>();
     for (const a of appts) {
@@ -232,7 +266,9 @@ function AgendaPage() {
     d.setHours(0, 0, 0, 0);
     d.setMinutes(mins);
     setForm((f) => ({ ...f, appointment_at: localISOForInput(d) }));
-    toast.success(`Slot seleccionado: ${d.toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}`);
+    toast.success(
+      `Slot seleccionado: ${d.toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}`,
+    );
     const el = document.getElementById("agenda-form");
     el?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -245,27 +281,52 @@ function AgendaPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
-      <PageHeader title="Agenda de citas" subtitle="Vista semanal con horas libres y ocupadas. Haz clic en una hora libre para crear cita." />
+      <PageHeader
+        title="Agenda de citas"
+        subtitle="Vista semanal con horas libres y ocupadas. Haz clic en una hora libre para crear cita."
+      />
 
       {/* Weekly view */}
       <Card className="mb-6 shadow-[var(--shadow-card)]">
         <CardContent className="p-0">
           <div className="px-6 py-3 border-b border-border flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={() => shiftWeek(-1)}><ChevronLeft className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="icon" onClick={() => shiftWeek(-1)}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
               <div className="font-display text-lg">
-                Semana del {weekStart.toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" })}
+                Semana del{" "}
+                {weekStart.toLocaleDateString("es-ES", {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                })}
               </div>
-              <Button variant="ghost" size="icon" onClick={() => shiftWeek(1)}><ChevronRight className="h-4 w-4" /></Button>
-              <Button variant="ghost" size="sm" onClick={() => setWeekStart(startOfWeek(new Date()))}>Hoy</Button>
+              <Button variant="ghost" size="icon" onClick={() => shiftWeek(1)}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setWeekStart(startOfWeek(new Date()))}
+              >
+                Hoy
+              </Button>
             </div>
             <div className="text-xs text-muted-foreground flex items-center gap-3">
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-muted border border-border" /> Libre</span>
-              <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-primary/80" /> Ocupado</span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-sm bg-muted border border-border" /> Libre
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-sm bg-primary/80" /> Ocupado
+              </span>
             </div>
           </div>
           <div className="overflow-x-auto">
-            <div className="min-w-[700px] grid" style={{ gridTemplateColumns: `64px repeat(${days.length}, minmax(0, 1fr))` }}>
+            <div
+              className="min-w-[700px] grid"
+              style={{ gridTemplateColumns: `64px repeat(${days.length}, minmax(0, 1fr))` }}
+            >
               {/* header row */}
               <div></div>
               {days.map((d) => {
@@ -275,17 +336,24 @@ function AgendaPage() {
                 const closed = isHoliday || isWeekend;
                 const isToday = iso === dateToISODate(new Date());
                 return (
-                  <div key={iso} className={cn(
-                    "px-2 py-2 text-center border-l border-b border-border",
-                    isToday && "bg-accent/5",
-                  )}>
+                  <div
+                    key={iso}
+                    className={cn(
+                      "px-2 py-2 text-center border-l border-b border-border",
+                      isToday && "bg-accent/5",
+                    )}
+                  >
                     <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
                       {d.toLocaleDateString("es-ES", { weekday: "short" })}
                     </div>
                     <div className={cn("font-display text-base", isToday && "text-primary")}>
                       {d.getDate()}
                     </div>
-                    {closed && <div className="text-[10px] text-destructive mt-0.5">{isHoliday ? "Festivo" : "Cerrado"}</div>}
+                    {closed && (
+                      <div className="text-[10px] text-destructive mt-0.5">
+                        {isHoliday ? "Festivo" : "Cerrado"}
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -303,9 +371,17 @@ function AgendaPage() {
                       const isWeekend = !sch.weekdays.includes(d.getDay());
                       const closed = isHoliday || isWeekend;
                       const slotEnd = mins + slotMin;
-                      const busy = (busyByDay.get(iso) ?? []).find((b) => b.startMin < slotEnd && b.endMin > mins);
+                      const busy = (busyByDay.get(iso) ?? []).find(
+                        (b) => b.startMin < slotEnd && b.endMin > mins,
+                      );
                       if (closed) {
-                        return <div key={`${iso}-${sIdx}`} className="border-t border-l border-border bg-destructive/10" style={{ minHeight: 28 }} />;
+                        return (
+                          <div
+                            key={`${iso}-${sIdx}`}
+                            className="border-t border-l border-border bg-destructive/10"
+                            style={{ minHeight: 28 }}
+                          />
+                        );
                       }
                       if (busy) {
                         const p = patients.find((x) => x.id === busy.appt.patient_id);
@@ -320,12 +396,16 @@ function AgendaPage() {
                             title={`${p ? p.last_name + ", " + p.first_name : "Cita"} · ${fmtHM(busy.startMin)}-${fmtHM(busy.endMin)}${editable ? " · Clic para editar" : ""}`}
                             className={cn(
                               "border-t border-l border-border text-primary-foreground text-[10px] px-1 overflow-hidden text-left",
-                              editable ? "bg-primary/80 hover:bg-primary cursor-pointer" : "bg-muted-foreground/50 cursor-default",
+                              editable
+                                ? "bg-primary/80 hover:bg-primary cursor-pointer"
+                                : "bg-muted-foreground/50 cursor-default",
                             )}
                             style={{ minHeight: 28 }}
                           >
                             {isStart && (
-                              <div className="truncate font-medium">{p ? `${p.last_name}, ${p.first_name}` : "Cita"}</div>
+                              <div className="truncate font-medium">
+                                {p ? `${p.last_name}, ${p.first_name}` : "Cita"}
+                              </div>
                             )}
                           </button>
                         );
@@ -336,7 +416,9 @@ function AgendaPage() {
                           onClick={() => pickSlot(d, mins)}
                           className="border-t border-l border-border bg-card hover:bg-accent/15 transition text-[10px] text-transparent hover:text-foreground"
                           style={{ minHeight: 28 }}
-                        >+ {fmtHM(mins)}</button>
+                        >
+                          + {fmtHM(mins)}
+                        </button>
                       );
                     })}
                   </Fragment>
@@ -363,47 +445,84 @@ function AgendaPage() {
                   }));
                 }}
               >
-                <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona" />
+                </SelectTrigger>
                 <SelectContent>
                   {patients.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.last_name}, {p.first_name}</SelectItem>
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.last_name}, {p.first_name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </Field>
             <Field className="md:col-span-3" label="Data i hora *">
-              <Input type="datetime-local" value={form.appointment_at} onChange={(e) => setForm({ ...form, appointment_at: e.target.value })} />
+              <Input
+                type="datetime-local"
+                value={form.appointment_at}
+                onChange={(e) => setForm({ ...form, appointment_at: e.target.value })}
+              />
             </Field>
             <Field className="md:col-span-1" label="Min.">
-              <Input type="number" value={form.duration_min} onChange={(e) => setForm({ ...form, duration_min: e.target.value })} />
+              <Input
+                type="number"
+                value={form.duration_min}
+                onChange={(e) => setForm({ ...form, duration_min: e.target.value })}
+              />
             </Field>
             <Field className="md:col-span-2" label="Perfil">
-              <Select value={form.profile_id} onValueChange={(v) => setForm({ ...form, profile_id: v })}>
-                <SelectTrigger><SelectValue placeholder="Perfil" /></SelectTrigger>
+              <Select
+                value={form.profile_id}
+                onValueChange={(v) => setForm({ ...form, profile_id: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Perfil" />
+                </SelectTrigger>
                 <SelectContent>
                   {profiles.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </Field>
             <Field className="md:col-span-3" label="Tratamiento">
-              <Select value={form.treatment} onValueChange={(v) => setForm({ ...form, treatment: v })}>
-                <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
+              <Select
+                value={form.treatment}
+                onValueChange={(v) => setForm({ ...form, treatment: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona" />
+                </SelectTrigger>
                 <SelectContent>
                   {treatments.map((t) => (
-                    <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
+                    <SelectItem key={t.id} value={t.name}>
+                      {t.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </Field>
             <Field className="md:col-span-6" label="Diagnóstico">
-              <Input value={form.diagnosis} onChange={(e) => setForm({ ...form, diagnosis: e.target.value })} />
+              <Input
+                value={form.diagnosis}
+                onChange={(e) => setForm({ ...form, diagnosis: e.target.value })}
+              />
             </Field>
             <Field className="md:col-span-5" label="Notas">
-              <Textarea rows={1} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+              <Textarea
+                rows={1}
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              />
             </Field>
-            <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-1 h-10">
+            <Button
+              onClick={() => add.mutate()}
+              disabled={add.isPending}
+              className="md:col-span-1 h-10"
+            >
               <Plus className="h-4 w-4 mr-1" /> Añadir
             </Button>
           </div>
@@ -418,7 +537,9 @@ function AgendaPage() {
               <p className="text-xs text-muted-foreground mt-0.5">{list.length} citas</p>
             </div>
             <Select value={filter} onValueChange={(v: "upcoming" | "past" | "all") => setFilter(v)}>
-              <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="upcoming">Próximas</SelectItem>
                 <SelectItem value="past">Pasadas</SelectItem>
@@ -440,23 +561,39 @@ function AgendaPage() {
               </thead>
               <tbody>
                 {list.length === 0 && (
-                  <tr><td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">Sin citas.</td></tr>
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                      Sin citas.
+                    </td>
+                  </tr>
                 )}
                 {list.map((a) => (
                   <tr key={a.id} className="border-t border-border hover:bg-muted/30">
                     <td className="px-6 py-3 text-muted-foreground tabular-nums">
-                      {new Date(a.appointment_at).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}
+                      {new Date(a.appointment_at).toLocaleString("es-ES", {
+                        dateStyle: "short",
+                        timeStyle: "short",
+                      })}
                     </td>
                     <td className="px-6 py-3 font-medium">{patName(a.patient_id)}</td>
                     <td className="px-6 py-3">
                       {a.treatment && (
-                        <span className="inline-flex px-2 py-0.5 rounded-md bg-accent/10 text-accent text-xs font-medium">{a.treatment}</span>
+                        <span className="inline-flex px-2 py-0.5 rounded-md bg-accent/10 text-accent text-xs font-medium">
+                          {a.treatment}
+                        </span>
                       )}
                     </td>
-                    <td className="px-6 py-3 text-muted-foreground text-xs max-w-xs truncate">{a.diagnosis ?? ""}</td>
+                    <td className="px-6 py-3 text-muted-foreground text-xs max-w-xs truncate">
+                      {a.diagnosis ?? ""}
+                    </td>
                     <td className="px-6 py-3">
-                      <Select value={a.status} onValueChange={(v) => updateStatus.mutate({ id: a.id, status: v })}>
-                        <SelectTrigger className="h-8 w-32 text-xs"><SelectValue /></SelectTrigger>
+                      <Select
+                        value={a.status}
+                        onValueChange={(v) => updateStatus.mutate({ id: a.id, status: v })}
+                      >
+                        <SelectTrigger className="h-8 w-32 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="scheduled">Programada</SelectItem>
                           <SelectItem value="completed">Realizada</SelectItem>
@@ -467,11 +604,18 @@ function AgendaPage() {
                     </td>
                     <td className="px-6 py-3 text-right whitespace-nowrap">
                       {a.status === "scheduled" && (
-                        <button onClick={() => openEdit(a)} className="text-muted-foreground hover:text-primary mr-2 inline-block align-middle" title="Editar">
+                        <button
+                          onClick={() => openEdit(a)}
+                          className="text-muted-foreground hover:text-primary mr-2 inline-block align-middle"
+                          title="Editar"
+                        >
                           <Pencil className="h-4 w-4" />
                         </button>
                       )}
-                      <button onClick={() => del.mutate(a.id)} className="text-muted-foreground hover:text-destructive align-middle">
+                      <button
+                        onClick={() => del.mutate(a.id)}
+                        className="text-muted-foreground hover:text-destructive align-middle"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </td>
@@ -484,48 +628,96 @@ function AgendaPage() {
       </Card>
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent className="max-w-2xl">
-          <DialogHeader><DialogTitle>Editar cita</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Editar cita</DialogTitle>
+          </DialogHeader>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Paciente *">
-              <Select value={editForm.patient_id} onValueChange={(v) => setEditForm({ ...editForm, patient_id: v })}>
-                <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
+              <Select
+                value={editForm.patient_id}
+                onValueChange={(v) => setEditForm({ ...editForm, patient_id: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona" />
+                </SelectTrigger>
                 <SelectContent>
-                  {patients.map((p) => <SelectItem key={p.id} value={p.id}>{p.last_name}, {p.first_name}</SelectItem>)}
+                  {patients.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.last_name}, {p.first_name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </Field>
             <Field label="Fecha y hora *">
-              <Input type="datetime-local" value={editForm.appointment_at} onChange={(e) => setEditForm({ ...editForm, appointment_at: e.target.value })} />
+              <Input
+                type="datetime-local"
+                value={editForm.appointment_at}
+                onChange={(e) => setEditForm({ ...editForm, appointment_at: e.target.value })}
+              />
             </Field>
             <Field label="Duración (min)">
-              <Input type="number" value={editForm.duration_min} onChange={(e) => setEditForm({ ...editForm, duration_min: e.target.value })} />
+              <Input
+                type="number"
+                value={editForm.duration_min}
+                onChange={(e) => setEditForm({ ...editForm, duration_min: e.target.value })}
+              />
             </Field>
             <Field label="Perfil">
-              <Select value={editForm.profile_id} onValueChange={(v) => setEditForm({ ...editForm, profile_id: v })}>
-                <SelectTrigger><SelectValue placeholder="Perfil" /></SelectTrigger>
+              <Select
+                value={editForm.profile_id}
+                onValueChange={(v) => setEditForm({ ...editForm, profile_id: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Perfil" />
+                </SelectTrigger>
                 <SelectContent>
-                  {profiles.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                  {profiles.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </Field>
             <Field label="Tratamiento" className="sm:col-span-2">
-              <Select value={editForm.treatment} onValueChange={(v) => setEditForm({ ...editForm, treatment: v })}>
-                <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
+              <Select
+                value={editForm.treatment}
+                onValueChange={(v) => setEditForm({ ...editForm, treatment: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona" />
+                </SelectTrigger>
                 <SelectContent>
-                  {treatments.map((t) => <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>)}
+                  {treatments.map((t) => (
+                    <SelectItem key={t.id} value={t.name}>
+                      {t.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </Field>
             <Field label="Diagnóstico" className="sm:col-span-2">
-              <Input value={editForm.diagnosis} onChange={(e) => setEditForm({ ...editForm, diagnosis: e.target.value })} />
+              <Input
+                value={editForm.diagnosis}
+                onChange={(e) => setEditForm({ ...editForm, diagnosis: e.target.value })}
+              />
             </Field>
             <Field label="Notas" className="sm:col-span-2">
-              <Textarea rows={2} value={editForm.notes} onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })} />
+              <Textarea
+                rows={2}
+                value={editForm.notes}
+                onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+              />
             </Field>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setEditing(null)}>Cancelar</Button>
-            <Button onClick={() => updateAppt.mutate()} disabled={updateAppt.isPending}>Guardar cambios</Button>
+            <Button variant="ghost" onClick={() => setEditing(null)}>
+              Cancelar
+            </Button>
+            <Button onClick={() => updateAppt.mutate()} disabled={updateAppt.isPending}>
+              Guardar cambios
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -533,10 +725,20 @@ function AgendaPage() {
   );
 }
 
-function Field({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
+function Field({
+  label,
+  children,
+  className,
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div className={className}>
-      <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">{label}</Label>
+      <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+        {label}
+      </Label>
       {children}
     </div>
   );

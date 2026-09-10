@@ -119,8 +119,7 @@ export const sendAppointmentConfirmation = createServerFn({ method: "POST" })
       return {
         ok: false,
         skipped: true,
-        reason:
-          "Cuenta de correo no configurada. Añádela en Configuración → Correo saliente.",
+        reason: "Cuenta de correo no configurada. Añádela en Configuración → Correo saliente.",
       };
     }
 
@@ -129,14 +128,14 @@ export const sendAppointmentConfirmation = createServerFn({ method: "POST" })
       .select("value")
       .eq("key", "company")
       .maybeSingle();
-    const company =
-      (companyRow?.value as CompanySettings | null) ?? { name: "fisioemocions", logo_url: null };
+    const company = (companyRow?.value as CompanySettings | null) ?? {
+      name: "fisioemocions",
+      logo_url: null,
+    };
 
     const start = new Date(appt.appointment_at);
     const end = new Date(start.getTime() + (appt.duration_min || 30) * 60000);
-    const patientName = patient
-      ? `${patient.first_name} ${patient.last_name}`.trim()
-      : "paciente";
+    const patientName = patient ? `${patient.first_name} ${patient.last_name}`.trim() : "paciente";
     const summary = `Cita ${company.name} — ${patientName}`;
     const descriptionParts = [
       `Cita con ${company.name}`,
@@ -202,9 +201,7 @@ export const sendAppointmentConfirmation = createServerFn({ method: "POST" })
     try {
       nodemailer = await import("nodemailer");
     } catch (e) {
-      throw new Error(
-        "No se pudo cargar el cliente SMTP en este entorno: " + (e as Error).message,
-      );
+      throw new Error("No se pudo cargar el cliente SMTP en este entorno: " + (e as Error).message);
     }
 
     const transporter = nodemailer.createTransport({

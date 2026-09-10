@@ -9,79 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VisitasRouteImport } from './routes/visitas'
-import { Route as UsuariosRouteImport } from './routes/usuarios'
-import { Route as RecordatoriosRouteImport } from './routes/recordatorios'
-import { Route as PerfilesRouteImport } from './routes/perfiles'
-import { Route as PacientesRouteImport } from './routes/pacientes'
-import { Route as MaterialRouteImport } from './routes/material'
-import { Route as InventarioRouteImport } from './routes/inventario'
-import { Route as InformesRouteImport } from './routes/informes'
-import { Route as GastosRouteImport } from './routes/gastos'
-import { Route as FacturasRouteImport } from './routes/facturas'
-import { Route as ConsumoRouteImport } from './routes/consumo'
-import { Route as ConfiguracionRouteImport } from './routes/configuracion'
-import { Route as AgendaRouteImport } from './routes/agenda'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AgendaRouteImport } from './routes/agenda'
+import { Route as ConfiguracionRouteImport } from './routes/configuracion'
+import { Route as ConsumoRouteImport } from './routes/consumo'
+import { Route as FacturasRouteImport } from './routes/facturas'
+import { Route as GastosRouteImport } from './routes/gastos'
+import { Route as InformesRouteImport } from './routes/informes'
+import { Route as InventarioRouteImport } from './routes/inventario'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as MaterialRouteImport } from './routes/material'
+import { Route as PacientesRouteImport } from './routes/pacientes'
+import { Route as PerfilesRouteImport } from './routes/perfiles'
+import { Route as RecordatoriosRouteImport } from './routes/recordatorios'
+import { Route as UsuariosRouteImport } from './routes/usuarios'
+import { Route as VisitasRouteImport } from './routes/visitas'
 
-const VisitasRoute = VisitasRouteImport.update({
-  id: '/visitas',
-  path: '/visitas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UsuariosRoute = UsuariosRouteImport.update({
-  id: '/usuarios',
-  path: '/usuarios',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecordatoriosRoute = RecordatoriosRouteImport.update({
-  id: '/recordatorios',
-  path: '/recordatorios',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PerfilesRoute = PerfilesRouteImport.update({
-  id: '/perfiles',
-  path: '/perfiles',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PacientesRoute = PacientesRouteImport.update({
-  id: '/pacientes',
-  path: '/pacientes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MaterialRoute = MaterialRouteImport.update({
-  id: '/material',
-  path: '/material',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InventarioRoute = InventarioRouteImport.update({
-  id: '/inventario',
-  path: '/inventario',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InformesRoute = InformesRouteImport.update({
-  id: '/informes',
-  path: '/informes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GastosRoute = GastosRouteImport.update({
-  id: '/gastos',
-  path: '/gastos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FacturasRoute = FacturasRouteImport.update({
-  id: '/facturas',
-  path: '/facturas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConsumoRoute = ConsumoRouteImport.update({
-  id: '/consumo',
-  path: '/consumo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfiguracionRoute = ConfiguracionRouteImport.update({
-  id: '/configuracion',
-  path: '/configuracion',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AgendaRoute = AgendaRouteImport.update({
@@ -89,9 +35,69 @@ const AgendaRoute = AgendaRouteImport.update({
   path: '/agenda',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ConfiguracionRoute = ConfiguracionRouteImport.update({
+  id: '/configuracion',
+  path: '/configuracion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsumoRoute = ConsumoRouteImport.update({
+  id: '/consumo',
+  path: '/consumo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FacturasRoute = FacturasRouteImport.update({
+  id: '/facturas',
+  path: '/facturas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GastosRoute = GastosRouteImport.update({
+  id: '/gastos',
+  path: '/gastos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InformesRoute = InformesRouteImport.update({
+  id: '/informes',
+  path: '/informes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InventarioRoute = InventarioRouteImport.update({
+  id: '/inventario',
+  path: '/inventario',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaterialRoute = MaterialRouteImport.update({
+  id: '/material',
+  path: '/material',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PacientesRoute = PacientesRouteImport.update({
+  id: '/pacientes',
+  path: '/pacientes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PerfilesRoute = PerfilesRouteImport.update({
+  id: '/perfiles',
+  path: '/perfiles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecordatoriosRoute = RecordatoriosRouteImport.update({
+  id: '/recordatorios',
+  path: '/recordatorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsuariosRoute = UsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VisitasRoute = VisitasRouteImport.update({
+  id: '/visitas',
+  path: '/visitas',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/gastos': typeof GastosRoute
   '/informes': typeof InformesRoute
   '/inventario': typeof InventarioRoute
+  '/login': typeof LoginRoute
   '/material': typeof MaterialRoute
   '/pacientes': typeof PacientesRoute
   '/perfiles': typeof PerfilesRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/gastos': typeof GastosRoute
   '/informes': typeof InformesRoute
   '/inventario': typeof InventarioRoute
+  '/login': typeof LoginRoute
   '/material': typeof MaterialRoute
   '/pacientes': typeof PacientesRoute
   '/perfiles': typeof PerfilesRoute
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/gastos': typeof GastosRoute
   '/informes': typeof InformesRoute
   '/inventario': typeof InventarioRoute
+  '/login': typeof LoginRoute
   '/material': typeof MaterialRoute
   '/pacientes': typeof PacientesRoute
   '/perfiles': typeof PerfilesRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/gastos'
     | '/informes'
     | '/inventario'
+    | '/login'
     | '/material'
     | '/pacientes'
     | '/perfiles'
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/gastos'
     | '/informes'
     | '/inventario'
+    | '/login'
     | '/material'
     | '/pacientes'
     | '/perfiles'
@@ -187,6 +198,7 @@ export interface FileRouteTypes {
     | '/gastos'
     | '/informes'
     | '/inventario'
+    | '/login'
     | '/material'
     | '/pacientes'
     | '/perfiles'
@@ -204,6 +216,7 @@ export interface RootRouteChildren {
   GastosRoute: typeof GastosRoute
   InformesRoute: typeof InformesRoute
   InventarioRoute: typeof InventarioRoute
+  LoginRoute: typeof LoginRoute
   MaterialRoute: typeof MaterialRoute
   PacientesRoute: typeof PacientesRoute
   PerfilesRoute: typeof PerfilesRoute
@@ -214,88 +227,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/visitas': {
-      id: '/visitas'
-      path: '/visitas'
-      fullPath: '/visitas'
-      preLoaderRoute: typeof VisitasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/usuarios': {
-      id: '/usuarios'
-      path: '/usuarios'
-      fullPath: '/usuarios'
-      preLoaderRoute: typeof UsuariosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recordatorios': {
-      id: '/recordatorios'
-      path: '/recordatorios'
-      fullPath: '/recordatorios'
-      preLoaderRoute: typeof RecordatoriosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/perfiles': {
-      id: '/perfiles'
-      path: '/perfiles'
-      fullPath: '/perfiles'
-      preLoaderRoute: typeof PerfilesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pacientes': {
-      id: '/pacientes'
-      path: '/pacientes'
-      fullPath: '/pacientes'
-      preLoaderRoute: typeof PacientesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/material': {
-      id: '/material'
-      path: '/material'
-      fullPath: '/material'
-      preLoaderRoute: typeof MaterialRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inventario': {
-      id: '/inventario'
-      path: '/inventario'
-      fullPath: '/inventario'
-      preLoaderRoute: typeof InventarioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/informes': {
-      id: '/informes'
-      path: '/informes'
-      fullPath: '/informes'
-      preLoaderRoute: typeof InformesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/gastos': {
-      id: '/gastos'
-      path: '/gastos'
-      fullPath: '/gastos'
-      preLoaderRoute: typeof GastosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/facturas': {
-      id: '/facturas'
-      path: '/facturas'
-      fullPath: '/facturas'
-      preLoaderRoute: typeof FacturasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/consumo': {
-      id: '/consumo'
-      path: '/consumo'
-      fullPath: '/consumo'
-      preLoaderRoute: typeof ConsumoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configuracion': {
-      id: '/configuracion'
-      path: '/configuracion'
-      fullPath: '/configuracion'
-      preLoaderRoute: typeof ConfiguracionRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/agenda': {
@@ -305,11 +241,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgendaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/configuracion': {
+      id: '/configuracion'
+      path: '/configuracion'
+      fullPath: '/configuracion'
+      preLoaderRoute: typeof ConfiguracionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/consumo': {
+      id: '/consumo'
+      path: '/consumo'
+      fullPath: '/consumo'
+      preLoaderRoute: typeof ConsumoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/facturas': {
+      id: '/facturas'
+      path: '/facturas'
+      fullPath: '/facturas'
+      preLoaderRoute: typeof FacturasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gastos': {
+      id: '/gastos'
+      path: '/gastos'
+      fullPath: '/gastos'
+      preLoaderRoute: typeof GastosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/informes': {
+      id: '/informes'
+      path: '/informes'
+      fullPath: '/informes'
+      preLoaderRoute: typeof InformesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inventario': {
+      id: '/inventario'
+      path: '/inventario'
+      fullPath: '/inventario'
+      preLoaderRoute: typeof InventarioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/material': {
+      id: '/material'
+      path: '/material'
+      fullPath: '/material'
+      preLoaderRoute: typeof MaterialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pacientes': {
+      id: '/pacientes'
+      path: '/pacientes'
+      fullPath: '/pacientes'
+      preLoaderRoute: typeof PacientesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/perfiles': {
+      id: '/perfiles'
+      path: '/perfiles'
+      fullPath: '/perfiles'
+      preLoaderRoute: typeof PerfilesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recordatorios': {
+      id: '/recordatorios'
+      path: '/recordatorios'
+      fullPath: '/recordatorios'
+      preLoaderRoute: typeof RecordatoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/usuarios': {
+      id: '/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof UsuariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/visitas': {
+      id: '/visitas'
+      path: '/visitas'
+      fullPath: '/visitas'
+      preLoaderRoute: typeof VisitasRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -324,6 +344,7 @@ const rootRouteChildren: RootRouteChildren = {
   GastosRoute: GastosRoute,
   InformesRoute: InformesRoute,
   InventarioRoute: InventarioRoute,
+  LoginRoute: LoginRoute,
   MaterialRoute: MaterialRoute,
   PacientesRoute: PacientesRoute,
   PerfilesRoute: PerfilesRoute,
@@ -334,3 +355,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

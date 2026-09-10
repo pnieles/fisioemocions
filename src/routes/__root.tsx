@@ -1,17 +1,22 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Link,
+  Outlet,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
+  useNavigate,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { Loader2 } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AppShell } from "../components/AppShell";
 import { Toaster } from "@/components/ui/sonner";
+import { useSession } from "@/lib/session";
 
 function NotFoundComponent() {
   return (
@@ -35,7 +40,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -79,12 +84,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "fisioemocions · Gestión clínica" },
-      { name: "description", content: "Gestión de ingresos, material y cuenta de explotación del centro de fisioterapia fisioemocions." },
+      {
+        name: "description",
+        content:
+          "Gestión de ingresos, material y cuenta de explotación del centro de fisioterapia fisioemocions.",
+      },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -116,8 +128,34 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AppShell />
+      <AuthGate />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
+}
+
+function FullPageSpinner() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+    </div>
+  );
+}
+
+function AuthGate() {
+  const { loading, session } = useSession();
+  const routerState = useRouterState();
+  const navigate = useNavigate();
+  const isLoginPage = routerState.location.pathname === "/login";
+
+  useEffect(() => {
+    if (loading) return;
+    if (!session && !isLoginPage) navigate({ to: "/login", replace: true });
+    else if (session && isLoginPage) navigate({ to: "/", replace: true });
+  }, [loading, session, isLoginPage, navigate]);
+
+  if (loading) return <FullPageSpinner />;
+  if (isLoginPage) return <Outlet />;
+  if (!session) return <FullPageSpinner />;
+  return <AppShell />;
 }

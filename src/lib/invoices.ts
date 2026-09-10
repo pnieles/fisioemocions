@@ -49,7 +49,11 @@ function round2(n: number) {
 }
 
 const eur = (n: number) =>
-  new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 2 }).format(n || 0);
+  new Intl.NumberFormat("es-ES", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 2,
+  }).format(n || 0);
 
 export function exportInvoicePdf(inv: Invoice, company: CompanySettings, patient?: Patient | null) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
@@ -81,7 +85,11 @@ export function exportInvoicePdf(inv: Invoice, company: CompanySettings, patient
   doc.setFontSize(10);
   const rightLines = [
     inv.patient_name || "—",
-    patient?.passport_id ? `Doc: ${patient.passport_id}` : inv.patient_passport ? `Doc: ${inv.patient_passport}` : "",
+    patient?.passport_id
+      ? `Doc: ${patient.passport_id}`
+      : inv.patient_passport
+        ? `Doc: ${inv.patient_passport}`
+        : "",
     patient?.phone ? `Tel: ${patient.phone}` : "",
     patient?.email ? patient.email : "",
   ].filter(Boolean);
@@ -99,7 +107,10 @@ export function exportInvoicePdf(inv: Invoice, company: CompanySettings, patient
   doc.setFontSize(10);
   const meta = [
     ["Nº factura", inv.invoice_number || "—"],
-    ["Fecha", new Date(inv.issue_date).toLocaleString("es-ES", { dateStyle: "long", timeStyle: "short" })],
+    [
+      "Fecha",
+      new Date(inv.issue_date).toLocaleString("es-ES", { dateStyle: "long", timeStyle: "short" }),
+    ],
     ["Tipo", inv.patient_type === "cass" ? "CASS" : "Privado"],
   ];
   meta.forEach(([k, v], i) => {
@@ -157,6 +168,18 @@ export function exportInvoicePdf(inv: Invoice, company: CompanySettings, patient
 
   const fname = `factura-${inv.invoice_number || inv.id.slice(0, 8)}.pdf`;
   doc.save(fname);
+}
+
+// A "mixto" patient is CASS for some sessions and private for others; unlike
+// a pure CASS patient, a session isn't automatically invoiced just because
+// of the patient's type — it follows wants_invoice like a private patient,
+// and the invoice record itself is filed as "privado".
+export function invoicePatientType(patientType: string | null): "cass" | "privado" {
+  return patientType === "cass" ? "cass" : "privado";
+}
+
+export function shouldAutoInvoice(patientType: string | null, wantsInvoice: boolean): boolean {
+  return patientType === "cass" || wantsInvoice;
 }
 
 export function computeIgiSplit(gross: number, ratePct: number) {

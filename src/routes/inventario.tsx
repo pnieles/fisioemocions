@@ -8,7 +8,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { eur } from "@/lib/format";
 import { toast } from "sonner";
 import { Trash2, Plus, TrendingUp, TrendingDown, Minus } from "lucide-react";
@@ -108,7 +114,8 @@ function InventarioPage() {
   }, [counts]);
 
   const [selectedPeriod, setSelectedPeriod] = useState<string | "all">("all");
-  const visiblePeriods = selectedPeriod === "all" ? periods : periods.filter((p) => p.period === selectedPeriod);
+  const visiblePeriods =
+    selectedPeriod === "all" ? periods : periods.filter((p) => p.period === selectedPeriod);
 
   // Chart data (chronological)
   const chartData = useMemo(
@@ -178,7 +185,11 @@ function InventarioPage() {
                 onChange={(e) => setForm({ ...form, unit_cost: e.target.value })}
               />
             </Field>
-            <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-2 h-10">
+            <Button
+              onClick={() => add.mutate()}
+              disabled={add.isPending}
+              className="md:col-span-2 h-10"
+            >
               <Plus className="h-4 w-4 mr-1" /> Añadir recuento
             </Button>
           </div>
@@ -209,7 +220,10 @@ function InventarioPage() {
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => eur(v)} width={90} />
                   <Tooltip
                     formatter={(v: number) => eur(v)}
-                    contentStyle={{ background: "hsl(var(--card))", borderColor: "hsl(var(--border))" }}
+                    contentStyle={{
+                      background: "hsl(var(--card))",
+                      borderColor: "hsl(var(--border))",
+                    }}
                   />
                   <Bar dataKey="valor" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
                 </BarChart>
@@ -250,7 +264,8 @@ function InventarioPage() {
         const v = variation(periods.indexOf(p));
         const trend = v?.diff ?? 0;
         const TrendIcon = trend > 0 ? TrendingUp : trend < 0 ? TrendingDown : Minus;
-        const trendClass = trend > 0 ? "text-emerald-600" : trend < 0 ? "text-destructive" : "text-muted-foreground";
+        const trendClass =
+          trend > 0 ? "text-emerald-600" : trend < 0 ? "text-destructive" : "text-muted-foreground";
         return (
           <Card key={p.period} className="mb-6 shadow-[var(--shadow-card)]">
             <CardContent className="p-0">
@@ -278,7 +293,9 @@ function InventarioPage() {
                     </div>
                   )}
                   <div className="text-right">
-                    <div className="text-xs uppercase tracking-wider text-muted-foreground">Valor stock</div>
+                    <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                      Valor stock
+                    </div>
                     <div className="font-display text-2xl tabular-nums">{eur(p.total)}</div>
                   </div>
                 </div>
@@ -302,9 +319,15 @@ function InventarioPage() {
                       return (
                         <tr key={it.id} className="border-t border-border hover:bg-muted/30">
                           <td className="px-6 py-3 font-medium">{it.item_name}</td>
-                          <td className="px-6 py-3 text-right tabular-nums">{Number(it.quantity)}</td>
-                          <td className="px-6 py-3 text-right tabular-nums">{eur(Number(it.unit_cost))}</td>
-                          <td className="px-6 py-3 text-right tabular-nums font-medium">{eur(val)}</td>
+                          <td className="px-6 py-3 text-right tabular-nums">
+                            {Number(it.quantity)}
+                          </td>
+                          <td className="px-6 py-3 text-right tabular-nums">
+                            {eur(Number(it.unit_cost))}
+                          </td>
+                          <td className="px-6 py-3 text-right tabular-nums font-medium">
+                            {eur(val)}
+                          </td>
                           <td className="px-6 py-3 text-right tabular-nums text-muted-foreground">
                             {(share * 100).toFixed(1)}%
                           </td>
@@ -330,10 +353,20 @@ function InventarioPage() {
   );
 }
 
-function Field({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
+function Field({
+  label,
+  children,
+  className,
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div className={className}>
-      <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">{label}</Label>
+      <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+        {label}
+      </Label>
       {children}
     </div>
   );

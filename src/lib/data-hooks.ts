@@ -134,13 +134,15 @@ export function useScheduleSettings() {
         .eq("key", "schedule")
         .maybeSingle();
       if (error) throw error;
-      return (data?.value as ScheduleSettings) ?? {
-        open: "09:00",
-        close: "20:00",
-        slot_min: 30,
-        weekdays: [1, 2, 3, 4, 5, 6],
-        holidays: [],
-      };
+      return (
+        (data?.value as ScheduleSettings) ?? {
+          open: "09:00",
+          close: "20:00",
+          slot_min: 30,
+          weekdays: [1, 2, 3, 4, 5, 6],
+          holidays: [],
+        }
+      );
     },
   });
 }
@@ -210,7 +212,6 @@ export function useEmailAccount() {
   });
 }
 
-
 export const EXPENSE_CATEGORIES = [
   "Alquiler",
   "Útiles",
@@ -224,10 +225,7 @@ export function useProfiles() {
   return useQuery({
     queryKey: ["profiles"],
     queryFn: async (): Promise<ClientProfile[]> => {
-      const { data, error } = await supabase
-        .from("client_profiles")
-        .select("*")
-        .order("name");
+      const { data, error } = await supabase.from("client_profiles").select("*").order("name");
       if (error) throw error;
       return data ?? [];
     },
@@ -329,10 +327,7 @@ export function useTreatments() {
   return useQuery({
     queryKey: ["treatments"],
     queryFn: async (): Promise<Treatment[]> => {
-      const { data, error } = await supabase
-        .from("treatments")
-        .select("*")
-        .order("name");
+      const { data, error } = await supabase.from("treatments").select("*").order("name");
       if (error) throw error;
       return (data ?? []) as Treatment[];
     },
@@ -364,4 +359,3 @@ export function useInvoices() {
     },
   });
 }
-
