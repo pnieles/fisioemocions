@@ -4,7 +4,13 @@ import { useVisits, usePatients } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { eur, fmtDate } from "@/lib/format";
 
 export const Route = createFileRoute("/informes")({
@@ -129,7 +135,9 @@ function InformesPage() {
         subtitle="Visitas per pacient i totales per dia, setmana i mes amb promitjos."
         actions={
           <Select value={period} onValueChange={(v) => setPeriod(v as Period)}>
-            <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-44">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="month">Este mes</SelectItem>
               <SelectItem value="quarter">Trimestre</SelectItem>
@@ -166,7 +174,9 @@ function InformesPage() {
                       <td className="px-6 py-3 font-medium">{r.name}</td>
                       <td className="px-6 py-3 text-right tabular-nums">{r.count}</td>
                       <td className="px-6 py-3 text-right tabular-nums">{eur(r.amount)}</td>
-                      <td className="px-6 py-3 text-right text-muted-foreground">{fmtDate(r.last)}</td>
+                      <td className="px-6 py-3 text-right text-muted-foreground">
+                        {fmtDate(r.last)}
+                      </td>
                     </tr>
                   ))
                 )}
@@ -197,8 +207,12 @@ function InformesPage() {
                     </tr>
                     <tr className="border-t border-border text-muted-foreground">
                       <td className="px-6 py-3">Promedio por día con actividad</td>
-                      <td className="px-6 py-3 text-right tabular-nums">{(totalCount / byDay.length).toFixed(2)}</td>
-                      <td className="px-6 py-3 text-right tabular-nums">{eur(totalAmount / byDay.length)}</td>
+                      <td className="px-6 py-3 text-right tabular-nums">
+                        {(totalCount / byDay.length).toFixed(2)}
+                      </td>
+                      <td className="px-6 py-3 text-right tabular-nums">
+                        {eur(totalAmount / byDay.length)}
+                      </td>
                     </tr>
                   </>
                 )}
@@ -210,7 +224,9 @@ function InformesPage() {
         <TabsContent value="week">
           <Card className="shadow-[var(--shadow-card)]">
             <CardContent className="p-0">
-              <Table headers={["Semana", "Días con datos", "Visitas", "Import", "Promedio visitas/día"]}>
+              <Table
+                headers={["Semana", "Días con datos", "Visitas", "Import", "Promedio visitas/día"]}
+              >
                 {byWeek.length === 0 ? (
                   <EmptyRow span={5} />
                 ) : (
@@ -221,7 +237,9 @@ function InformesPage() {
                         <td className="px-6 py-3 text-right tabular-nums">{r.days}</td>
                         <td className="px-6 py-3 text-right tabular-nums">{r.count}</td>
                         <td className="px-6 py-3 text-right tabular-nums">{eur(r.amount)}</td>
-                        <td className="px-6 py-3 text-right tabular-nums">{r.avgPerDay.toFixed(2)}</td>
+                        <td className="px-6 py-3 text-right tabular-nums">
+                          {r.avgPerDay.toFixed(2)}
+                        </td>
                       </tr>
                     ))}
                     <tr className="border-t border-border bg-muted/20 font-medium">
@@ -243,21 +261,34 @@ function InformesPage() {
         <TabsContent value="month">
           <Card className="shadow-[var(--shadow-card)]">
             <CardContent className="p-0">
-              <Table headers={["Mes", "Días con datos", "Visitas", "Import", "Promedio visitas/día con datos"]}>
+              <Table
+                headers={[
+                  "Mes",
+                  "Días con datos",
+                  "Visitas",
+                  "Import",
+                  "Promedio visitas/día con datos",
+                ]}
+              >
                 {byMonth.length === 0 ? (
                   <EmptyRow span={5} />
                 ) : (
                   <>
                     {byMonth.map((r) => {
                       const [y, m] = r.month.split("-");
-                      const label = new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(new Date(Number(y), Number(m) - 1, 1));
+                      const label = new Intl.DateTimeFormat("es-ES", {
+                        month: "long",
+                        year: "numeric",
+                      }).format(new Date(Number(y), Number(m) - 1, 1));
                       return (
                         <tr key={r.month} className="border-t border-border hover:bg-muted/30">
                           <td className="px-6 py-3 font-medium capitalize">{label}</td>
                           <td className="px-6 py-3 text-right tabular-nums">{r.days}</td>
                           <td className="px-6 py-3 text-right tabular-nums">{r.count}</td>
                           <td className="px-6 py-3 text-right tabular-nums">{eur(r.amount)}</td>
-                          <td className="px-6 py-3 text-right tabular-nums">{r.avgPerDay.toFixed(2)}</td>
+                          <td className="px-6 py-3 text-right tabular-nums">
+                            {r.avgPerDay.toFixed(2)}
+                          </td>
                         </tr>
                       );
                     })}
@@ -288,7 +319,9 @@ function Table({ headers, children }: { headers: string[]; children: React.React
         <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
           <tr className="text-left">
             {headers.map((h, i) => (
-              <th key={i} className={`px-6 py-3 font-medium ${i === 0 ? "" : "text-right"}`}>{h}</th>
+              <th key={i} className={`px-6 py-3 font-medium ${i === 0 ? "" : "text-right"}`}>
+                {h}
+              </th>
             ))}
           </tr>
         </thead>
@@ -299,7 +332,13 @@ function Table({ headers, children }: { headers: string[]; children: React.React
 }
 
 function EmptyRow({ span }: { span: number }) {
-  return <tr><td colSpan={span} className="px-6 py-10 text-center text-muted-foreground">Sin datos en este período.</td></tr>;
+  return (
+    <tr>
+      <td colSpan={span} className="px-6 py-10 text-center text-muted-foreground">
+        Sin datos en este período.
+      </td>
+    </tr>
+  );
 }
 
 function Kpi({ label, value }: { label: string; value: string }) {

@@ -3,7 +3,13 @@ import { useMemo, useState } from "react";
 import { useMaterials, useVisits } from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { eur } from "@/lib/format";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
@@ -12,10 +18,14 @@ export const Route = createFileRoute("/consumo")({
   component: ConsumoPage,
 });
 
-function monthKey(iso: string) { return iso.slice(0, 7); }
+function monthKey(iso: string) {
+  return iso.slice(0, 7);
+}
 function fmtMonth(key: string) {
   const [y, m] = key.split("-");
-  return new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(new Date(Number(y), Number(m) - 1, 1));
+  return new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(
+    new Date(Number(y), Number(m) - 1, 1),
+  );
 }
 
 type MonthData = {
@@ -66,21 +76,27 @@ function ConsumoPage() {
 
   const chartData = useMemo(
     () =>
-      months.slice().reverse().map((k) => {
-        const r = byMonth.get(k)!;
-        return { month: fmtMonth(k), Unidades: r.units, Import: Number(r.amount.toFixed(2)) };
-      }),
+      months
+        .slice()
+        .reverse()
+        .map((k) => {
+          const r = byMonth.get(k)!;
+          return { month: fmtMonth(k), Unidades: r.units, Import: Number(r.amount.toFixed(2)) };
+        }),
     [months, byMonth],
   );
 
   const active = activeKey ? byMonth.get(activeKey) : null;
   const totalVisits = active ? Array.from(active.patients.values()).reduce((s, n) => s + n, 0) : 0;
-  const perPatient = active && totalVisits > 0
-    ? Array.from(active.patients.entries()).map(([name, vc]) => {
-        const share = vc / totalVisits;
-        return { name, visits: vc, units: active.units * share, amount: active.amount * share };
-      }).sort((a, b) => b.amount - a.amount)
-    : [];
+  const perPatient =
+    active && totalVisits > 0
+      ? Array.from(active.patients.entries())
+          .map(([name, vc]) => {
+            const share = vc / totalVisits;
+            return { name, visits: vc, units: active.units * share, amount: active.amount * share };
+          })
+          .sort((a, b) => b.amount - a.amount)
+      : [];
 
   const perProduct = active
     ? Array.from(active.products.entries())
@@ -95,10 +111,14 @@ function ConsumoPage() {
         subtitle="Detallee por producto (cantidad e importe) y prorrateo por paciente según las visitas del mes."
         actions={
           <Select value={activeKey} onValueChange={setPeriod}>
-            <SelectTrigger className="w-56"><SelectValue placeholder="Període" /></SelectTrigger>
+            <SelectTrigger className="w-56">
+              <SelectValue placeholder="Període" />
+            </SelectTrigger>
             <SelectContent>
               {months.map((k) => (
-                <SelectItem key={k} value={k}>{fmtMonth(k)}</SelectItem>
+                <SelectItem key={k} value={k}>
+                  {fmtMonth(k)}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -108,7 +128,11 @@ function ConsumoPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Kpi label="Unidades totales" value={active ? active.units.toLocaleString("es-ES") : "—"} />
         <Kpi label="Importe total" value={active ? eur(active.amount) : "—"} />
-        <Kpi label="Pacientees atendidos" value={active ? String(active.patients.size) : "—"} sub={active ? `${totalVisits} visites` : ""} />
+        <Kpi
+          label="Pacientees atendidos"
+          value={active ? String(active.patients.size) : "—"}
+          sub={active ? `${totalVisits} visites` : ""}
+        />
       </div>
 
       <Card className="shadow-[var(--shadow-card)] mb-6">
@@ -122,8 +146,18 @@ function ConsumoPage() {
                 <YAxis yAxisId="l" tick={{ fontSize: 11 }} />
                 <YAxis yAxisId="r" orientation="right" tick={{ fontSize: 11 }} />
                 <Tooltip />
-                <Bar yAxisId="l" dataKey="Unidades" fill="oklch(0.55 0.08 200)" radius={[4, 4, 0, 0]} />
-                <Bar yAxisId="r" dataKey="Import" fill="oklch(0.65 0.12 35)" radius={[4, 4, 0, 0]} />
+                <Bar
+                  yAxisId="l"
+                  dataKey="Unidades"
+                  fill="oklch(0.55 0.08 200)"
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  yAxisId="r"
+                  dataKey="Import"
+                  fill="oklch(0.65 0.12 35)"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -133,8 +167,12 @@ function ConsumoPage() {
       <Card className="shadow-[var(--shadow-card)] mb-6">
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border">
-            <h2 className="font-display text-lg">Detallee por producto · {activeKey ? fmtMonth(activeKey) : "—"}</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">Cantidades compradas e importe por artículo del mes.</p>
+            <h2 className="font-display text-lg">
+              Detallee por producto · {activeKey ? fmtMonth(activeKey) : "—"}
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Cantidades compradas e importe por artículo del mes.
+            </p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -148,15 +186,25 @@ function ConsumoPage() {
               </thead>
               <tbody>
                 {perProduct.length === 0 && (
-                  <tr><td colSpan={4} className="px-6 py-10 text-center text-muted-foreground">Sin compras en este período.</td></tr>
+                  <tr>
+                    <td colSpan={4} className="px-6 py-10 text-center text-muted-foreground">
+                      Sin compras en este período.
+                    </td>
+                  </tr>
                 )}
                 {perProduct.map((p) => (
                   <tr key={p.name} className="border-t border-border hover:bg-muted/30">
                     <td className="px-6 py-3 font-medium">{p.name}</td>
-                    <td className="px-6 py-3 text-right tabular-nums">{p.units.toLocaleString("es-ES")}</td>
-                    <td className="px-6 py-3 text-right tabular-nums font-medium">{eur(p.amount)}</td>
+                    <td className="px-6 py-3 text-right tabular-nums">
+                      {p.units.toLocaleString("es-ES")}
+                    </td>
+                    <td className="px-6 py-3 text-right tabular-nums font-medium">
+                      {eur(p.amount)}
+                    </td>
                     <td className="px-6 py-3 text-right tabular-nums text-muted-foreground">
-                      {active && active.amount > 0 ? ((p.amount / active.amount) * 100).toFixed(1) + "%" : "—"}
+                      {active && active.amount > 0
+                        ? ((p.amount / active.amount) * 100).toFixed(1) + "%"
+                        : "—"}
                     </td>
                   </tr>
                 ))}
@@ -165,7 +213,9 @@ function ConsumoPage() {
                 <tfoot>
                   <tr className="border-t border-border bg-muted/20 font-medium">
                     <td className="px-6 py-3">Total</td>
-                    <td className="px-6 py-3 text-right tabular-nums">{active.units.toLocaleString("es-ES")}</td>
+                    <td className="px-6 py-3 text-right tabular-nums">
+                      {active.units.toLocaleString("es-ES")}
+                    </td>
                     <td className="px-6 py-3 text-right tabular-nums">{eur(active.amount)}</td>
                     <td className="px-6 py-3 text-right tabular-nums">100%</td>
                   </tr>
@@ -179,8 +229,12 @@ function ConsumoPage() {
       <Card className="shadow-[var(--shadow-card)]">
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border">
-            <h2 className="font-display text-lg">Consumo por paciente · {activeKey ? fmtMonth(activeKey) : "—"}</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">Prorrateo según número de visitas del mes.</p>
+            <h2 className="font-display text-lg">
+              Consumo por paciente · {activeKey ? fmtMonth(activeKey) : "—"}
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Prorrateo según número de visitas del mes.
+            </p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -194,7 +248,11 @@ function ConsumoPage() {
               </thead>
               <tbody>
                 {perPatient.length === 0 && (
-                  <tr><td colSpan={4} className="px-6 py-10 text-center text-muted-foreground">Sin datos para el período seleccionado.</td></tr>
+                  <tr>
+                    <td colSpan={4} className="px-6 py-10 text-center text-muted-foreground">
+                      Sin datos para el período seleccionado.
+                    </td>
+                  </tr>
                 )}
                 {perPatient.map((r) => (
                   <tr key={r.name} className="border-t border-border hover:bg-muted/30">

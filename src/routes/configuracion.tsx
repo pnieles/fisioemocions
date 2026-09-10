@@ -2,7 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useCompanySettings, useReminderTemplates, useScheduleSettings, useProfiles, useIgiRates, useEmailAccount } from "@/lib/data-hooks";
+import {
+  useCompanySettings,
+  useReminderTemplates,
+  useScheduleSettings,
+  useProfiles,
+  useIgiRates,
+  useEmailAccount,
+} from "@/lib/data-hooks";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,10 +19,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { eur } from "@/lib/format";
 import { toast } from "sonner";
 import { Upload, X, Plus, Trash2, Save } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/configuracion")({
   head: () => ({ meta: [{ title: "Configuración · fisioemocions" }] }),
@@ -79,17 +89,21 @@ function ConfigPage() {
     mutationFn: async () => {
       const ts = new Date().toISOString();
       const { error: e1 } = await supabase.from("app_settings").upsert({
-        key: "company", value: { name, logo_url: logo }, updated_at: ts,
+        key: "company",
+        value: { name, logo_url: logo },
+        updated_at: ts,
       });
       if (e1) throw e1;
       const { error: e2 } = await supabase.from("app_settings").upsert({
         key: "reminder_templates",
-        value: { whatsapp: wa, email_subject: subj, email_body: body }, updated_at: ts,
+        value: { whatsapp: wa, email_subject: subj, email_body: body },
+        updated_at: ts,
       });
       if (e2) throw e2;
       const { error: e3 } = await supabase.from("app_settings").upsert({
         key: "schedule",
-        value: { open, close, slot_min: Number(slot) || 30, weekdays, holidays }, updated_at: ts,
+        value: { open, close, slot_min: Number(slot) || 30, weekdays, holidays },
+        updated_at: ts,
       });
       if (e3) throw e3;
     },
@@ -103,12 +117,15 @@ function ConfigPage() {
   const onPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (f.size > 500_000) { toast.error("Imagen demasiado grande (máx 500KB)"); return; }
+    if (f.size > 500_000) {
+      toast.error("Imagen demasiado grande (máx 500KB)");
+      return;
+    }
     setLogo(await fileToDataUrl(f));
   };
 
   const toggleDay = (d: number) => {
-    setWeekdays((cur) => cur.includes(d) ? cur.filter((x) => x !== d) : [...cur, d].sort());
+    setWeekdays((cur) => (cur.includes(d) ? cur.filter((x) => x !== d) : [...cur, d].sort()));
   };
 
   const addHoliday = () => {
@@ -120,22 +137,39 @@ function ConfigPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1000px] mx-auto">
-      <PageHeader title="Configuración" subtitle="Personaliza la marca, los mensajes y el calendario de explotación." />
+      <PageHeader
+        title="Configuración"
+        subtitle="Personaliza la marca, los mensajes y el calendario de explotación."
+      />
 
       <Card className="mb-6 shadow-[var(--shadow-card)]">
         <CardContent className="p-6 space-y-5">
           <h2 className="font-display text-lg">Empresa</h2>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nombre de la empresa</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              Nombre de la empresa
+            </Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Logo</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              Logo
+            </Label>
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-md border border-border bg-muted/30 flex items-center justify-center overflow-hidden">
-                {logo ? <img src={logo} alt="Logo" className="h-full w-full object-cover" /> : <span className="text-xs text-muted-foreground">—</span>}
+                {logo ? (
+                  <img src={logo} alt="Logo" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-xs text-muted-foreground">—</span>
+                )}
               </div>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPick} />
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={onPick}
+              />
               <Button variant="secondary" type="button" onClick={() => fileRef.current?.click()}>
                 <Upload className="h-4 w-4 mr-1" /> Subir imagen
               </Button>
@@ -145,7 +179,9 @@ function ConfigPage() {
                 </Button>
               )}
             </div>
-            <p className="text-xs text-muted-foreground mt-2">Recomendado: PNG/JPG cuadrado, &lt; 500KB.</p>
+            <p className="text-xs text-muted-foreground mt-2">
+              Recomendado: PNG/JPG cuadrado, &lt; 500KB.
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -155,20 +191,34 @@ function ConfigPage() {
           <h2 className="font-display text-lg">Horario de explotación</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Apertura</Label>
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+                Apertura
+              </Label>
               <Input type="time" value={open} onChange={(e) => setOpen(e.target.value)} />
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Cierre</Label>
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+                Cierre
+              </Label>
               <Input type="time" value={close} onChange={(e) => setClose(e.target.value)} />
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Duraciónn slot (min)</Label>
-              <Input type="number" min="5" step="5" value={slot} onChange={(e) => setSlot(e.target.value)} />
+              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+                Duraciónn slot (min)
+              </Label>
+              <Input
+                type="number"
+                min="5"
+                step="5"
+                value={slot}
+                onChange={(e) => setSlot(e.target.value)}
+              />
             </div>
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-2 block">Días laborables</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-2 block">
+              Días laborables
+            </Label>
             <div className="flex gap-2 flex-wrap">
               {WEEKDAY_LABELS.map((lbl, d) => {
                 const active = weekdays.includes(d);
@@ -178,23 +228,48 @@ function ConfigPage() {
                     type="button"
                     onClick={() => toggleDay(d)}
                     className={`h-9 w-12 rounded-md text-sm border transition ${active ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border hover:bg-muted"}`}
-                  >{lbl}</button>
+                  >
+                    {lbl}
+                  </button>
                 );
               })}
             </div>
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-2 block">Festivos y vacaciones</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-2 block">
+              Festivos y vacaciones
+            </Label>
             <div className="flex gap-2 mb-3">
-              <Input type="date" value={newHoliday} onChange={(e) => setNewHoliday(e.target.value)} className="w-48" />
-              <Button type="button" variant="secondary" onClick={addHoliday}><Plus className="h-4 w-4 mr-1" />Añadir</Button>
+              <Input
+                type="date"
+                value={newHoliday}
+                onChange={(e) => setNewHoliday(e.target.value)}
+                className="w-48"
+              />
+              <Button type="button" variant="secondary" onClick={addHoliday}>
+                <Plus className="h-4 w-4 mr-1" />
+                Añadir
+              </Button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {holidays.length === 0 && <span className="text-xs text-muted-foreground">Sin fechas añadidas.</span>}
+              {holidays.length === 0 && (
+                <span className="text-xs text-muted-foreground">Sin fechas añadidas.</span>
+              )}
               {holidays.map((h) => (
-                <span key={h} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted text-sm">
-                  {new Date(h + "T00:00:00").toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })}
-                  <button type="button" onClick={() => setHolidays(holidays.filter((x) => x !== h))} className="text-muted-foreground hover:text-destructive">
+                <span
+                  key={h}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted text-sm"
+                >
+                  {new Date(h + "T00:00:00").toLocaleDateString("es-ES", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                  <button
+                    type="button"
+                    onClick={() => setHolidays(holidays.filter((x) => x !== h))}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </span>
@@ -216,15 +291,21 @@ function ConfigPage() {
             </p>
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">WhatsApp</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              WhatsApp
+            </Label>
             <Textarea rows={4} value={wa} onChange={(e) => setWa(e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Asunto del correo</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              Asunto del correo
+            </Label>
             <Input value={subj} onChange={(e) => setSubj(e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Cuerpo del correo</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              Cuerpo del correo
+            </Label>
             <Textarea rows={7} value={body} onChange={(e) => setBody(e.target.value)} />
           </div>
         </CardContent>
@@ -236,10 +317,10 @@ function ConfigPage() {
 
       <IgiRatesCard />
 
-      
-
       <div className="flex justify-end">
-        <Button onClick={() => save.mutate()} disabled={save.isPending}>Guardar cambios</Button>
+        <Button onClick={() => save.mutate()} disabled={save.isPending}>
+          Guardar cambios
+        </Button>
       </div>
     </div>
   );
@@ -270,7 +351,10 @@ function ProfilesCard() {
 
   const update = useMutation({
     mutationFn: async ({ id, rate }: { id: string; rate: number }) => {
-      const { error } = await supabase.from("client_profiles").update({ default_rate: rate }).eq("id", id);
+      const { error } = await supabase
+        .from("client_profiles")
+        .update({ default_rate: rate })
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -297,18 +381,38 @@ function ProfilesCard() {
       <CardContent className="p-6 space-y-5">
         <div>
           <h2 className="font-display text-lg">Perfiles y tarifas de pacientes</h2>
-          <p className="text-xs text-muted-foreground mt-1">Define los perfiles (CASS, Privado...) y la tarifa por defecto que se aplicará a las visitas.</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Define los perfiles (CASS, Privado...) y la tarifa por defecto que se aplicará a las
+            visitas.
+          </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
           <div className="md:col-span-6">
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nombre del perfil</Label>
-            <Input placeholder="Ex: CASS 1, Privat..." value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              Nombre del perfil
+            </Label>
+            <Input
+              placeholder="Ex: CASS 1, Privat..."
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
           </div>
           <div className="md:col-span-4">
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Tarifa por defecto (€)</Label>
-            <Input type="number" step="0.01" value={form.default_rate} onChange={(e) => setForm({ ...form, default_rate: e.target.value })} />
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              Tarifa por defecto (€)
+            </Label>
+            <Input
+              type="number"
+              step="0.01"
+              value={form.default_rate}
+              onChange={(e) => setForm({ ...form, default_rate: e.target.value })}
+            />
           </div>
-          <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-2 h-10">
+          <Button
+            onClick={() => add.mutate()}
+            disabled={add.isPending}
+            className="md:col-span-2 h-10"
+          >
             <Plus className="h-4 w-4 mr-1" /> Crear
           </Button>
         </div>
@@ -328,28 +432,47 @@ function ProfilesCard() {
                   return (
                     <tr key={p.id} className="border-t border-border">
                       <td className="px-4 py-2 font-medium">
-                        <span className="inline-flex px-2 py-0.5 rounded-md bg-accent/10 text-accent">{p.name}</span>
+                        <span className="inline-flex px-2 py-0.5 rounded-md bg-accent/10 text-accent">
+                          {p.name}
+                        </span>
                       </td>
                       <td className="px-4 py-2 text-right">
                         {editing ? (
-                          <Input type="number" step="0.01" value={edits[p.id]}
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={edits[p.id]}
                             onChange={(e) => setEdits({ ...edits, [p.id]: e.target.value })}
-                            className="w-28 ml-auto text-right h-8" />
+                            className="w-28 ml-auto text-right h-8"
+                          />
                         ) : (
-                          <span className="tabular-nums font-medium">{eur(Number(p.default_rate))}</span>
+                          <span className="tabular-nums font-medium">
+                            {eur(Number(p.default_rate))}
+                          </span>
                         )}
                       </td>
                       <td className="px-4 py-2 text-right space-x-2 whitespace-nowrap">
                         {editing ? (
-                          <Button size="sm" variant="default" onClick={() => update.mutate({ id: p.id, rate: Number(edits[p.id]) })}>
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() => update.mutate({ id: p.id, rate: Number(edits[p.id]) })}
+                          >
                             <Save className="h-3.5 w-3.5 mr-1" /> Guardar
                           </Button>
                         ) : (
-                          <Button size="sm" variant="outline" onClick={() => setEdits({ ...edits, [p.id]: String(p.default_rate) })}>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEdits({ ...edits, [p.id]: String(p.default_rate) })}
+                          >
                             Editar
                           </Button>
                         )}
-                        <button onClick={() => del.mutate(p.id)} className="text-muted-foreground hover:text-destructive align-middle">
+                        <button
+                          onClick={() => del.mutate(p.id)}
+                          className="text-muted-foreground hover:text-destructive align-middle"
+                        >
                           <Trash2 className="h-4 w-4 inline" />
                         </button>
                       </td>
@@ -373,7 +496,9 @@ function IgiRatesCard() {
   const add = useMutation({
     mutationFn: async () => {
       if (!form.name || form.rate === "") throw new Error("Nombre y porcentaje requeridos");
-      const { error } = await supabase.from("igi_rates").insert({ name: form.name, rate: Number(form.rate) });
+      const { error } = await supabase
+        .from("igi_rates")
+        .insert({ name: form.name, rate: Number(form.rate) });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -400,18 +525,37 @@ function IgiRatesCard() {
       <CardContent className="p-6 space-y-5">
         <div>
           <h2 className="font-display text-lg">Tipos de IGI</h2>
-          <p className="text-xs text-muted-foreground mt-1">Tarifas de IGI aplicables a las facturas de pacientes.</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Tarifas de IGI aplicables a las facturas de pacientes.
+          </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
           <div className="md:col-span-6">
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Nombre</Label>
-            <Input placeholder="Ex: IGI 4,5%" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              Nombre
+            </Label>
+            <Input
+              placeholder="Ex: IGI 4,5%"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
           </div>
           <div className="md:col-span-4">
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Porcentaje (%)</Label>
-            <Input type="number" step="0.01" value={form.rate} onChange={(e) => setForm({ ...form, rate: e.target.value })} />
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              Porcentaje (%)
+            </Label>
+            <Input
+              type="number"
+              step="0.01"
+              value={form.rate}
+              onChange={(e) => setForm({ ...form, rate: e.target.value })}
+            />
           </div>
-          <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-2 h-10">
+          <Button
+            onClick={() => add.mutate()}
+            disabled={add.isPending}
+            className="md:col-span-2 h-10"
+          >
             <Plus className="h-4 w-4 mr-1" /> Crear
           </Button>
         </div>
@@ -431,7 +575,10 @@ function IgiRatesCard() {
                     <td className="px-4 py-2 font-medium">{r.name}</td>
                     <td className="px-4 py-2 text-right tabular-nums">{r.rate}%</td>
                     <td className="px-4 py-2 text-right">
-                      <button onClick={() => del.mutate(r.id)} className="text-muted-foreground hover:text-destructive align-middle">
+                      <button
+                        onClick={() => del.mutate(r.id)}
+                        className="text-muted-foreground hover:text-destructive align-middle"
+                      >
                         <Trash2 className="h-4 w-4 inline" />
                       </button>
                     </td>
@@ -446,34 +593,60 @@ function IgiRatesCard() {
   );
 }
 
-const PROVIDER_PRESETS: Record<string, { smtp_host: string; smtp_port: number; smtp_secure: boolean; imap_host: string; imap_port: number; caldav_url: string; help: string }> = {
+const PROVIDER_PRESETS: Record<
+  string,
+  {
+    smtp_host: string;
+    smtp_port: number;
+    smtp_secure: boolean;
+    imap_host: string;
+    imap_port: number;
+    caldav_url: string;
+    help: string;
+  }
+> = {
   google: {
-    smtp_host: "smtp.gmail.com", smtp_port: 465, smtp_secure: true,
-    imap_host: "imap.gmail.com", imap_port: 993,
+    smtp_host: "smtp.gmail.com",
+    smtp_port: 465,
+    smtp_secure: true,
+    imap_host: "imap.gmail.com",
+    imap_port: 993,
     caldav_url: "https://apidata.googleusercontent.com/caldav/v2/",
     help: "Usa una contraseña de aplicación de Google (myaccount.google.com/apppasswords). El ID de calendario suele ser tu correo o uno específico.",
   },
   outlook: {
-    smtp_host: "smtp.office365.com", smtp_port: 587, smtp_secure: false,
-    imap_host: "outlook.office365.com", imap_port: 993,
+    smtp_host: "smtp.office365.com",
+    smtp_port: 587,
+    smtp_secure: false,
+    imap_host: "outlook.office365.com",
+    imap_port: 993,
     caldav_url: "https://outlook.office365.com/EWS/Exchange.asmx",
     help: "Genera una contraseña de aplicación en account.microsoft.com si tienes 2FA.",
   },
   icloud: {
-    smtp_host: "smtp.mail.me.com", smtp_port: 587, smtp_secure: false,
-    imap_host: "imap.mail.me.com", imap_port: 993,
+    smtp_host: "smtp.mail.me.com",
+    smtp_port: 587,
+    smtp_secure: false,
+    imap_host: "imap.mail.me.com",
+    imap_port: 993,
     caldav_url: "https://caldav.icloud.com/",
     help: "Necesitas una contraseña específica de app desde appleid.apple.com.",
   },
   caldav: {
-    smtp_host: "", smtp_port: 465, smtp_secure: true,
-    imap_host: "", imap_port: 993,
+    smtp_host: "",
+    smtp_port: 465,
+    smtp_secure: true,
+    imap_host: "",
+    imap_port: 993,
     caldav_url: "",
     help: "Indica manualmente los servidores SMTP y la URL CalDAV de tu proveedor.",
   },
   other: {
-    smtp_host: "", smtp_port: 465, smtp_secure: true,
-    imap_host: "", imap_port: 993,
+    smtp_host: "",
+    smtp_port: 465,
+    smtp_secure: true,
+    imap_host: "",
+    imap_port: 993,
     caldav_url: "",
     help: "Completa manualmente los datos SMTP/IMAP y calendario.",
   },
@@ -483,11 +656,16 @@ function EmailAccountCard() {
   const { data: account } = useEmailAccount();
   const qc = useQueryClient();
   const [form, setForm] = useState({
-    email: "", password: "",
-    smtp_host: "", smtp_port: "465", smtp_secure: true,
-    imap_host: "", imap_port: "993",
+    email: "",
+    password: "",
+    smtp_host: "",
+    smtp_port: "465",
+    smtp_secure: true,
+    imap_host: "",
+    imap_port: "993",
     calendar_provider: "google" as "google" | "outlook" | "icloud" | "caldav" | "other",
-    calendar_id: "", caldav_url: "",
+    calendar_id: "",
+    caldav_url: "",
     sync_enabled: false,
   });
 
@@ -560,26 +738,49 @@ function EmailAccountCard() {
         <div>
           <h2 className="font-display text-lg">Cuenta de correo y calendario</h2>
           <p className="text-xs text-muted-foreground mt-1">
-            Cuenta usada para enviar recordatorios por correo y sincronizar la agenda local con el calendario del proveedor.
-            La contraseña se guarda para uso del servidor; se recomienda usar una <strong>contraseña de aplicación</strong>.
+            Cuenta usada para enviar recordatorios por correo y sincronizar la agenda local con el
+            calendario del proveedor. La contraseña se guarda para uso del servidor; se recomienda
+            usar una <strong>contraseña de aplicación</strong>.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Correo electrónico</Label>
-            <Input type="email" placeholder="tu@correo.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              Correo electrónico
+            </Label>
+            <Input
+              type="email"
+              placeholder="tu@correo.com"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Contraseña / App password</Label>
-            <Input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              Contraseña / App password
+            </Label>
+            <Input
+              type="password"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
           </div>
         </div>
 
         <div>
-          <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">Proveedor de calendario</Label>
-          <Select value={form.calendar_provider} onValueChange={(v) => applyPreset(v as "google" | "outlook" | "icloud" | "caldav" | "other")}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+            Proveedor de calendario
+          </Label>
+          <Select
+            value={form.calendar_provider}
+            onValueChange={(v) =>
+              applyPreset(v as "google" | "outlook" | "icloud" | "caldav" | "other")
+            }
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="google">Google (Gmail / Google Calendar)</SelectItem>
               <SelectItem value="outlook">Microsoft Outlook / 365</SelectItem>
@@ -593,41 +794,83 @@ function EmailAccountCard() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">ID del calendario</Label>
-            <Input placeholder="p.ej. tu@correo.com o ID del calendario" value={form.calendar_id} onChange={(e) => setForm({ ...form, calendar_id: e.target.value })} />
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              ID del calendario
+            </Label>
+            <Input
+              placeholder="p.ej. tu@correo.com o ID del calendario"
+              value={form.calendar_id}
+              onChange={(e) => setForm({ ...form, calendar_id: e.target.value })}
+            />
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">URL CalDAV</Label>
-            <Input placeholder="https://..." value={form.caldav_url} onChange={(e) => setForm({ ...form, caldav_url: e.target.value })} />
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              URL CalDAV
+            </Label>
+            <Input
+              placeholder="https://..."
+              value={form.caldav_url}
+              onChange={(e) => setForm({ ...form, caldav_url: e.target.value })}
+            />
           </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">SMTP host</Label>
-            <Input value={form.smtp_host} onChange={(e) => setForm({ ...form, smtp_host: e.target.value })} />
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              SMTP host
+            </Label>
+            <Input
+              value={form.smtp_host}
+              onChange={(e) => setForm({ ...form, smtp_host: e.target.value })}
+            />
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">SMTP puerto</Label>
-            <Input type="number" value={form.smtp_port} onChange={(e) => setForm({ ...form, smtp_port: e.target.value })} />
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              SMTP puerto
+            </Label>
+            <Input
+              type="number"
+              value={form.smtp_port}
+              onChange={(e) => setForm({ ...form, smtp_port: e.target.value })}
+            />
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">IMAP host</Label>
-            <Input value={form.imap_host} onChange={(e) => setForm({ ...form, imap_host: e.target.value })} />
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              IMAP host
+            </Label>
+            <Input
+              value={form.imap_host}
+              onChange={(e) => setForm({ ...form, imap_host: e.target.value })}
+            />
           </div>
           <div>
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">IMAP puerto</Label>
-            <Input type="number" value={form.imap_port} onChange={(e) => setForm({ ...form, imap_port: e.target.value })} />
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              IMAP puerto
+            </Label>
+            <Input
+              type="number"
+              value={form.imap_port}
+              onChange={(e) => setForm({ ...form, imap_port: e.target.value })}
+            />
           </div>
         </div>
 
         <div className="flex flex-wrap gap-6 items-center">
           <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="checkbox" checked={form.smtp_secure} onChange={(e) => setForm({ ...form, smtp_secure: e.target.checked })} />
+            <input
+              type="checkbox"
+              checked={form.smtp_secure}
+              onChange={(e) => setForm({ ...form, smtp_secure: e.target.checked })}
+            />
             SMTP con SSL/TLS
           </label>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="checkbox" checked={form.sync_enabled} onChange={(e) => setForm({ ...form, sync_enabled: e.target.checked })} />
+            <input
+              type="checkbox"
+              checked={form.sync_enabled}
+              onChange={(e) => setForm({ ...form, sync_enabled: e.target.checked })}
+            />
             Sincronizar agenda con el calendario del correo
           </label>
         </div>

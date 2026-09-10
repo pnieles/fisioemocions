@@ -49,7 +49,11 @@ function round2(n: number) {
 }
 
 const eur = (n: number) =>
-  new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 2 }).format(n || 0);
+  new Intl.NumberFormat("es-ES", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 2,
+  }).format(n || 0);
 
 export function exportInvoicePdf(inv: Invoice, company: CompanySettings, patient?: Patient | null) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
@@ -81,7 +85,11 @@ export function exportInvoicePdf(inv: Invoice, company: CompanySettings, patient
   doc.setFontSize(10);
   const rightLines = [
     inv.patient_name || "—",
-    patient?.passport_id ? `Doc: ${patient.passport_id}` : inv.patient_passport ? `Doc: ${inv.patient_passport}` : "",
+    patient?.passport_id
+      ? `Doc: ${patient.passport_id}`
+      : inv.patient_passport
+        ? `Doc: ${inv.patient_passport}`
+        : "",
     patient?.phone ? `Tel: ${patient.phone}` : "",
     patient?.email ? patient.email : "",
   ].filter(Boolean);
@@ -99,7 +107,10 @@ export function exportInvoicePdf(inv: Invoice, company: CompanySettings, patient
   doc.setFontSize(10);
   const meta = [
     ["Nº factura", inv.invoice_number || "—"],
-    ["Fecha", new Date(inv.issue_date).toLocaleString("es-ES", { dateStyle: "long", timeStyle: "short" })],
+    [
+      "Fecha",
+      new Date(inv.issue_date).toLocaleString("es-ES", { dateStyle: "long", timeStyle: "short" }),
+    ],
     ["Tipo", inv.patient_type === "cass" ? "CASS" : "Privado"],
   ];
   meta.forEach(([k, v], i) => {

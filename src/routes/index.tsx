@@ -4,7 +4,13 @@ import { useExpenses, useMaterials, useProfiles, useVisits } from "@/lib/data-ho
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { eur, pct } from "@/lib/format";
 import {
   ResponsiveContainer,
@@ -17,7 +23,16 @@ import {
   Cell,
   Legend,
 } from "recharts";
-import { ChevronRight, ArrowLeft, TrendingUp, TrendingDown, Wallet, Stethoscope, Package, Receipt } from "lucide-react";
+import {
+  ChevronRight,
+  ArrowLeft,
+  TrendingUp,
+  TrendingDown,
+  Wallet,
+  Stethoscope,
+  Package,
+  Receipt,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -68,7 +83,7 @@ function Dashboard() {
   const incomeByProfile = useMemo(() => {
     const map = new Map<string, number>();
     for (const v of filt.visits) {
-      const key = v.profile_id ? profileMap[v.profile_id]?.name ?? "Sin perfil" : "Sin perfil";
+      const key = v.profile_id ? (profileMap[v.profile_id]?.name ?? "Sin perfil") : "Sin perfil";
       map.set(key, (map.get(key) ?? 0) + Number(v.amount));
     }
     return Array.from(map, ([name, value]) => ({ name, value }));
@@ -77,7 +92,10 @@ function Dashboard() {
   // Expense by category (materials + general expenses)
   const expenseByCategory = useMemo(() => {
     const map = new Map<string, number>();
-    const matTotal = filt.materials.reduce((s, m) => s + Number(m.quantity) * Number(m.unit_cost), 0);
+    const matTotal = filt.materials.reduce(
+      (s, m) => s + Number(m.quantity) * Number(m.unit_cost),
+      0,
+    );
     if (matTotal > 0) map.set("Material", matTotal);
     for (const e of filt.expenses) {
       map.set(e.category, (map.get(e.category) ?? 0) + Number(e.amount));
@@ -113,7 +131,12 @@ function Dashboard() {
     }
     return filt.expenses
       .filter((e) => e.category === drill.key)
-      .map((e) => ({ date: e.expense_date, label: e.description, sub: "", amount: Number(e.amount) }));
+      .map((e) => ({
+        date: e.expense_date,
+        label: e.description,
+        sub: "",
+        amount: Number(e.amount),
+      }));
   }, [drill, filt, profileMap]);
 
   return (
@@ -146,15 +169,32 @@ function Dashboard() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <KPI label="Ingresos" value={eur(totalIncome)} icon={<Stethoscope className="h-4 w-4" />} accent="primary" />
-        <KPI label="Gastos" value={eur(totalExpense)} icon={<Receipt className="h-4 w-4" />} accent="muted" />
+        <KPI
+          label="Ingresos"
+          value={eur(totalIncome)}
+          icon={<Stethoscope className="h-4 w-4" />}
+          accent="primary"
+        />
+        <KPI
+          label="Gastos"
+          value={eur(totalExpense)}
+          icon={<Receipt className="h-4 w-4" />}
+          accent="muted"
+        />
         <KPI
           label="Resultado neto"
           value={eur(net)}
-          icon={net >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+          icon={
+            net >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />
+          }
           accent={net >= 0 ? "success" : "destructive"}
         />
-        <KPI label="Margen" value={pct(margin)} icon={<Wallet className="h-4 w-4" />} accent="accent" />
+        <KPI
+          label="Margen"
+          value={pct(margin)}
+          icon={<Wallet className="h-4 w-4" />}
+          accent="accent"
+        />
       </div>
 
       {/* Chart + Table */}
@@ -162,8 +202,12 @@ function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <Card className="lg:col-span-3 shadow-[var(--shadow-card)]">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-base font-medium">Ingresos vs Gastos por categoría</CardTitle>
-              <span className="text-xs text-muted-foreground">Haz clic en una barra para ver el detalle</span>
+              <CardTitle className="text-base font-medium">
+                Ingresos vs Gastos por categoría
+              </CardTitle>
+              <span className="text-xs text-muted-foreground">
+                Haz clic en una barra para ver el detalle
+              </span>
             </CardHeader>
             <CardContent>
               <DrillChart
@@ -227,7 +271,11 @@ function Dashboard() {
                 </thead>
                 <tbody>
                   {drillRows.length === 0 && (
-                    <tr><td colSpan={5} className="py-8 text-center text-muted-foreground">Sin registros en este período.</td></tr>
+                    <tr>
+                      <td colSpan={5} className="py-8 text-center text-muted-foreground">
+                        Sin registros en este período.
+                      </td>
+                    </tr>
                   )}
                   {drillRows.map((r, i) => {
                     const total = drillRows.reduce((s, x) => s + x.amount, 0);
@@ -249,7 +297,6 @@ function Dashboard() {
           </CardContent>
         </Card>
       )}
-
     </div>
   );
 }
@@ -277,7 +324,12 @@ function KPI({
       <CardContent className="p-5">
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs uppercase tracking-wider text-muted-foreground">{label}</span>
-          <span className={cn("h-7 w-7 rounded-md inline-flex items-center justify-center", accents[accent])}>
+          <span
+            className={cn(
+              "h-7 w-7 rounded-md inline-flex items-center justify-center",
+              accents[accent],
+            )}
+          >
             {icon}
           </span>
         </div>
@@ -322,7 +374,13 @@ function DrillChart({
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-          <XAxis dataKey="name" stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
+          <XAxis
+            dataKey="name"
+            stroke="var(--color-muted-foreground)"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
+          />
           <YAxis
             stroke="var(--color-muted-foreground)"
             fontSize={12}
@@ -340,10 +398,7 @@ function DrillChart({
             }}
             formatter={(value: number, _name, props) => {
               const d = props.payload;
-              return [
-                view === "abs" ? eur(d.value) : `${value.toFixed(1)}%`,
-                d.group,
-              ];
+              return [view === "abs" ? eur(d.value) : `${value.toFixed(1)}%`, d.group];
             }}
           />
           <Legend wrapperStyle={{ fontSize: 12 }} />
@@ -351,7 +406,7 @@ function DrillChart({
             dataKey="display"
             name={view === "abs" ? "Import (€)" : "% del total"}
             radius={[6, 6, 0, 0]}
-            onClick={(d: any) => onSelect(d.kind, d.name)}
+            onClick={(d: { kind: "income" | "expense"; name: string }) => onSelect(d.kind, d.name)}
             cursor="pointer"
           >
             {data.map((d, i) => (
@@ -392,7 +447,12 @@ function PLTable({
         {income
           .sort((a, b) => b.value - a.value)
           .map((r) => (
-            <Row key={r.name} label={r.name} value={fmt(r.value, totalIncome)} onClick={() => onDrill("income", r.name)} />
+            <Row
+              key={r.name}
+              label={r.name}
+              value={fmt(r.value, totalIncome)}
+              onClick={() => onDrill("income", r.name)}
+            />
           ))}
       </Section>
       <Section title="Gastos" total={totalExpense} view={view}>
@@ -400,7 +460,12 @@ function PLTable({
         {expense
           .sort((a, b) => b.value - a.value)
           .map((r) => (
-            <Row key={r.name} label={r.name} value={fmt(r.value, totalExpense)} onClick={() => onDrill("expense", r.name)} />
+            <Row
+              key={r.name}
+              label={r.name}
+              value={fmt(r.value, totalExpense)}
+              onClick={() => onDrill("expense", r.name)}
+            />
           ))}
       </Section>
       <div className="border-t-2 border-foreground/80 pt-3 mt-3">
@@ -442,7 +507,12 @@ function Section({
     <div className="mb-4">
       <div className="flex items-center justify-between border-b border-border pb-1.5 mb-1.5">
         <span className="text-xs uppercase tracking-wider text-muted-foreground">{title}</span>
-        <span className={cn("text-sm tabular-nums font-medium", positive ? "text-primary" : "text-foreground")}>
+        <span
+          className={cn(
+            "text-sm tabular-nums font-medium",
+            positive ? "text-primary" : "text-foreground",
+          )}
+        >
           {view === "abs" ? eur(total) : "100%"}
         </span>
       </div>

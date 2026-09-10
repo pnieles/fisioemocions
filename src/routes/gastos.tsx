@@ -8,7 +8,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { eur, fmtDate, todayISO } from "@/lib/format";
 import { toast } from "sonner";
 import { Trash2, Plus } from "lucide-react";
@@ -63,29 +69,58 @@ function ExpensesPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
-      <PageHeader title="Gastos" subtitle="Alquiler, impuestos, útiles, inversiones y otros gastos operativos." />
+      <PageHeader
+        title="Gastos"
+        subtitle="Alquiler, impuestos, útiles, inversiones y otros gastos operativos."
+      />
 
       <Card className="mb-8 shadow-[var(--shadow-card)]">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             <Field className="md:col-span-2" label="Data">
-              <Input type="date" value={form.expense_date} onChange={(e) => setForm({ ...form, expense_date: e.target.value })} />
+              <Input
+                type="date"
+                value={form.expense_date}
+                onChange={(e) => setForm({ ...form, expense_date: e.target.value })}
+              />
             </Field>
             <Field className="md:col-span-2" label="Categoría">
-              <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={form.category}
+                onValueChange={(v) => setForm({ ...form, category: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {EXPENSE_CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  {EXPENSE_CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </Field>
             <Field className="md:col-span-5" label="Descripción *">
-              <Input placeholder="Ex: Alquiler Enero" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+              <Input
+                placeholder="Ex: Alquiler Enero"
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+              />
             </Field>
             <Field className="md:col-span-2" label="Import (€) *">
-              <Input type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
+              <Input
+                type="number"
+                step="0.01"
+                value={form.amount}
+                onChange={(e) => setForm({ ...form, amount: e.target.value })}
+              />
             </Field>
-            <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-1 h-10">
+            <Button
+              onClick={() => add.mutate()}
+              disabled={add.isPending}
+              className="md:col-span-1 h-10"
+            >
               <Plus className="h-4 w-4 mr-1" /> Añadir
             </Button>
           </div>
@@ -96,7 +131,9 @@ function ExpensesPage() {
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border">
             <h2 className="font-display text-lg">Gastos registrados</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">{expenses.length} entradas · {eur(total)} totales</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {expenses.length} entradas · {eur(total)} totales
+            </p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -111,18 +148,29 @@ function ExpensesPage() {
               </thead>
               <tbody>
                 {expenses.length === 0 && (
-                  <tr><td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">Sin gastos registrados.</td></tr>
+                  <tr>
+                    <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                      Sin gastos registrados.
+                    </td>
+                  </tr>
                 )}
                 {expenses.map((e) => (
                   <tr key={e.id} className="border-t border-border hover:bg-muted/30">
                     <td className="px-6 py-3 text-muted-foreground">{fmtDate(e.expense_date)}</td>
                     <td className="px-6 py-3">
-                      <span className="inline-flex px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground text-xs font-medium">{e.category}</span>
+                      <span className="inline-flex px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground text-xs font-medium">
+                        {e.category}
+                      </span>
                     </td>
                     <td className="px-6 py-3 font-medium">{e.description}</td>
-                    <td className="px-6 py-3 text-right tabular-nums font-medium">{eur(Number(e.amount))}</td>
+                    <td className="px-6 py-3 text-right tabular-nums font-medium">
+                      {eur(Number(e.amount))}
+                    </td>
                     <td className="px-6 py-3 text-right">
-                      <button onClick={() => del.mutate(e.id)} className="text-muted-foreground hover:text-destructive">
+                      <button
+                        onClick={() => del.mutate(e.id)}
+                        className="text-muted-foreground hover:text-destructive"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </td>
@@ -137,10 +185,20 @@ function ExpensesPage() {
   );
 }
 
-function Field({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
+function Field({
+  label,
+  children,
+  className,
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div className={className}>
-      <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">{label}</Label>
+      <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+        {label}
+      </Label>
       {children}
     </div>
   );

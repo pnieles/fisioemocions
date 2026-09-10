@@ -1,12 +1,39 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Stethoscope, Package, Receipt, Activity, ClipboardList, CalendarDays, UserPlus, BarChart3, BellRing, Settings as SettingsIcon, Boxes, FileBarChart, FileText, Users as UsersIcon, Menu, X } from "lucide-react";
+import {
+  LayoutDashboard,
+  Stethoscope,
+  Package,
+  Receipt,
+  Activity,
+  ClipboardList,
+  CalendarDays,
+  UserPlus,
+  BarChart3,
+  BellRing,
+  Settings as SettingsIcon,
+  Boxes,
+  FileBarChart,
+  FileText,
+  Users as UsersIcon,
+  Menu,
+  X,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useCompanySettings } from "@/lib/data-hooks";
 import { useRoles, type MenuKey } from "@/lib/roles";
 
-type NavItem = { to: string; label: string; icon: React.ComponentType<{ className?: string; strokeWidth?: number }>; key: MenuKey };
-type NavGroup = { label: string; icon: React.ComponentType<{ className?: string; strokeWidth?: number }>; children: NavItem[] };
+type NavItem = {
+  to: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  key: MenuKey;
+};
+type NavGroup = {
+  label: string;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  children: NavItem[];
+};
 type NavEntry = NavItem | NavGroup;
 
 const nav: NavEntry[] = [
@@ -26,9 +53,9 @@ const nav: NavEntry[] = [
       { to: "/consumo", label: "Consumo mensual", icon: BarChart3, key: "consumo" },
     ],
   },
- { to: "/gastos", label: "Gastos", icon: Receipt, key: "gastos" },
- { to: "/usuarios", label: "Usuarios", icon: UsersIcon, key: "usuarios" },
- { to: "/configuracion", label: "Configuración", icon: SettingsIcon, key: "configuracion" },
+  { to: "/gastos", label: "Gastos", icon: Receipt, key: "gastos" },
+  { to: "/usuarios", label: "Usuarios", icon: UsersIcon, key: "usuarios" },
+  { to: "/configuracion", label: "Configuración", icon: SettingsIcon, key: "configuracion" },
 ];
 
 export function AppShell() {
@@ -38,7 +65,9 @@ export function AppShell() {
   const companyName = company?.name || "fisioemocions";
   const [open, setOpen] = useState(false);
 
-  useEffect(() => { setOpen(false); }, [location.pathname]);
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
 
   const filteredNav = nav.flatMap<NavEntry>((entry) => {
     if ("children" in entry) {
@@ -53,7 +82,11 @@ export function AppShell() {
       <div className="px-6 py-6 border-b border-sidebar-border flex items-center justify-between">
         <div className="flex items-center gap-2.5 min-w-0">
           {company?.logo_url ? (
-            <img src={company.logo_url} alt={companyName} className="h-9 w-9 shrink-0 rounded-md object-cover bg-sidebar-primary/10" />
+            <img
+              src={company.logo_url}
+              alt={companyName}
+              className="h-9 w-9 shrink-0 rounded-md object-cover bg-sidebar-primary/10"
+            />
           ) : (
             <div className="h-9 w-9 shrink-0 rounded-md bg-sidebar-primary/15 flex items-center justify-center">
               <Activity className="h-5 w-5 text-sidebar-primary" strokeWidth={2.2} />
@@ -66,7 +99,10 @@ export function AppShell() {
             </div>
           </div>
         </div>
-        <button onClick={() => setOpen(false)} className="md:hidden text-sidebar-foreground/70 hover:text-sidebar-foreground p-1">
+        <button
+          onClick={() => setOpen(false)}
+          className="md:hidden text-sidebar-foreground/70 hover:text-sidebar-foreground p-1"
+        >
           <X className="h-5 w-5" />
         </button>
       </div>
@@ -77,10 +113,12 @@ export function AppShell() {
             const anyActive = entry.children.some((c) => location.pathname === c.to);
             return (
               <div key={`g-${idx}`} className="pt-2">
-                <div className={cn(
-                  "flex items-center gap-3 px-3 py-1.5 text-[11px] uppercase tracking-[0.16em]",
-                  anyActive ? "text-sidebar-primary" : "text-sidebar-foreground/50",
-                )}>
+                <div
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-1.5 text-[11px] uppercase tracking-[0.16em]",
+                    anyActive ? "text-sidebar-primary" : "text-sidebar-foreground/50",
+                  )}
+                >
                   <Icon className="h-3.5 w-3.5" strokeWidth={2} />
                   {entry.label}
                 </div>
@@ -89,10 +127,16 @@ export function AppShell() {
                     const active = location.pathname === c.to;
                     const CI = c.icon;
                     return (
-                      <Link key={c.to} to={c.to} className={cn(
-                        "flex items-center gap-3 pl-8 pr-3 py-2 rounded-md text-sm transition-colors",
-                        active ? "bg-sidebar-accent text-sidebar-primary font-medium" : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
-                      )}>
+                      <Link
+                        key={c.to}
+                        to={c.to}
+                        className={cn(
+                          "flex items-center gap-3 pl-8 pr-3 py-2 rounded-md text-sm transition-colors",
+                          active
+                            ? "bg-sidebar-accent text-sidebar-primary font-medium"
+                            : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
+                        )}
+                      >
                         <CI className="h-4 w-4" strokeWidth={2} />
                         {c.label}
                       </Link>
@@ -147,7 +191,11 @@ export function AppShell() {
       <main className="flex-1 min-w-0 overflow-x-hidden">
         {/* Mobile top bar */}
         <div className="md:hidden sticky top-0 z-30 flex items-center justify-between gap-2 px-4 py-3 bg-background/95 backdrop-blur border-b border-border">
-          <button onClick={() => setOpen(true)} className="p-2 -ml-2 text-foreground" aria-label="Menú">
+          <button
+            onClick={() => setOpen(true)}
+            className="p-2 -ml-2 text-foreground"
+            aria-label="Menú"
+          >
             <Menu className="h-5 w-5" />
           </button>
           <div className="font-display text-base truncate">{companyName}</div>

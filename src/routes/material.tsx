@@ -64,27 +64,55 @@ function MaterialsPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 max-w-[1400px] mx-auto">
-      <PageHeader title="Material consumible" subtitle="Compras de material y consumibles para el centro." />
+      <PageHeader
+        title="Material consumible"
+        subtitle="Compras de material y consumibles para el centro."
+      />
 
       <Card className="mb-8 shadow-[var(--shadow-card)]">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             <Field className="md:col-span-2" label="Data">
-              <Input type="date" value={form.purchase_date} onChange={(e) => setForm({ ...form, purchase_date: e.target.value })} />
+              <Input
+                type="date"
+                value={form.purchase_date}
+                onChange={(e) => setForm({ ...form, purchase_date: e.target.value })}
+              />
             </Field>
             <Field className="md:col-span-4" label="Descripción *">
-              <Input placeholder="Ex: Crema massatge 500ml" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+              <Input
+                placeholder="Ex: Crema massatge 500ml"
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+              />
             </Field>
             <Field className="md:col-span-1" label="Qtat">
-              <Input type="number" step="0.01" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} />
+              <Input
+                type="number"
+                step="0.01"
+                value={form.quantity}
+                onChange={(e) => setForm({ ...form, quantity: e.target.value })}
+              />
             </Field>
             <Field className="md:col-span-2" label="Coste unit. (€) *">
-              <Input type="number" step="0.01" value={form.unit_cost} onChange={(e) => setForm({ ...form, unit_cost: e.target.value })} />
+              <Input
+                type="number"
+                step="0.01"
+                value={form.unit_cost}
+                onChange={(e) => setForm({ ...form, unit_cost: e.target.value })}
+              />
             </Field>
             <Field className="md:col-span-2" label="Proveedor">
-              <Input value={form.supplier} onChange={(e) => setForm({ ...form, supplier: e.target.value })} />
+              <Input
+                value={form.supplier}
+                onChange={(e) => setForm({ ...form, supplier: e.target.value })}
+              />
             </Field>
-            <Button onClick={() => add.mutate()} disabled={add.isPending} className="md:col-span-1 h-10">
+            <Button
+              onClick={() => add.mutate()}
+              disabled={add.isPending}
+              className="md:col-span-1 h-10"
+            >
               <Plus className="h-4 w-4 mr-1" /> Añadir
             </Button>
           </div>
@@ -95,7 +123,9 @@ function MaterialsPage() {
         <CardContent className="p-0">
           <div className="px-6 py-4 border-b border-border">
             <h2 className="font-display text-lg">Compras</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">{materials.length} entradas · {eur(total)} en material</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {materials.length} entradas · {eur(total)} en material
+            </p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -112,7 +142,11 @@ function MaterialsPage() {
               </thead>
               <tbody>
                 {materials.length === 0 && (
-                  <tr><td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">Sin entradas de material.</td></tr>
+                  <tr>
+                    <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
+                      Sin entradas de material.
+                    </td>
+                  </tr>
                 )}
                 {materials.map((m) => (
                   <tr key={m.id} className="border-t border-border hover:bg-muted/30">
@@ -120,10 +154,17 @@ function MaterialsPage() {
                     <td className="px-6 py-3 font-medium">{m.description}</td>
                     <td className="px-6 py-3 text-muted-foreground">{m.supplier ?? ""}</td>
                     <td className="px-6 py-3 text-right tabular-nums">{Number(m.quantity)}</td>
-                    <td className="px-6 py-3 text-right tabular-nums">{eur(Number(m.unit_cost))}</td>
-                    <td className="px-6 py-3 text-right tabular-nums font-medium">{eur(Number(m.quantity) * Number(m.unit_cost))}</td>
+                    <td className="px-6 py-3 text-right tabular-nums">
+                      {eur(Number(m.unit_cost))}
+                    </td>
+                    <td className="px-6 py-3 text-right tabular-nums font-medium">
+                      {eur(Number(m.quantity) * Number(m.unit_cost))}
+                    </td>
                     <td className="px-6 py-3 text-right">
-                      <button onClick={() => del.mutate(m.id)} className="text-muted-foreground hover:text-destructive">
+                      <button
+                        onClick={() => del.mutate(m.id)}
+                        className="text-muted-foreground hover:text-destructive"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </td>
@@ -138,10 +179,20 @@ function MaterialsPage() {
   );
 }
 
-function Field({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
+function Field({
+  label,
+  children,
+  className,
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div className={className}>
-      <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">{label}</Label>
+      <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
+        {label}
+      </Label>
       {children}
     </div>
   );

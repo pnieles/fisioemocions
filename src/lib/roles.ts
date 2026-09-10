@@ -65,7 +65,9 @@ const DEFAULT_ROLES: Role[] = [
 ];
 
 const listeners = new Set<() => void>();
-function emit() { listeners.forEach((l) => l()); }
+function emit() {
+  listeners.forEach((l) => l());
+}
 
 let cachedRoles: Role[] | null = null;
 let cachedActive: string | null = null;
@@ -74,7 +76,10 @@ function computeRoles(): Role[] {
   if (typeof window === "undefined") return DEFAULT_ROLES;
   try {
     const raw = localStorage.getItem(STORAGE_ROLES);
-    if (!raw) { cachedRoles = DEFAULT_ROLES; return cachedRoles; }
+    if (!raw) {
+      cachedRoles = DEFAULT_ROLES;
+      return cachedRoles;
+    }
     const parsed = JSON.parse(raw) as Role[];
     cachedRoles = parsed.map((r) => ({
       ...r,
@@ -95,7 +100,10 @@ function writeRoles(r: Role[]) {
   emit();
 }
 function computeActive(): string {
-  if (typeof window === "undefined") { cachedActive = "admin"; return cachedActive; }
+  if (typeof window === "undefined") {
+    cachedActive = "admin";
+    return cachedActive;
+  }
   cachedActive = localStorage.getItem(STORAGE_ACTIVE) || "admin";
   return cachedActive;
 }
@@ -110,11 +118,17 @@ function writeActive(id: string) {
 
 function subscribe(l: () => void) {
   listeners.add(l);
-  const onStorage = () => { cachedRoles = null; cachedActive = null; l(); };
+  const onStorage = () => {
+    cachedRoles = null;
+    cachedActive = null;
+    l();
+  };
   window.addEventListener("storage", onStorage);
-  return () => { listeners.delete(l); window.removeEventListener("storage", onStorage); };
+  return () => {
+    listeners.delete(l);
+    window.removeEventListener("storage", onStorage);
+  };
 }
-
 
 export function useRoles() {
   const roles = useSyncExternalStore(subscribe, readRoles, () => DEFAULT_ROLES);
