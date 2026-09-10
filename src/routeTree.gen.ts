@@ -17,6 +17,7 @@ import { Route as FacturasRouteImport } from './routes/facturas'
 import { Route as GastosRouteImport } from './routes/gastos'
 import { Route as InformesRouteImport } from './routes/informes'
 import { Route as InventarioRouteImport } from './routes/inventario'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as MaterialRouteImport } from './routes/material'
 import { Route as PacientesRouteImport } from './routes/pacientes'
 import { Route as PerfilesRouteImport } from './routes/perfiles'
@@ -64,6 +65,11 @@ const InventarioRoute = InventarioRouteImport.update({
   path: '/inventario',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MaterialRoute = MaterialRouteImport.update({
   id: '/material',
   path: '/material',
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/gastos': typeof GastosRoute
   '/informes': typeof InformesRoute
   '/inventario': typeof InventarioRoute
+  '/login': typeof LoginRoute
   '/material': typeof MaterialRoute
   '/pacientes': typeof PacientesRoute
   '/perfiles': typeof PerfilesRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/gastos': typeof GastosRoute
   '/informes': typeof InformesRoute
   '/inventario': typeof InventarioRoute
+  '/login': typeof LoginRoute
   '/material': typeof MaterialRoute
   '/pacientes': typeof PacientesRoute
   '/perfiles': typeof PerfilesRoute
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/gastos': typeof GastosRoute
   '/informes': typeof InformesRoute
   '/inventario': typeof InventarioRoute
+  '/login': typeof LoginRoute
   '/material': typeof MaterialRoute
   '/pacientes': typeof PacientesRoute
   '/perfiles': typeof PerfilesRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/gastos'
     | '/informes'
     | '/inventario'
+    | '/login'
     | '/material'
     | '/pacientes'
     | '/perfiles'
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/gastos'
     | '/informes'
     | '/inventario'
+    | '/login'
     | '/material'
     | '/pacientes'
     | '/perfiles'
@@ -187,6 +198,7 @@ export interface FileRouteTypes {
     | '/gastos'
     | '/informes'
     | '/inventario'
+    | '/login'
     | '/material'
     | '/pacientes'
     | '/perfiles'
@@ -204,6 +216,7 @@ export interface RootRouteChildren {
   GastosRoute: typeof GastosRoute
   InformesRoute: typeof InformesRoute
   InventarioRoute: typeof InventarioRoute
+  LoginRoute: typeof LoginRoute
   MaterialRoute: typeof MaterialRoute
   PacientesRoute: typeof PacientesRoute
   PerfilesRoute: typeof PerfilesRoute
@@ -270,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InventarioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/material': {
       id: '/material'
       path: '/material'
@@ -324,6 +344,7 @@ const rootRouteChildren: RootRouteChildren = {
   GastosRoute: GastosRoute,
   InformesRoute: InformesRoute,
   InventarioRoute: InventarioRoute,
+  LoginRoute: LoginRoute,
   MaterialRoute: MaterialRoute,
   PacientesRoute: PacientesRoute,
   PerfilesRoute: PerfilesRoute,

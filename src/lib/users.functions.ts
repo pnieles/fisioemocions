@@ -1,21 +1,25 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireAdminAuth } from "@/integrations/supabase/auth-middleware";
 
 const emailSchema = z.string().trim().email().max(255);
 const passwordSchema = z.string().min(6).max(128);
 const roleSchema = z.string().trim().min(1).max(64);
 
-export const listAppUsers = createServerFn({ method: "GET" }).handler(async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: rows, error } = await supabaseAdmin
-    .from("app_users")
-    .select("user_id,email,role_id,created_at")
-    .order("created_at", { ascending: false });
-  if (error) throw new Error(error.message);
-  return rows ?? [];
-});
+export const listAppUsers = createServerFn({ method: "GET" })
+  .middleware([requireAdminAuth])
+  .handler(async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("app_users")
+      .select("user_id,email,role_id,created_at")
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
 
 export const createAppUser = createServerFn({ method: "POST" })
+  .middleware([requireAdminAuth])
   .inputValidator((data) =>
     z.object({ email: emailSchema, password: passwordSchema, role_id: roleSchema }).parse(data),
   )
@@ -40,6 +44,7 @@ export const createAppUser = createServerFn({ method: "POST" })
   });
 
 export const updateAppUserRole = createServerFn({ method: "POST" })
+  .middleware([requireAdminAuth])
   .inputValidator((data) =>
     z.object({ user_id: z.string().uuid(), role_id: roleSchema }).parse(data),
   )
@@ -54,6 +59,7 @@ export const updateAppUserRole = createServerFn({ method: "POST" })
   });
 
 export const updateAppUserPassword = createServerFn({ method: "POST" })
+  .middleware([requireAdminAuth])
   .inputValidator((data) =>
     z.object({ user_id: z.string().uuid(), password: passwordSchema }).parse(data),
   )
@@ -67,6 +73,7 @@ export const updateAppUserPassword = createServerFn({ method: "POST" })
   });
 
 export const deleteAppUser = createServerFn({ method: "POST" })
+  .middleware([requireAdminAuth])
   .inputValidator((data) => z.object({ user_id: z.string().uuid() }).parse(data))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

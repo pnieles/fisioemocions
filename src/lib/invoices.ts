@@ -170,6 +170,18 @@ export function exportInvoicePdf(inv: Invoice, company: CompanySettings, patient
   doc.save(fname);
 }
 
+// A "mixto" patient is CASS for some sessions and private for others; unlike
+// a pure CASS patient, a session isn't automatically invoiced just because
+// of the patient's type — it follows wants_invoice like a private patient,
+// and the invoice record itself is filed as "privado".
+export function invoicePatientType(patientType: string | null): "cass" | "privado" {
+  return patientType === "cass" ? "cass" : "privado";
+}
+
+export function shouldAutoInvoice(patientType: string | null, wantsInvoice: boolean): boolean {
+  return patientType === "cass" || wantsInvoice;
+}
+
 export function computeIgiSplit(gross: number, ratePct: number) {
   const r = Number(ratePct) || 0;
   const base = r > 0 ? gross / (1 + r / 100) : gross;

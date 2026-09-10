@@ -3,6 +3,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { useRoles, MENU_KEYS, permissionLabel, type Permission, type Role } from "@/lib/roles";
 import {
   Select,
   SelectContent,
@@ -10,12 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2 } from "lucide-react";
-import { toast } from "sonner";
-import { useRoles, MENU_KEYS, permissionLabel, type Permission, type Role } from "@/lib/roles";
 
 export function RolesCard() {
-  const { roles, activeId, setActive, setRoles } = useRoles();
+  const { roles, active, myEmail, setRoles } = useRoles();
   const [newName, setNewName] = useState("");
 
   const updateRole = (id: string, patch: Partial<Role>) => {
@@ -40,7 +40,6 @@ export function RolesCard() {
       return;
     }
     setRoles(roles.filter((r) => r.id !== id));
-    if (activeId === id) setActive("admin");
   };
 
   return (
@@ -49,43 +48,26 @@ export function RolesCard() {
         <div>
           <h2 className="font-display text-lg">Roles y permisos</h2>
           <p className="text-xs text-muted-foreground mt-1">
-            Define qué opciones de la aplicación puede ver o editar cada rol.
+            Define qué opciones de la aplicación puede ver o editar cada rol. Tu rol se asigna a tu
+            cuenta desde el listado de usuarios de arriba
+            {myEmail ? ` (ahora mismo: ${myEmail} → ${active.name})` : ""}.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+        <div className="flex items-end gap-2 max-w-sm">
+          <div className="flex-1">
             <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
-              Rol activo
+              Nuevo rol
             </Label>
-            <Select value={activeId} onValueChange={setActive}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {roles.map((r) => (
-                  <SelectItem key={r.id} value={r.id}>
-                    {r.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              placeholder="Ex: Recepción"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+            />
           </div>
-          <div className="flex items-end gap-2">
-            <div className="flex-1">
-              <Label className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 block">
-                Nuevo rol
-              </Label>
-              <Input
-                placeholder="Ex: Recepción"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-              />
-            </div>
-            <Button type="button" variant="secondary" onClick={addRole}>
-              <Plus className="h-4 w-4 mr-1" />
-              Crear
-            </Button>
-          </div>
+          <Button type="button" variant="secondary" onClick={addRole}>
+            <Plus className="h-4 w-4 mr-1" />
+            Crear
+          </Button>
         </div>
 
         <div className="space-y-6">

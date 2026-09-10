@@ -17,11 +17,13 @@ import {
   Users as UsersIcon,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useCompanySettings } from "@/lib/data-hooks";
 import { useRoles, type MenuKey } from "@/lib/roles";
+import { supabase } from "@/integrations/supabase/client";
 
 type NavItem = {
   to: string;
@@ -61,7 +63,7 @@ const nav: NavEntry[] = [
 export function AppShell() {
   const { location } = useRouterState();
   const { data: company } = useCompanySettings();
-  const { can, active } = useRoles();
+  const { can, active, myEmail } = useRoles();
   const companyName = company?.name || "fisioemocions";
   const [open, setOpen] = useState(false);
 
@@ -165,8 +167,20 @@ export function AppShell() {
           );
         })}
       </nav>
-      <div className="px-6 py-4 text-[11px] text-sidebar-foreground/45 border-t border-sidebar-border">
-        v1.0 · Gestión interna
+      <div className="px-6 py-4 border-t border-sidebar-border">
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <div className="text-xs text-sidebar-foreground/80 truncate">{myEmail}</div>
+            <div className="text-[11px] text-sidebar-foreground/45">v1.0 · Gestión interna</div>
+          </div>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="p-1.5 rounded-md text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 shrink-0"
+            title="Cerrar sesión"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
       </div>
     </>
   );

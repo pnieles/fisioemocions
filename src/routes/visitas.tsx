@@ -9,7 +9,7 @@ import {
   useAppointments,
   useIgiRates,
 } from "@/lib/data-hooks";
-import { createInvoiceFromVisit } from "@/lib/invoices";
+import { createInvoiceFromVisit, invoicePatientType, shouldAutoInvoice } from "@/lib/invoices";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -81,15 +81,14 @@ function VisitsPage() {
       // Auto-create invoice if applicable
       const p = patients.find((x) => x.id === form.patient_id) ?? null;
       if (p) {
-        const ptype = (p.patient_type as "cass" | "privado" | null) ?? null;
         const igi = igiRates.find((r) => r.id === p.igi_rate_id);
-        if (ptype && (ptype === "cass" || p.wants_invoice)) {
+        if (p.patient_type && shouldAutoInvoice(p.patient_type, !!p.wants_invoice)) {
           try {
             await createInvoiceFromVisit({
               visit_id: visit?.id ?? null,
               patient: p,
               patient_name: `${p.first_name} ${p.last_name}`,
-              patient_type: ptype,
+              patient_type: invoicePatientType(p.patient_type),
               wants_invoice: !!p.wants_invoice,
               service_description: form.notes || "Sesión de fisioterapia",
               gross_amount: Number(form.amount),
@@ -190,15 +189,14 @@ function VisitsPage() {
       toast.error(error.message);
       return;
     }
-    const ptype = (p.patient_type as "cass" | "privado" | null) ?? null;
     const igi = igiRates.find((r) => r.id === p.igi_rate_id);
-    if (ptype && (ptype === "cass" || p.wants_invoice)) {
+    if (p.patient_type && shouldAutoInvoice(p.patient_type, !!p.wants_invoice)) {
       try {
         await createInvoiceFromVisit({
           visit_id: visit?.id ?? null,
           patient: p,
           patient_name: `${p.first_name} ${p.last_name}`,
-          patient_type: ptype,
+          patient_type: invoicePatientType(p.patient_type),
           wants_invoice: !!p.wants_invoice,
           service_description: a.treatment || "Sesión de fisioterapia",
           gross_amount: Number(prof.default_rate),

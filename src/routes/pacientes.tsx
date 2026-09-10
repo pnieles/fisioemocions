@@ -197,6 +197,7 @@ function PatientsPage() {
                   <SelectItem value="__none">— Sin definir —</SelectItem>
                   <SelectItem value="cass">CASS</SelectItem>
                   <SelectItem value="privado">Privado</SelectItem>
+                  <SelectItem value="mixto">Mixto</SelectItem>
                 </SelectContent>
               </Select>
             </Field>
@@ -238,7 +239,7 @@ function PatientsPage() {
                 </SelectContent>
               </Select>
             </Field>
-            {form.patient_type === "cass" && (
+            {(form.patient_type === "cass" || form.patient_type === "mixto") && (
               <Field className="md:col-span-2" label="Cobertura CASS (%)">
                 <Input
                   type="number"

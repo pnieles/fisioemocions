@@ -71,3 +71,22 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
     });
   },
 );
+
+// Same as requireSupabaseAuth, but also requires the caller's app_users row
+// to have role_id = 'admin'. Use this on server functions that manage other
+// users' accounts, roles or anything else that must never be reachable by
+// non-admin staff regardless of what the UI shows.
+export const requireAdminAuth = createMiddleware({ type: "function" })
+  .middleware([requireSupabaseAuth])
+  .server(async ({ next, context }) => {
+    const { data, error } = await context.supabase
+      .from("app_users")
+      .select("role_id")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!data || data.role_id !== "admin") {
+      throw new Error("Forbidden: se requiere rol de administrador");
+    }
+    return next();
+  });

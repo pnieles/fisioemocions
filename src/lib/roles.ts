@@ -1,4 +1,6 @@
-import { useSyncExternalStore } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/lib/session";
 
 export type Permission = "hidden" | "view" | "edit";
 
@@ -26,14 +28,13 @@ export const MENU_KEYS = [
 
 export type MenuKey = (typeof MENU_KEYS)[number]["key"];
 
-const STORAGE_ROLES = "fe.roles.v1";
-const STORAGE_ACTIVE = "fe.activeRole.v1";
-
 function allPerms(p: Permission): Record<string, Permission> {
   return Object.fromEntries(MENU_KEYS.map((m) => [m.key, p]));
 }
 
-const DEFAULT_ROLES: Role[] = [
+// Fallback used only before the "roles" row in app_settings has loaded (or
+// for a brand-new project where the seed migration hasn't run yet).
+export const DEFAULT_ROLES: Role[] = [
   { id: "admin", name: "Admin", permissions: allPerms("edit") },
   {
     id: "secretaria",
@@ -44,9 +45,14 @@ const DEFAULT_ROLES: Role[] = [
       recordatorios: "edit",
       pacientes: "edit",
       visitas: "edit",
+      facturas: "edit",
       configuracion: "hidden",
       gastos: "hidden",
       inicio: "hidden",
+      material: "hidden",
+      inventario: "hidden",
+      consumo: "hidden",
+      usuarios: "hidden",
     },
   },
   {
@@ -60,86 +66,79 @@ const DEFAULT_ROLES: Role[] = [
       informes: "view",
       gastos: "hidden",
       configuracion: "hidden",
+      material: "hidden",
+      inventario: "hidden",
+      consumo: "hidden",
+      usuarios: "hidden",
     },
   },
 ];
 
-const listeners = new Set<() => void>();
-function emit() {
-  listeners.forEach((l) => l());
+// Role/permission definitions live in app_settings so every device and user
+// sees the same menu — a localStorage-only version meant each browser could
+// define its own roles independently, which made the setting meaningless.
+export function useRoleDefinitions() {
+  return useQuery({
+    queryKey: ["settings", "roles"],
+    queryFn: async (): Promise<Role[]> => {
+      const { data, error } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "roles")
+        .maybeSingle();
+      if (error) throw error;
+      const parsed = data?.value as Role[] | undefined;
+      if (!parsed || parsed.length === 0) return DEFAULT_ROLES;
+      return parsed.map((r) => ({ ...r, permissions: { ...allPerms("edit"), ...r.permissions } }));
+    },
+  });
 }
 
-let cachedRoles: Role[] | null = null;
-let cachedActive: string | null = null;
-
-function computeRoles(): Role[] {
-  if (typeof window === "undefined") return DEFAULT_ROLES;
-  try {
-    const raw = localStorage.getItem(STORAGE_ROLES);
-    if (!raw) {
-      cachedRoles = DEFAULT_ROLES;
-      return cachedRoles;
-    }
-    const parsed = JSON.parse(raw) as Role[];
-    cachedRoles = parsed.map((r) => ({
-      ...r,
-      permissions: { ...allPerms("edit"), ...r.permissions },
-    }));
-    return cachedRoles;
-  } catch {
-    cachedRoles = DEFAULT_ROLES;
-    return cachedRoles;
-  }
-}
-function readRoles(): Role[] {
-  return cachedRoles ?? computeRoles();
-}
-function writeRoles(r: Role[]) {
-  cachedRoles = r;
-  localStorage.setItem(STORAGE_ROLES, JSON.stringify(r));
-  emit();
-}
-function computeActive(): string {
-  if (typeof window === "undefined") {
-    cachedActive = "admin";
-    return cachedActive;
-  }
-  cachedActive = localStorage.getItem(STORAGE_ACTIVE) || "admin";
-  return cachedActive;
-}
-function readActive(): string {
-  return cachedActive ?? computeActive();
-}
-function writeActive(id: string) {
-  cachedActive = id;
-  localStorage.setItem(STORAGE_ACTIVE, id);
-  emit();
-}
-
-function subscribe(l: () => void) {
-  listeners.add(l);
-  const onStorage = () => {
-    cachedRoles = null;
-    cachedActive = null;
-    l();
-  };
-  window.addEventListener("storage", onStorage);
-  return () => {
-    listeners.delete(l);
-    window.removeEventListener("storage", onStorage);
-  };
+// The active role is no longer a manual local switch: it is whatever
+// role_id is assigned to the signed-in account in app_users, so access
+// actually follows who is logged in rather than a per-browser toggle.
+export function useMyAppUser() {
+  const { session } = useSession();
+  const userId = session?.user.id;
+  return useQuery({
+    queryKey: ["my_app_user", userId],
+    enabled: !!userId,
+    queryFn: async (): Promise<{ role_id: string; email: string } | null> => {
+      const { data, error } = await supabase
+        .from("app_users")
+        .select("role_id,email")
+        .eq("user_id", userId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
 }
 
 export function useRoles() {
-  const roles = useSyncExternalStore(subscribe, readRoles, () => DEFAULT_ROLES);
-  const activeId = useSyncExternalStore(subscribe, readActive, () => "admin");
+  const { data: roles = DEFAULT_ROLES } = useRoleDefinitions();
+  const { data: me } = useMyAppUser();
+  const qc = useQueryClient();
+
+  const activeId = me?.role_id ?? "admin";
   const active = roles.find((r) => r.id === activeId) ?? roles[0] ?? DEFAULT_ROLES[0];
+
+  const saveRoles = useMutation({
+    mutationFn: async (next: Role[]) => {
+      const { error } = await supabase
+        .from("app_settings")
+        .upsert({ key: "roles", value: next, updated_at: new Date().toISOString() });
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["settings", "roles"] }),
+  });
+
   return {
     roles,
     activeId,
     active,
-    setActive: writeActive,
-    setRoles: writeRoles,
+    myEmail: me?.email ?? null,
+    setRoles: (next: Role[]) => saveRoles.mutate(next),
     can: (key: MenuKey): Permission => active?.permissions[key] ?? "edit",
   };
 }
