@@ -108,7 +108,10 @@ export const sendAppointmentConfirmation = createServerFn({ method: "POST" })
       patient = (p as unknown as PatientLite | null) ?? null;
     }
 
-    const { data: emailRow } = await supabase
+    // The email_account row (SMTP password) is hidden from non-admin staff by RLS;
+    // read it server-side with the admin client after the caller is authenticated.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: emailRow } = await supabaseAdmin
       .from("app_settings")
       .select("value")
       .eq("key", "email_account")
@@ -207,7 +210,9 @@ export const sendAppointmentConfirmation = createServerFn({ method: "POST" })
     const transporter = nodemailer.createTransport({
       host: account.smtp_host,
       port: Number(account.smtp_port) || 465,
-      secure: account.smtp_secure !== false,
+      // Port 465 = implicit TLS; 587/25 use STARTTLS (secure must be false there).
+      secure: (Number(account.smtp_port) || 465) === 465,
+      requireTLS: (Number(account.smtp_port) || 465) !== 465,
       auth: { user: account.email, pass: account.password },
     });
 
